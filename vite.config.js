@@ -10,17 +10,6 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
   plugins: [react()],
 
-  server: {
-    port: 5173,
-    proxy: {
-      "/api": {
-        target: "http://localhost:4003",
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
-
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

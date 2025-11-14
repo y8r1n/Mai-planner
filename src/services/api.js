@@ -1,7 +1,8 @@
 // src/services/api.js
 import axios from "axios";
 
-const BASE_URL = "/api"; // ✅ 
+// 백엔드 Render URL
+const BASE_URL = "https://mai-planner-backend.onrender.com/api";
 
 // 📅 일정 추천 (WithAI)
 export const withAI = axios.create({
@@ -23,8 +24,7 @@ export const quizAI = axios.create({
   baseURL: `${BASE_URL}`,
 });
 
-//이미지 생성 (DRAW)
+// 🎨 이미지 생성 (DRAW)
 export const drawAI = axios.create({
-  baseURL:`${BASE_URL}`
-})
-
+  baseURL: `${BASE_URL}`,
+});
