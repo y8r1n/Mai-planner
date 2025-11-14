@@ -1,6 +1,7 @@
-// Firebase Client SDK
+// ===== Firebase Client SDK (for Frontend) =====
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -11,7 +12,11 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+// Firebase 초기화
 const app = initializeApp(firebaseConfig);
 
-// 여기!!!!
+// Firestore / Storage export
 export const db = getFirestore(app);
+export const storage = getStorage(app);
+
+export default app;
