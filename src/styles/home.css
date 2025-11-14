@@ -1,0 +1,345 @@
+/* ===========================
+ 📍 Home 탭 스타일 (핑크 베이지 톤)
+=========================== */
+
+/* 전체 컨테이너 */
+#home-container {
+  background-color: #fffdfd;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 90px 16px 40px;
+}
+
+/* 섹션 공통 */
+#home-container section {
+  width: 100%;
+  max-width: 460px;
+  margin-bottom: 40px;
+}
+
+/* 섹션 제목 */
+#home-container h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+/* 구분선 */
+.divider {
+  border: none;
+  height: 1px;
+  background-color: #f3baba;
+  opacity: 0.6;
+  margin: 12px 0;
+}
+
+/* 카드 기본형 */
+.home-card {
+  background-color: #fff;
+  border: 1.5px solid #f3baba;
+  border-radius: 16px;
+  box-shadow: 0 2px 5px rgba(240, 146, 146, 0.08);
+  padding: 16px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.home-card:hover {
+  background-color: #fff8f8;
+  transform: translateY(-2px);
+}
+
+/* 카드 내 텍스트 */
+.home-card p,
+.home-card span {
+  color: #444;
+  font-size: 0.9rem;
+}
+
+/* 🩷 ToDo 섹션 */
+#todo-section .todo-empty {
+  text-align: center;
+  color: #aaa;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f5d3d3;
+}
+
+.todo-item:last-child {
+  border-bottom: none;
+}
+
+.todo-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #f09292;
+}
+
+/* ToDo 버튼 */
+.todo-btn {
+  background: #ffe6e6;
+  color: #f09292;
+  border: none;
+  border-radius: 24px;
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.todo-btn:hover {
+  background: #ffdcdc;
+}
+
+/* ==============================
+   🕐 시간표 미리보기
+============================== */
+#timetable-section {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto 40px;
+}
+
+#timetable-section h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+/* 시간표 전체 박스 */
+.timetable-box {
+  background: #fffdfd;
+  border: 1.5px solid #f3caca;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(240, 146, 146, 0.15);
+  transition: 0.25s ease;
+  cursor: pointer;
+}
+
+.timetable-box:hover {
+  background: #fff8f8;
+  transform: scale(1.01);
+}
+
+/* 요일별 grid */
+.timetable-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+/* 각 요일 칸 */
+.timetable-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-height: 70px;
+  border-radius: 14px;
+  background: #fffafa;
+  border: 1px solid #ffe1e1;
+  padding: 6px;
+  transition: all 0.2s ease;
+}
+
+.timetable-cell:hover {
+  background: #fff7f7;
+  border-color: #f3baba;
+}
+
+/* 과목 이름 pill */
+.timetable-item {
+  display: inline-block;
+  color: #fff;
+  background: #f8b6b6;
+  border-radius: 20px;  /* ✅ 완전 둥글게 */
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  box-shadow: 0 2px 3px rgba(240, 146, 146, 0.15);
+  transition: all 0.2s ease;
+}
+
+.timetable-item:hover {
+  transform: scale(1.05);
+  background: #f49d9d;
+}
+
+/* 빈 칸 */
+.timetable-empty {
+  color: #ccc;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* 등록된 시간표 없을 때 */
+.timetable-empty-box {
+  text-align: center;
+  background: #fffdfd;
+  border: 1.5px dashed #f3caca;
+  border-radius: 16px;
+  padding: 30px 10px;
+  color: #999;
+}
+
+.timetable-btn {
+  background: #ffe6e6;
+  color: #f36c6c;
+  border: none;
+  border-radius: 25px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timetable-btn:hover {
+  background: #ffd4d4;
+}
+
+
+/* ==============================
+   📅 캘린더 미리보기
+============================== */
+#calendar-preview {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.calendar-header {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+/* 캘린더 전체 박스 */
+.calendar-box {
+  background: #fffdfd;
+  border: 1.5px solid #f3caca;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 2px 6px rgba(240, 146, 146, 0.15);
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.calendar-box:hover {
+  background: #fff8f8;
+  transform: scale(1.01);
+}
+
+/* 요일 헤더 행 */
+.calendar-header-row {
+  margin-bottom: 6px;
+}
+
+/* 공통 캘린더 그리드 */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+/* 요일 칸 */
+.calendar-day-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #777;
+  padding: 4px 0;
+  border-radius: 10px;
+  background: #fff5f5;
+}
+
+.calendar-day-header.sunday {
+  color: #f09292;
+  background: #ffeaea;
+}
+.calendar-day-header.saturday {
+  color: #8fb6ff;
+  background: #edf4ff;
+}
+
+/* 날짜 칸 */
+.calendar-day-cell {
+  min-height: 54px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #ffe1e1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 6px 4px;
+  font-size: 0.75rem;
+  color: #555;
+  transition: all 0.2s ease;
+}
+
+.calendar-day-cell:hover {
+  background: #fff7f7;
+  border-color: #f3baba;
+  transform: translateY(-2px);
+}
+
+.calendar-day-cell.sunday {
+  color: #f09292;
+}
+.calendar-day-cell.saturday {
+  color: #4c74d1;
+}
+
+/* 날짜 숫자 */
+.calendar-date {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+/* 일정 아이템 */
+.calendar-event {
+  background: #ffe6e6;
+  color: #f36c6c;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  margin-top: 2px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 90%;
+}
+
+/* +N 더보기 */
+.calendar-more {
+  font-size: 0.65rem;
+  color: #aaa;
+  margin-top: 1px;
+}
+
+/* 하단 전체보기 */
+.calendar-footer {
+  color: #f09292;
+  font-size: 0.8rem;
+  margin-top: 8px;
+  font-weight: 500;
+}

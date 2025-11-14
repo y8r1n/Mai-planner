@@ -1,0 +1,191 @@
+/* ==============================
+   🌷 ToDo Tab (핑크-베이지 톤)
+============================== */
+#todo-page {
+  min-height: 100vh;
+  background: #fffaf9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 90px 20px 40px;
+}
+
+/* 헤더 */
+.todo-header {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.todo-header h2 {
+  color: #444;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.todo-add-btn {
+  background: #ffe6e6;
+  color: #f36c6c;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.todo-add-btn:hover {
+  background: #ffd4d4;
+  transform: scale(1.1);
+}
+
+/* 필터 버튼 */
+.todo-filter {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.filter-btn {
+  border: 1.5px solid #ffcfcf;
+  border-radius: 20px;
+  background: #fff;
+  color: #F7C6C6;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  transition: all 0.2s ease;
+}
+
+.filter-btn.active {
+  background: #F7C6C6;
+  color: #fff;
+  font-weight: 500;
+}
+
+.filter-btn:hover {
+  background: #ffe8e8;
+}
+
+/* 입력창 */
+.todo-input-box {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #f8b6b6;
+  border-radius: 12px;
+  background: #fff;
+  padding: 8px 10px;
+  margin-bottom: 16px;
+}
+
+.todo-input-box input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  color: #555;
+  outline: none;
+}
+
+.todo-input-box .circle {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #f49d9d;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+/* 리스트 */
+.todo-list {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todo-item-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.delete-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: #ff7a7a;
+  color: white;
+  border: none;
+  padding: 0 18px;
+  font-size: 0.85rem;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.delete-btn.show {
+  transform: translateX(0);
+}
+
+/* 개별 아이템 */
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-bottom: 1.5px solid #f3baba; 
+  border-radius: 0; 
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  color: #555;
+  transition: transform 0.25s ease;
+  position: relative;
+  z-index: 1;
+}
+.todo-item:hover {
+  background: #fff7f7;
+  transform: translateY(-2px);
+}
+
+.todo-item.done {
+  opacity: 0.6;
+  text-decoration: line-through;
+  background: #fdf1f1;
+}
+
+/* 체크 원 */
+.check-circle {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f49d9d;
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.check-circle.checked {
+  background: #f49d9d;
+  border-color: #f36c6c;
+}
+
+/* 제목 */
+.todo-title {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #444;
+  word-break: break-all;
+}
+
+/* 빈 상태 */
+.todo-empty {
+  text-align: center;
+  color: #bbb;
+  font-size: 0.9rem;
+  margin-top: 20px;
+}

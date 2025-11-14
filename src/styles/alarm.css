@@ -1,0 +1,164 @@
+/* =========================================================
+   📱 알림 페이지 전체 레이아웃
+========================================================= */
+.alarm-page {
+  min-height: 100vh;
+  background: #fff;
+  padding: 2rem 1.25rem;
+  box-sizing: border-box;
+}
+
+.alarm-container {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   🔖 제목
+========================================================= */
+.alarm-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+/* =========================================================
+   🟣 필터 버튼 영역
+========================================================= */
+.alarm-filter-wrap {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.alarm-filter-btn {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background: #f3f4f6;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+
+.alarm-filter-btn.active {
+  background: #fda4af;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(253, 164, 175, 0.35);
+}
+
+.alarm-filter-btn:hover:not(.active) {
+  background: #e5e7eb;
+}
+
+/* =========================================================
+   📌 알림 리스트
+========================================================= */
+.alarm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Empty UI */
+.alarm-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+/* =========================================================
+   🔔 알림 카드
+========================================================= */
+.alarm-card {
+  background: #fef1f5;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  cursor: pointer;
+}
+
+.alarm-card:hover {
+  box-shadow: 0 4px 10px rgba(253, 164, 175, 0.35);
+  transform: translateY(-2px);
+}
+
+/* delete button */
+.alarm-delete {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 12px;
+  height: 12px;
+  background: #f87171;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.alarm-delete:hover {
+  background: #dc2626;
+}
+
+/* icon */
+.alarm-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+/* =========================================================
+   📝 알림 내용
+========================================================= */
+.alarm-content {
+  flex: 1;
+}
+
+.alarm-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.72rem;
+  color: #6b7280;
+}
+
+.alarm-tab {
+  font-weight: 600;
+}
+
+.alarm-dot {
+  color: #d1d5db;
+}
+
+.alarm-message {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.35rem;
+}
+
+.alarm-details {
+  margin-top: 0.3rem;
+}
+
+.alarm-details p {
+  font-size: 0.76rem;
+  color: #4b5563;
+  margin: 0.2rem 0;
+}

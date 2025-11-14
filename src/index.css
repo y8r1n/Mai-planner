@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "tailwindcss/theme";
+
+body {
+  font-family: 'Pretendard', sans-serif;
+  background-color: #F5F5F5;
+}
+
+
+
+

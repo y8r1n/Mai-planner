@@ -1,0 +1,103 @@
+/* ============================
+ 📍 Global NavBar (핑크 베이지 테마)
+============================ */
+
+#global-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #fffdfd;
+  box-shadow: 0 1px 6px rgba(240, 146, 146, 0.15);
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 64px;
+  transition: 0.3s ease;
+  
+}
+
+/* 내부 컨테이너 */
+.nav-container {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+}
+
+/* 네비 버튼 그룹 */
+.nav-links {
+  display: flex;
+  margin-left: 260px;
+  gap: 28px;
+  align-items: center;
+}
+
+/* 기본 버튼 */
+.nav-btn {
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #777;
+  cursor: pointer;
+  position: relative;
+  transition: 0.25s ease;
+}
+
+/* hover */
+.nav-btn:hover {
+  color: #f09292;
+}
+
+/* 활성화 상태 */
+.nav-btn.active {
+  color: #f09292;
+}
+
+/* 활성화 밑줄 */
+.nav-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 50%;
+  height: 2px;
+  background-color: #f09292;
+  border-radius: 2px;
+}
+
+/* 오른쪽 아이콘 그룹 */
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 아이콘 버튼 */
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: 0.2s;
+  right: 20px;
+}
+
+.icon-btn:first-child {
+  color: #f0c14a;
+}
+
+.icon-btn:last-child {
+  color: #f09292;
+}
+
+.icon-btn:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}

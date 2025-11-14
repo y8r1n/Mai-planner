@@ -1,0 +1,267 @@
+/* ===========================
+   🌸 Calendar Page
+=========================== */
+#fullcalendar-page {
+  min-height: 100vh;
+  background: #fffaf9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100px 0 40px;
+}
+
+/* 상단 헤더 */
+.fullcalendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  max-width: 420px;
+  margin-bottom: 10px;
+}
+
+.fullcalendar-header h2 {
+  color: #444;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.fullcalendar-header button {
+  color: #f36c6c;
+  font-size: 1.2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.fullcalendar-header button:hover {
+  color: #ff8787;
+}
+
+/* 요일 */
+.fullcalendar-days-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  width: 90%;
+  max-width: 420px;
+  color: #777;
+  font-weight: 500;
+  border-top: 1px solid #fddede;
+  padding: 6px 0;
+}
+.calendar-days-row .sun {
+  color: #f36c6c;
+}
+
+/* 날짜 */
+.fullcalendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  width: 90%;
+  max-width: 420px;
+  border: 1.5px solid #f3caca;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(240, 146, 146, 0.15);
+  overflow: hidden;
+}
+
+.fullcalendar-cell {
+  height: 90px;
+  border: 0.5px solid #fde7e7;
+  padding: 6px;
+  text-align: center;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.fullcalendar-cell.active:hover {
+  background: #fff1f1;
+  cursor: pointer;
+}
+
+.fullcalendar-cell.inactive {
+  background: #fff7f7;
+}
+
+.fullcalendar-cell.sun {
+  color: #f36c6c;
+}
+
+.fullcalendar-day-number {
+  font-size: 0.8rem;
+  color: #555;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+
+.fullcalendar-day-number.today {
+  background: #f36c6c;
+  color: white;
+  font-weight: 600;
+}
+
+.fullcalendar-event-preview {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fullcalendar-event-badge {
+  background: #ffe1e1;
+  color: #f36c6c;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  width: 90%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.fullcalendar-extra-count {
+  color: #aaa;
+  font-size: 10px;
+}
+
+/* 모달 */
+.fullcalendar-modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+.fullcalendar-modal {
+  background: #fff;
+  border: 1.5px solid #f3caca;
+  border-radius: 20px;
+  padding: 20px;
+  width: 320px;
+  box-shadow: 0 4px 12px rgba(240, 146, 146, 0.15);
+  text-align: center;
+}
+
+.fullcalendar-modal h3 {
+  color: #444;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.fullcalendar-event-list {
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+
+.fullcalendar-event-item {
+  background: #ffe9ea;
+  color: #f36c6c;
+  border-radius: 14px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.fullcalendar-event-item.selected {
+  background: #f36c6c;
+  color: #fff;
+}
+
+.fullcalendar-empty {
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+.fullcalendar-add-btn {
+  background: #ffe6e6;
+  color: #f36c6c;
+  border-radius: 25px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+.fullcalendar-add-btn:hover {
+  background: #ffd4d4;
+}
+
+.fullcalendar-modal-btns {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.fullcalendar-modal-btns button {
+  background: #ffe6e6;
+  color: #f36c6c;
+  border: none;
+  border-radius: 25px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.fullcalendar-modal-btns .delete {
+  background: #fddede;
+  color: #cc5a5a;
+}
+.fullcalendar-modal-btns button:hover {
+  background: #ffd4d4;
+}
+
+.fullcalendar-add-form input {
+  width: 100%;
+  background: #fff7f7;
+  border: 1.5px solid #f3caca;
+  border-radius: 999px;
+  padding: 8px 10px;
+  color: #f36c6c;
+  text-align: center;
+  font-size: 0.85rem;
+  outline: none;
+}
+/* 일요일 컬러 강조 */
+.fullcalendar-cell.sun .fullcalendar-day-number {
+  color: #f36c6c; /* 따뜻한 핑크레드 */
+  font-weight: 600;
+}
+
+/* 혹은 요일 헤더(일요일)도 강조 */
+.fullcalendar-days-row .sun {
+  color: #f36c6c;
+  font-weight: 600;
+}
+/* ✅ 요일 헤더 색상 구분 */
+.fullcalendar-days-row .sun {
+  color: #f36c6c;
+  font-weight: 600;
+}
+
+.fullcalendar-days-row .sat {
+  color: #5A88FF;
+  font-weight: 600;
+}
+
+/* ✅ 달력 셀 내 날짜 색상 구분 */
+.fullcalendar-cell.sun .fullcalendar-day-number {
+  color: #f36c6c;
+  font-weight: 600;
+}
+
+.fullcalendar-cell.sat .fullcalendar-day-number {
+  color: #5A88FF;
+  font-weight: 600;
+}

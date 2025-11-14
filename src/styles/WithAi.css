@@ -1,0 +1,288 @@
+/* ========== 🌸 기본 레이아웃 ========== */
+.withai-page {
+  background-color: #fafafa;
+  min-height: 100vh;
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ====== WITHAI 상단바 ====== */
+.withai-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 420px;
+  background: #fffdfd;
+  border: 2px solid #f5cdd5;
+  border-radius: 20px;
+  padding: 0.7rem 1rem;
+  box-shadow: 0 2px 8px rgba(255, 170, 190, 0.15);
+  margin-bottom: 1.8rem;
+  position: relative;
+  margin-top: 1.8rem;
+}
+
+/* ▶ 버튼 */
+.withai-playbtn {
+  color: #f7a1a1;
+  font-size: 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.withai-playbtn:hover { transform: scale(1.2); }
+
+/* 날짜 텍스트 */
+.withai-date {
+  color: #7d6664;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.withai-date:hover { color: #f28aa5; }
+
+/* 추가하기 버튼 */
+.withai-addbtn {
+  color: #e76588;
+  font-size: 0.85rem;
+  border-radius: 10px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.withai-addbtn:hover {
+  background: #ffc8d6;
+  color: #fff;
+}
+
+/* 드롭다운 */
+.withai-dropdown {
+  position: absolute;
+  top: 3.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  background: #fffafc;
+  border: 2px solid #f5cfd6;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(255, 175, 190, 0.2);
+  z-index: 30;
+  overflow-y: auto;
+  opacity: 0;
+  max-height: 0;
+  transition: all 0.3s ease;
+}
+.withai-dropdown.open {
+  opacity: 1;
+  max-height: 200px;
+}
+.withai-dropdown p {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #6d5b5a;
+  padding: 0.6rem;
+  transition: all 0.2s;
+}
+.withai-dropdown p:hover {
+  background: #fff1f4;
+  color: #e85d8c;
+}
+
+/* =============== 타임라인 구조 =============== */
+:root {
+  --rail-x: 28px;
+  --rail-w: 2px;
+  --dot: 18px;
+  --rail-top: 22px;
+  --rail-bottom: 22px;
+}
+
+/* 타임라인 컨테이너 */
+.withai-timeline {
+  position: relative;
+  padding-left: calc(var(--rail-x) + 20px);
+  background: #ffffff;
+  border: 2px solid #f4cfd3;
+  border-radius: 25px;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 12px rgba(255, 160, 175, 0.1);
+}
+
+/* 세로 레일 */
+.withai-timeline::before {
+  content: "";
+  position: absolute;
+  left: var(--rail-x);
+  top: var(--rail-top);
+  bottom: var(--rail-bottom);
+  width: var(--rail-w);
+  background: #f8d4dc;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+/* 각 아이템 */
+.withai-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+  z-index: 1;
+}
+.withai-item:last-child { margin-bottom: 0; }
+
+/* 동그라미 */
+.withai-item .withai-circle {
+  position: absolute;
+  left: var(--rail-x);
+  top: 0.25rem;
+  transform: translateX(-50%);
+  width: var(--dot);
+  height: var(--dot);
+  border: 2px solid #f4a4b7;
+  border-radius: 50%;
+  background-color: #fff8f8;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+  cursor: pointer;
+  left: -20px;
+}
+.withai-item .withai-circle.checked {
+  background-color: #f7adc0;
+  border-color: #f7adc0;
+  box-shadow: 0 0 6px rgba(247,173,192,0.6);
+}
+
+/* 아이템 내용 */
+.withai-item .withai-content {
+  flex: 1;
+}
+.withai-item .withai-content h4 {
+  color: #5a4a49;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.withai-item .withai-content .withai-time {
+  font-size: 0.8rem;
+  color: #a08885;
+  margin-top: 2px;
+}
+/* ========================= ✏️🗑️ 수정 / 삭제 버튼 ========================= */
+.withai-editbtns {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.8rem;
+  display: flex;
+  gap: 0.4rem;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-2px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 20; /* 🔹 버튼이 항상 위로 */
+}
+
+/* hover 시 나타남 */
+.withai-item:hover .withai-editbtns {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* 버튼 스타일 */
+.withai-editbtns button {
+  background: #ffffff;
+  border: 1px solid #f5b9c9;
+  border-radius: 8px;
+  color: #e85a8c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 3px rgba(240, 150, 160, 0.15);
+}
+
+.withai-editbtns button:hover {
+  background: #f7adc0;
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 3px 6px rgba(230, 150, 160, 0.25);
+}
+
+/* 아이콘이 확실히 보이게 */
+.withai-editbtns svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.2;
+  color: inherit;
+}
+
+/* ========== AI 추천 멘트 / 플랜 카드 ========== */
+.withai-item.ai .withai-circle {
+  border-style: dashed;
+  border-color: #f5b1c1;
+  background: #fffafc;
+}
+
+.withai-aiplan-card {
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(135deg, #fff7f9 0%, #ffeef4 100%);
+  border: 1.8px solid #f7c9d8;
+  border-radius: 22px;
+  box-shadow: 0 4px 12px rgba(255, 185, 200, 0.18);
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1.8rem;
+  animation: fadeSlideUp 0.6s ease forwards;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.withai-aiplan-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(255, 180, 195, 0.25);
+}
+.withai-aiplan-card h3 {
+  font-size: 0.95rem;
+  color: #e76087;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.withai-aiplan-card p {
+  font-size: 0.88rem;
+  color: #6f5d5d;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* ========== 애니메이션 ========== */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.withai-item {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeSlideUp 0.4s ease forwards;
+}
+.withai-item.ai {
+  animation-delay: 0.1s;
+}
+
+/* 반응형 */
+@media (max-width: 480px) {
+  :root {
+    --rail-x: 22px;
+    --dot: 16px;
+  }
+  .withai-timeline { padding-left: calc(var(--rail-x) + 18px); }
+}

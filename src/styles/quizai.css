@@ -1,0 +1,284 @@
+/* =====================================
+   🎀 QuizAI 스타일 (WithAI 톤 맞춤)
+   ===================================== */
+
+.quiz-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 18px 60px;
+  color: #5a4a49;
+  background-color: #fafafa;
+  min-height: 100vh;
+}
+
+/* 뒤로가기 버튼 */
+.back {
+  border: none;
+  background: none;
+  color: #f7adc0;
+  font-size: 22px;
+  cursor: pointer;
+  margin-top: 32px;
+  margin-bottom: 10px;
+  transition: transform 0.2s ease;
+}
+.back:hover {
+  transform: translateX(-3px);
+}
+
+/* ================== 인트로 카드 ================== */
+.intro-card {
+  border: 2px solid #f8cdd5;
+  background: #fffdfd;
+  border-radius: 20px;
+  padding: 56px 16px;
+  text-align: center;
+  margin-top: 120px;
+  box-shadow: 0 4px 10px rgba(247, 173, 192, 0.1);
+  transition: transform 0.3s ease;
+}
+.intro-card:hover {
+  transform: translateY(-4px);
+}
+.intro-card .subject {
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+  color: #5c4b49;
+}
+.intro-card .set-title {
+  color: #7b6764;
+  margin-bottom: 12px;
+}
+.intro-card .hint {
+  color: #b4a2a0;
+  margin: 28px 0;
+}
+
+/* ================== 버튼 ================== */
+.cta {
+  background: #ffe7ed;
+  border: 1px solid #f7b8c5;
+  padding: 10px 24px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #5a4a49;
+  transition: all 0.25s ease;
+}
+.cta:hover {
+  background: #f7adc0;
+  color: #fff;
+  border-color: #f499ae;
+}
+
+.ghost {
+  background: #fff;
+  border: 1px solid #f7b8c5;
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: #7a6763;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.ghost:hover {
+  background: #fff5f8;
+  color: #f07c98;
+}
+
+/* ================== 퀴즈 상단바 ================== */
+.quiz-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12px 0 16px;
+  padding: 0 4px;
+}
+.set-badge {
+  background: #fff3f6;
+  border: 1px solid #f6c5ce;
+  border-radius: 999px;
+  padding: 6px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #7b6764;
+}
+
+/* ================== 점 (진행 표시) ================== */
+.dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 36px 0 32px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f8d4dc;
+  transition: background 0.3s ease;
+}
+.dot.active {
+  background: #f48ba5;
+}
+
+/* ================== 문제 카드 ================== */
+.question-wrap {
+  margin-top: 12px;
+}
+.qtext {
+  margin-bottom: 16px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.opt {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #f6cfd4;
+  background: #fff;
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  color: #5a4a49;
+  transition: all 0.25s ease;
+}
+.opt:hover {
+  background: #fff5f8;
+  border-color: #f6a8b6;
+}
+.opt.selected {
+  background: #fff3f7;
+  border-color: #f38ea7;
+  box-shadow: 0 0 6px rgba(243, 142, 167, 0.3);
+}
+
+/* ================== 결과 화면 ================== */
+.result-title {
+  border: 1px solid #f4cfd3;
+  border-radius: 999px;
+  padding: 10px 18px;
+  text-align: center;
+  background: #fffafc;
+  margin: 50px 0 40px;
+  font-weight: 600;
+  color: #5a4a49;
+}
+
+.score-table {
+  border: 2px solid #f4cfd3;
+  border-radius: 16px;
+  margin: 40px 0 50px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 3px 8px rgba(255, 160, 175, 0.08);
+}
+.row {
+  display: grid;
+  grid-template-columns: 100px repeat(auto-fit, minmax(40px, 1fr));
+}
+.row .cell {
+  border-top: 1px solid #f9d9dc;
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+}
+.row.header .cell {
+  background: #fff5f8;
+  font-weight: 600;
+  border-top: none;
+  color: #7b6764;
+}
+.cell.ok {
+  color: #17a574;
+  font-weight: 700;
+}
+.cell.bad {
+  color: #f05c82;
+  font-weight: 700;
+}
+.score-note {
+  text-align: center;
+  color: #7e6763;
+  margin: 20px 0 30px;
+  font-weight: 500;
+}
+
+.result-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+/* ================== 해설 화면 ================== */
+.explain-title {
+  margin: 8px 0 14px;
+  text-align: center;
+  color: #5a4a49;
+  font-weight: 600;
+}
+.explain-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ex-card {
+  border: 1px solid #f6cfd4;
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(255, 180, 190, 0.05);
+}
+.ex-qhead {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.tag {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #f6cfd4;
+  font-weight: 600;
+}
+.tag.ok {
+  background: #e6fff2;
+  border-color: #a8e8ca;
+  color: #17a574;
+}
+.tag.bad {
+  background: #fff1f4;
+  border-color: #f7b1c2;
+  color: #e34972;
+}
+.ex-qidx {
+  color: #b9a5a2;
+  font-size: 12px;
+}
+.ex-q,
+.ex-a,
+.ex-my,
+.ex-exp {
+  margin: 6px 0;
+  color: #5a4a49;
+}
+
+/* ================== 애니메이션 (부드러운 등장) ================== */
+.intro-card,
+.ex-card,
+.result-title,
+.opt {
+  animation: fadeIn 0.4s ease both;
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
