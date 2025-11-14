@@ -1,4 +1,4 @@
-##📚 Mai-Planner — AI 기반 학습 플래너 웹앱
+#📚 Mai-Planner — AI 기반 학습 플래너 웹앱
 
 대학생의 학습 루틴을 돕기 위해 기획된 AI 학습 플래너
 일정 추천, 요약, 챗봇, 이미지 기반 다이어리, 시간표 관리 등
@@ -7,16 +7,16 @@
 🔗 배포 URL: https://mai-planner.vercel.app
 🔗 백엔드 API URL: https://mai-planner-backend.onrender.com
 
-##👩🏻‍💻 제작 목적 (Project Goal)
+#👩🏻‍💻 제작 목적 (Project Goal)
 실제 대학생 학습 상황에 유용한 AI 학습 도구(MVP) 개발
 공모전 출품 → 기능성 + 실사용성 + 확장성을 중심으로 설계
 UI/UX 흐름, 데이터 구조, AI 자동화 기능 강조
 
-##22Z team 
+#22Z team 
 김재이: 아이디어 구상, 기능 구현, 테스팅 
 이예린: 백 엔드, 프론트엔드 개발, UI/UX 디자인(Figma) 
 
-##✨ 주요 기능 (Key Features)
+#✨ 주요 기능 (Key Features)
 🔥 AI 기반 기능
 
 AI 일정 추천 — 하루의 기분·과목 기반으로 일정 3가지 자동 추천
@@ -41,15 +41,16 @@ AI 이미지 다이어리 — 감정 + 일기 → 이미지 생성 후 Firebase 
 
 전체 UI 아이패드 4:3 기준 디자인 적용
 
-##🏛 기술 스택 (Tech Stack)
-#Frontend
+#🏛 기술 스택 (Tech Stack)
+
+**Frontend**
 React 19
 Vite 5
 React Router
 TailwindCSS 4
 Lucide Icons
 
-#Backend
+**Backend**
 Node.js (Express)
 Firebase Admin SDK
 Firebase Firestore (Client + Admin)
@@ -62,9 +63,9 @@ Frontend → Vercel
 Backend → Render (Web Service)
 Storage → Firebase Storage
 
-##📸 스크린샷 (Screenshots)
+#📸 스크린샷 (Screenshots)
 
-##🛠 프로젝트 구조 (Project Structure)
+#🛠 프로젝트 구조 (Project Structure)
 ai-planner/
 ├─ src/
 │  ├─ components/
@@ -75,59 +76,36 @@ ai-planner/
 ├─ package.json
 └─ README.md
 
-🚀 실행 방법 (How to Run)
+#🚀 실행 방법 (How to Run)
 ▶ 1. 📦 프론트엔드 실행 (Vite)
 npm install
 npm run dev
 
-
 로컬 주소:
 http://localhost:5173
 
-▶ 2. 🔥 백엔드(Node.js Express) 실행
+#▶ 2. 🔥 백엔드(Node.js Express) 실행
 
-먼저 .env 준비:
-
-# OpenAI
+.env 준비:
 OPENAI_API_KEY=...
-
-# Stability AI
 STABILITY_KEY=...
-
-# Firebase
 FIREBASE_API_KEY=...
 FIREBASE_AUTH_DOMAIN=...
 FIREBASE_PROJECT_ID=...
 FIREBASE_STORAGE_BUCKET=...
 FIREBASE_MSG_ID=...
 FIREBASE_APP_ID=...
-
-# Admin key는 Render Secret에 업로드
+**Admin key는 Render Secret에 업로드**
 
 
 설치 및 실행:
-
 npm install
 node server-api.js
-
 
 로컬 주소
 http://localhost:4003
 
-▶ 3. 환경 변수 (.env) 설명
-OPENAI_API_KEY= OpenAI ChatCompletion API
-STABILITY_KEY= Stability Image Generation API
-FIREBASE_API_KEY= Firebase Client
-FIREBASE_AUTH_DOMAIN=
-FIREBASE_PROJECT_ID=
-FIREBASE_STORAGE_BUCKET=
-FIREBASE_MSG_ID=
-FIREBASE_APP_ID=
-
-
-serviceAccountKey.json은 GitHub에 올리지 않고, Render에 Secret으로 업로드됨.
-
-🌐 배포 방법 (Deploy Guide)
+#🌐 배포 방법 (Deploy Guide)
 🔵 Frontend (Vercel)
 1) Vercel → New Project
 2) GitHub Repo 연결
@@ -145,7 +123,7 @@ serviceAccountKey.json은 GitHub에 올리지 않고, Render에 Secret으로 업
 5) Auto Deploy 활성화
 6) Keep Alive 필요 없음 (무료 플랜은 sleep 모드)
 
-🔒 보안 정책 (Security)
+#🔒 보안 정책 (Security)
 serviceAccountKey.json → GitHub에 절대 업로드 ❌
 모든 API KEY는 .env 또는 Render Secret에서 관리
 서버는 CORS 정책으로 Vercel URL만 허용
