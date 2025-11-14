@@ -1,7 +1,3 @@
-/// <reference types="node" />
-//@ts-nocheck
-
-
 /* ========================================================================== */
 /* 📦 Imports */
 /* ========================================================================== */
@@ -14,23 +10,52 @@ import fs from "fs";
 import FormData from "form-data";
 import admin from "firebase-admin";
 
-// Firebase Client SDK (프론트와 같은 Firestore)
+// Firebase Client SDK
 import { initializeApp } from "firebase/app";
-import { getFirestore, addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  getFirestore,
+  addDoc,
+  collection,
+  serverTimestamp,
+} from "firebase/firestore";
 
 dotenv.config();
 
 /* ========================================================================== */
-/* 🔐 Service Account Load */
+/* 🔐 Service Account */
 /* ========================================================================== */
-const serviceAccount = JSON.parse(fs.readFileSync("./serviceAccountKey.json", "utf8"));
+const serviceAccount = JSON.parse(
+  fs.readFileSync("./serviceAccountKey.json", "utf8")
+);
 
 /* ========================================================================== */
 /* 🚀 Express Init */
 /* ========================================================================== */
 const app = express();
-app.use(cors());
 app.use(express.json());
+
+/* ========================================================================== */
+/* 🌐 CORS 설정 — (Render + Vercel 허용) */
+/* ========================================================================== */
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://mai-planner.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("❌ CORS BLOCKED:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 /* ========================================================================== */
 /* 🔥 Firebase Admin Init */
@@ -56,6 +81,7 @@ const clientApp = initializeApp({
   messagingSenderId: process.env.FIREBASE_MSG_ID,
   appId: process.env.FIREBASE_APP_ID,
 });
+
 const db = getFirestore(clientApp);
 
 /* ========================================================================== */
@@ -89,7 +115,7 @@ async function callOpenAI(prompt, model = "gpt-4o-mini", jsonMode = false) {
 }
 
 /* ========================================================================== */
-/* 🎯 Helper: JSON 안전 파싱 */
+/* 🎯 JSON Safe Parse */
 /* ========================================================================== */
 function safeJsonParse(text) {
   try {
@@ -105,13 +131,18 @@ function safeJsonParse(text) {
 /* 🧭 WITH AI — 일정 추천 */
 /* ========================================================================== */
 app.post("/api/with-ai/recommend", async (req, res) => {
-  const { userId = "defaultUser", day = "오늘", subject = "공부", mood = "보통" } = req.body;
+  const {
+    userId = "defaultUser",
+    day = "오늘",
+    subject = "공부",
+    mood = "보통",
+  } = req.body;
 
   const prompt = `
 "${day}" 하루 동안 "${subject}" 관련 추천 활동 3가지를 제안해줘.
 기분: ${mood}
 JSON 배열만 출력.
-  `;
+    `;
 
   try {
     const result = await callOpenAI(prompt, "gpt-4o-mini", true);
@@ -162,7 +193,7 @@ app.post("/api/mentor-chat/message", async (req, res) => {
 });
 
 /* ========================================================================== */
-/* 📘 Mentor Summary */
+/* 📘 요약 */
 /* ========================================================================== */
 app.post("/api/mentor-ai/summary", async (req, res) => {
   const { subjectName, weekTitle, subjectId, weekId } = req.body;
@@ -189,7 +220,7 @@ app.post("/api/mentor-ai/summary", async (req, res) => {
 });
 
 /* ========================================================================== */
-/* 🧩 Quiz 생성 */
+/* 🧩 퀴즈 생성 */
 /* ========================================================================== */
 app.post("/api/generate-quiz", async (req, res) => {
   const { subjectName, count = 5, subjectId, weekId } = req.body;
@@ -222,17 +253,18 @@ app.post("/api/generate-quiz", async (req, res) => {
 });
 
 /* ========================================================================== */
-/* 📖 Quiz 해설 */
+/* 📖 퀴즈 해설 */
 /* ========================================================================== */
 app.post("/api/generate-explanations", async (req, res) => {
   const { questions = [], userAnswers = [] } = req.body;
 
   if (!questions.length) {
-    return res.status(400).json({ success: false, error: "문제가 없습니다." });
+    return res
+      .status(400)
+      .json({ success: false, error: "문제가 없습니다." });
   }
 
-  // 문제 + 정답 + 내답 매핑 (correctAnswer/answer 둘 다 지원)
-  const mappedQuestions = questions.map((q, i) => {
+  const mapped = questions.map((q, i) => {
     const correctIdx = q.correctAnswer ?? q.answer ?? 0;
     const myIdx = userAnswers[i] ?? null;
 
@@ -240,14 +272,13 @@ app.post("/api/generate-explanations", async (req, res) => {
       number: i + 1,
       question: q.question,
       correct: String.fromCharCode(65 + correctIdx),
-      mine: myIdx !== null ? String.fromCharCode(65 + myIdx) : "-"
+      mine: myIdx !== null ? String.fromCharCode(65 + myIdx) : "-",
     };
   });
 
   const prompt = `
 아래 문제들에 대해 각 번호별로 해설을 작성해줘.
-
-반드시 JSON 배열 ONLY로 반환해야 한다.
+JSON 배열 ONLY.
 형식:
 [
   {"explanation": "해설 1"},
@@ -255,22 +286,15 @@ app.post("/api/generate-explanations", async (req, res) => {
 ]
 
 문제 목록:
-${JSON.stringify(mappedQuestions, null, 2)}
+${JSON.stringify(mapped, null, 2)}
 `;
 
   try {
-    let result = await callOpenAI(prompt, "gpt-4o-mini");
-
-    // AI가 앞뒤에 쓸데없는 내용 붙이면 JSON 부분만 자르기
+    const result = await callOpenAI(prompt, "gpt-4o-mini");
     const first = result.indexOf("[");
     const last = result.lastIndexOf("]") + 1;
 
-    if (first === -1 || last === -1) {
-      throw new Error("AI가 JSON 형식을 반환하지 않았습니다");
-    }
-
-    const jsonString = result.slice(first, last);
-    const json = JSON.parse(jsonString);
+    const json = JSON.parse(result.slice(first, last));
 
     res.json({ success: true, explanations: json });
   } catch (e) {
@@ -280,7 +304,7 @@ ${JSON.stringify(mappedQuestions, null, 2)}
 });
 
 /* ========================================================================== */
-/* 🎨 Image Diary 생성 */
+/* 🎨 이미지 다이어리 */
 /* ========================================================================== */
 app.post("/api/generate-image-diary", async (req, res) => {
   const { emotion, diaryText, userId = "guest" } = req.body;
@@ -295,7 +319,6 @@ Diary: "${diaryText}"
 Only English. No explanation.
 `);
 
-    // Stable Diffusion 요청
     const formData = new FormData();
     formData.append("prompt", promptRes);
     formData.append("aspect_ratio", "1:1");
@@ -315,8 +338,6 @@ Only English. No explanation.
     );
 
     const buffer = Buffer.from(imgRes.data);
-
-    // Firebase Storage 업로드
     const fileName = `imageDiary/${userId}/${Date.now()}.png`;
     const file = bucket.file(fileName);
 
@@ -327,7 +348,6 @@ Only English. No explanation.
       expires: "2030-12-31",
     });
 
-    // Firestore 저장
     await addDoc(collection(db, "imageDiary"), {
       userId,
       emotion: cleanEmotion,
@@ -351,18 +371,8 @@ async function startServer() {
   const defaultPort = process.env.PORT || 4003;
   const port = await detect(defaultPort);
 
-  if (port !== defaultPort) {
-    console.log(`⚠️ 포트 ${defaultPort} 충돌 → ${port} 로 변경`);
-  }
-
-  // .env 업데이트
-  const envContent = fs.readFileSync(".env", "utf8");
-  const newEnv = envContent.replace(/VITE_SERVER_PORT=.*/g, `VITE_SERVER_PORT=${port}`);
-  fs.writeFileSync(".env", newEnv);
-
   app.listen(port, () => {
-    console.log(`🚀 서버 실행됨 → http://localhost:${port}`);
-    console.log("🔄 프론트는 자동으로 새 포트에 연결됩니다!");
+    console.log(`🚀 서버 실행됨: http://localhost:${port}`);
   });
 }
 
