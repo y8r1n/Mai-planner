@@ -1,30 +1,47 @@
 // src/services/api.js
 import axios from "axios";
 
-// 백엔드 Render URL
-const BASE_URL = "https://mai-planner-backend.onrender.com/api";
+// 자동 환경 감지
+const isDev = import.meta.env.DEV;
 
-// 📅 일정 추천 (WithAI)
-export const withAI = axios.create({
-  baseURL: `${BASE_URL}/with-ai`,
+// 로컬 / 배포 자동 전환
+export const BASE_URL = isDev
+  ? "http://localhost:4003"
+  : "https://mai-planner-backend.onrender.com";
+
+// 공통 axios
+export const api = axios.create({
+  baseURL: `${BASE_URL}/api`,
+  timeout: 15000,
 });
 
-// 📘 요약 (MentorAI)
-export const mentorAI = axios.create({
-  baseURL: `${BASE_URL}/mentor-ai`,
-});
+// 오류 로그 공통 처리
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    console.error("💥 API 오류:", err.response || err.message);
+    return Promise.reject(err);
+  }
+);
 
-// 💬 대화 (MentorChat)
-export const mentorChat = axios.create({
-  baseURL: `${BASE_URL}/mentor-chat`,
-});
+// =============== 그룹 API ===============
+export const withAI = {
+  recommend: (data) => api.post("/with-ai/recommend", data),
+};
 
-// 🧩 퀴즈 (QuizAI)
-export const quizAI = axios.create({
-  baseURL: `${BASE_URL}`,
-});
+export const mentorAI = {
+  summary: (data) => api.post("/mentor-ai/summary", data),
+};
 
-// 🎨 이미지 생성 (DRAW)
-export const drawAI = axios.create({
-  baseURL: `${BASE_URL}`,
-});
+export const mentorChat = {
+  message: (data) => api.post("/mentor-chat/message", data),
+};
+
+export const quizAI = {
+  generate: (data) => api.post("/generate-quiz", data),
+  explain: (data) => api.post("/generate-explanations", data),
+};
+
+export const drawAI = {
+  diary: (data) => api.post("/generate-image-diary", data),
+};
