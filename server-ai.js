@@ -335,16 +335,18 @@ app.get("/", (req, res) => {
   res.json({ status: "OK", message: "Mai-planner backend running" });
 });
 
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ ok: true });
+});
+
+
 /* ========================================================================== */
 /* 🚀 Start Server */
 /* ========================================================================== */
-async function startServer() {
-  const defaultPort = process.env.PORT || 4003;
-  const port = await detect(defaultPort);
 
-  app.listen(port, () => {
-    console.log(`🚀 서버 실행됨 → :${port}`);
-  });
-}
+const port = process.env.PORT || 4003;
 
-startServer();
+app.listen(port, "0.0.0.0", () => {
+  console.log(`🚀 서버 실행됨 (Render) → 포트: ${port}`);
+});
+
