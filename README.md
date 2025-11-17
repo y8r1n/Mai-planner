@@ -4,8 +4,8 @@
 일정 추천, 요약, 챗봇, 이미지 기반 다이어리, 시간표 관리 등
 학습과 감정 기록을 동시에 지원하는 AI Productivity Web App입니다.
 
-🔗 배포 URL: https://mai-planner.vercel.app
-🔗 백엔드 API URL: https://mai-planner-backend.onrender.com
+🔗 배포 URL: https://mai-planner.vercel.app/
+🔗 백엔드 API URL:https://mai-planner.onrender.com
 
 #👩🏻‍💻 제작 목적 (Project Goal)
 실제 대학생 학습 상황에 유용한 AI 학습 도구(MVP) 개발
@@ -13,7 +13,7 @@
 UI/UX 흐름, 데이터 구조, AI 자동화 기능 강조
 
 #22Z team 
-김재이: 아이디어 구상, 기능 구현, 테스팅 
+김재이: 아이디어 구상, 프론트엔드 개발, 테스팅
 이예린: 백 엔드, 프론트엔드 개발, UI/UX 디자인(Figma) 
 
 #✨ 주요 기능 (Key Features)
@@ -67,13 +67,18 @@ Storage → Firebase Storage
 
 #🛠 프로젝트 구조 (Project Structure)
 ai-planner/
-├─ src/
+├─ Frontend/
 │  ├─ components/
 │  ├─ contexts/
 │  ├─ services/
 │  └─ styles/
+├─ Backend/
+│  ├─ firebase.json/
+│  ├─ server-ai.js/
+│  ├─ firebaserc/
+│  └─ package.json/
 ├─ public/
-├─ package.json
+├─ vercel.json
 └─ README.md
 
 #🚀 실행 방법 (How to Run)
