@@ -1,5 +1,13 @@
+// src/components/School.jsx
 import React, { useState, useEffect } from "react";
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  updateDoc,
+  onSnapshot,
+} from "firebase/firestore";
 import { db } from "../services/firebase";
 import "../styles/school.css";
 
@@ -23,69 +31,74 @@ export default function School() {
   const korDays = ["월", "화", "수", "목", "금"];
   const colors = ["#f8b6b6", "#f3a6b6", "#f8c2c2", "#fcbfcf", "#f4a5a5"];
 
-  const resetForm = () => {
+  // ------------------------------
+  // 🔥 Firestore 실시간 반영
+  // ------------------------------
+  useEffect(() => {
+    const unsub = onSnapshot(col, (snap) => {
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setSubjects(list);
+    });
+    return () => unsub();
+  }, []);
+
+  // ------------------------------
+  // 🔥 과목 추가
+  // ------------------------------
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    if (!formData.day || !formData.start || !formData.end || !formData.title.trim())
+      return alert("모든 필드를 입력하세요!");
+
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    await addDoc(col, { ...formData, color });
+
+    setShowAddModal(false);
     setFormData({ day: "", start: "", end: "", title: "", room: "" });
   };
 
-  const fetchSubjects = async () => {
-    const snap = await getDocs(col);
-    setSubjects(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-  };
-
-  useEffect(() => {
-    fetchSubjects();
-  }, []);
-
-  const handleAdd = async (e) => {
-    e.preventDefault();
-    if (!formData.day || !formData.start || !formData.end || !formData.title.trim()) return;
-
-    const color = colors[Math.floor(Math.random() * colors.length)];
-
-    await addDoc(col, { ...formData, color });
-
-    resetForm();
-    setShowAddModal(false);
-    fetchSubjects();
-  };
-
+  // ------------------------------
+  // 🔥 과목 삭제
+  // ------------------------------
   const handleDelete = async (id) => {
-    if (!id) return console.error("❌ 삭제 실패: id 없음");
-
     await deleteDoc(doc(db, "timetable", id));
     setShowInfoModal(false);
     setSelected(null);
-    fetchSubjects();
   };
 
+  // ------------------------------
+  // 🔥 과목 수정
+  // ------------------------------
   const handleUpdate = async (e) => {
     e.preventDefault();
-
-    if (!selected?.id) return console.error("❌ update 실패: selected.id 없음");
+    if (!selected) return;
 
     const ref = doc(db, "timetable", selected.id);
-    await updateDoc(ref, {
-      day: formData.day,
-      start: formData.start,
-      end: formData.end,
-      title: formData.title,
-      room: formData.room,
-    });
+    await updateDoc(ref, { ...formData });
 
     setShowEditModal(false);
     setShowInfoModal(false);
-    setSelected(null);
-    resetForm();
-    fetchSubjects();
   };
 
-  const topPx = (t) => (parseInt(t.split(":")[0], 10) - 9) * 64;
-  const heightPx = (s, e) =>
-    (parseInt(e.split(":")[0], 10) - parseInt(s.split(":")[0], 10)) * 64 || 48;
+  // ------------------------------
+  // 🔥 시간 배치 계산
+  // ------------------------------
+  const topPx = (t) => {
+    const [h, m] = t.split(":").map(Number);
+    const base = h - 9;
+    return base * 64 + (m / 60) * 64;
+  };
+
+  const heightPx = (start, end) => {
+    const [sh, sm] = start.split(":").map(Number);
+    const [eh, em] = end.split(":").map(Number);
+    const diffHours = eh + em / 60 - (sh + sm / 60);
+    return diffHours * 64;
+  };
 
   const maxHour =
     subjects.length > 0
-      ? Math.max(...subjects.map((s) => parseInt(s.end.split(":")[0], 10))) + 1
+      ? Math.max(...subjects.map((s) => Number(s.end.split(":")[0]))) + 1
       : 16;
 
   const timeSlots = Array.from({ length: maxHour - 9 }, (_, i) => `${9 + i}:00`);
@@ -99,15 +112,19 @@ export default function School() {
         <div className="school-header">
           <div className="school-header-empty"></div>
           {days.map((d) => (
-            <div key={d} className="school-header-day">{d}</div>
+            <div key={d} className="school-header-day">
+              {d}
+            </div>
           ))}
         </div>
 
-        {/* 본문 */}
+        {/* 그리드 */}
         <div className="school-grid">
           <div className="school-time-column">
             {timeSlots.map((t) => (
-              <div key={t} className="school-time-cell">{t}</div>
+              <div key={t} className="school-time-cell">
+                {t}
+              </div>
             ))}
           </div>
 
@@ -117,6 +134,13 @@ export default function School() {
                 key={s.id}
                 onClick={() => {
                   setSelected(s);
+                  setFormData({
+                    day: s.day,
+                    start: s.start,
+                    end: s.end,
+                    title: s.title,
+                    room: s.room,
+                  });
                   setShowInfoModal(true);
                 }}
                 className="school-subject"
@@ -136,14 +160,11 @@ export default function School() {
         </div>
       </div>
 
-      <button
-        onClick={() => setShowAddModal(true)}
-        className="school-add-btn"
-      >
+      <button className="school-add-btn" onClick={() => setShowAddModal(true)}>
         과목 추가
       </button>
 
-      {/* 모달들 */}
+      {/* 모달 3종 */}
       {showAddModal && (
         <SchoolModal
           title="과목 추가"
@@ -182,7 +203,7 @@ export default function School() {
   );
 }
 
-/* ===================== 📘 모달: 추가 & 수정 ===================== */
+/* ======================== 📌 SchoolModal ======================== */
 
 function SchoolModal({ title, formData, setFormData, korDays, days, onSubmit, onClose }) {
   return (
@@ -191,6 +212,7 @@ function SchoolModal({ title, formData, setFormData, korDays, days, onSubmit, on
         <h4 className="school-modal-title">{title}</h4>
 
         <form onSubmit={onSubmit}>
+          {/* 요일 선택 */}
           <div className="school-modal-day">
             <p>요일 선택</p>
             <div className="school-day-buttons">
@@ -200,9 +222,7 @@ function SchoolModal({ title, formData, setFormData, korDays, days, onSubmit, on
                   type="button"
                   onClick={() => setFormData({ ...formData, day: days[i] })}
                   className={
-                    formData.day === days[i]
-                      ? "school-day-btn active"
-                      : "school-day-btn"
+                    formData.day === days[i] ? "school-day-btn active" : "school-day-btn"
                   }
                 >
                   {k}
@@ -211,6 +231,7 @@ function SchoolModal({ title, formData, setFormData, korDays, days, onSubmit, on
             </div>
           </div>
 
+          {/* 시간 */}
           <div className="school-time-inputs">
             <input
               type="time"
@@ -225,6 +246,7 @@ function SchoolModal({ title, formData, setFormData, korDays, days, onSubmit, on
             />
           </div>
 
+          {/* 과목명 */}
           <input
             type="text"
             placeholder="과목명"
@@ -233,6 +255,7 @@ function SchoolModal({ title, formData, setFormData, korDays, days, onSubmit, on
             className="school-input"
           />
 
+          {/* 강의실 */}
           <input
             type="text"
             placeholder="강의실"
@@ -242,8 +265,12 @@ function SchoolModal({ title, formData, setFormData, korDays, days, onSubmit, on
           />
 
           <div className="school-modal-btns">
-            <button type="submit" className="school-btn-confirm">확인</button>
-            <button type="button" className="school-btn-cancel" onClick={onClose}>취소</button>
+            <button type="submit" className="school-btn-confirm">
+              확인
+            </button>
+            <button type="button" className="school-btn-cancel" onClick={onClose}>
+              취소
+            </button>
           </div>
         </form>
       </div>
@@ -251,9 +278,16 @@ function SchoolModal({ title, formData, setFormData, korDays, days, onSubmit, on
   );
 }
 
-/* ===================== 📕 모달: 과목 정보 ===================== */
+/* ======================== 📌 SchoolInfoModal ======================== */
 
-function SchoolInfoModal({ selected, setSelected, handleDelete, setFormData, setShowInfoModal, setShowEditModal }) {
+function SchoolInfoModal({
+  selected,
+  setSelected,
+  handleDelete,
+  setFormData,
+  setShowInfoModal,
+  setShowEditModal,
+}) {
   return (
     <div className="school-modal-bg">
       <div className="school-modal">
@@ -261,7 +295,9 @@ function SchoolInfoModal({ selected, setSelected, handleDelete, setFormData, set
 
         <div className="school-info">
           <div>요일: {selected.day}</div>
-          <div>시간: {selected.start} ~ {selected.end}</div>
+          <div>
+            시간: {selected.start} ~ {selected.end}
+          </div>
           <div>과목명: {selected.title}</div>
           <div>강의실: {selected.room || "-"}</div>
         </div>
@@ -274,9 +310,8 @@ function SchoolInfoModal({ selected, setSelected, handleDelete, setFormData, set
                 start: selected.start,
                 end: selected.end,
                 title: selected.title,
-                room: selected.room || "",
+                room: selected.room,
               });
-
               setShowEditModal(true);
             }}
             className="school-btn-edit"

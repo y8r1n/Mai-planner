@@ -1,14 +1,15 @@
+// src/components/TodoTab.jsx
 import React, { useState, useEffect } from "react";
 import {
   collection,
   addDoc,
-  getDocs,
   updateDoc,
   deleteDoc,
   doc,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
-import "../styles/todotab.css"; 
+import "../styles/todotab-refactored.css";
 
 export default function TodoTab() {
   const [todos, setTodos] = useState([]);
@@ -18,77 +19,110 @@ export default function TodoTab() {
 
   const todosCollection = collection(db, "todos");
 
-  const fetchTodos = async () => {
-    const snapshot = await getDocs(todosCollection);
-    const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    setTodos(data);
-  };
-
+  /* ========================================================
+      🔥 실시간 구독 (fetchTodos 제거됨)
+  ======================================================== */
   useEffect(() => {
-    fetchTodos();
+    const unsub = onSnapshot(todosCollection, (snap) => {
+      const data = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
+      }));
+      setTodos(data);
+    });
+    return () => unsub();
   }, []);
 
+  /* ========================================================
+      ➕ 할 일 추가
+  ======================================================== */
   const addTodo = async (e) => {
     e.preventDefault();
     if (!newTodo.trim()) return;
-    await addDoc(todosCollection, { title: newTodo.trim(), completed: false });
+
+    await addDoc(todosCollection, {
+      title: newTodo.trim(),
+      completed: false,
+      createdAt: Date.now(),
+    });
+
     setNewTodo("");
     setAdding(false);
-    fetchTodos();
   };
 
+  /* ========================================================
+      ✔ 완료 / 미완료 토글
+  ======================================================== */
   const toggleTodo = async (todo) => {
     const ref = doc(db, "todos", todo.id);
     await updateDoc(ref, { completed: !todo.completed });
-    fetchTodos();
   };
 
+  /* ========================================================
+      🗑️ 삭제
+  ======================================================== */
   const deleteTodo = async (id) => {
-    const ref = doc(db, "todos", id);
-    await deleteDoc(ref);
-    fetchTodos();
+    await deleteDoc(doc(db, "todos", id));
   };
 
+  /* ========================================================
+      🔍 필터 적용
+  ======================================================== */
   const filteredTodos = todos.filter((todo) => {
     if (filter === "completed") return todo.completed;
     if (filter === "active") return !todo.completed;
     return true;
   });
 
-  // 드래그 관련
+  /* ========================================================
+      👉 슬라이드 삭제 (드래그)
+  ======================================================== */
   const [startX, setStartX] = useState(null);
   const [offsetX, setOffsetX] = useState({});
   const [openDelete, setOpenDelete] = useState({});
 
-  const startDrag = (id, clientX) => setStartX(clientX);
+  const startDrag = (id, clientX) => {
+    setStartX(clientX);
+  };
+
   const moveDrag = (id, clientX) => {
     if (startX === null) return;
     const diff = clientX - startX;
+
+    // 왼쪽으로만 슬라이드 가능
     if (diff < 0) {
-      setOffsetX((prev) => ({ ...prev, [id]: Math.max(diff, -80) }));
+      setOffsetX((prev) => ({
+        ...prev,
+        [id]: Math.max(diff, -80),
+      }));
     } else {
-      setOffsetX((prev) => ({ ...prev, [id]: Math.min(diff, 0) }));
+      setOffsetX((prev) => ({
+        ...prev,
+        [id]: Math.min(diff, 0),
+      }));
     }
   };
+
   const endDrag = (id) => {
     if (offsetX[id] < -50) {
-      setOpenDelete((p) => ({ ...p, [id]: true }));
-      setOffsetX((p) => ({ ...p, [id]: -80 }));
+      setOpenDelete((prev) => ({ ...prev, [id]: true }));
+      setOffsetX((prev) => ({ ...prev, [id]: -80 }));
     } else {
-      setOpenDelete((p) => ({ ...p, [id]: false }));
-      setOffsetX((p) => ({ ...p, [id]: 0 }));
+      setOpenDelete((prev) => ({ ...prev, [id]: false }));
+      setOffsetX((prev) => ({ ...prev, [id]: 0 }));
     }
     setStartX(null);
   };
 
+  /* ========================================================
+      🎨 렌더
+  ======================================================== */
   return (
     <div id="todo-page">
+      {/* 상단 */}
       <div className="todo-header">
         <h2>ToDo</h2>
-        <button
-          onClick={() => setAdding(!adding)}
-          className="todo-add-btn"
-        >
+        <button onClick={() => setAdding(!adding)} className="todo-add-btn">
           ＋
         </button>
       </div>
@@ -110,7 +144,7 @@ export default function TodoTab() {
         ))}
       </div>
 
-      {/* 추가 입력 */}
+      {/* 할 일 추가 입력창 */}
       {adding && (
         <form onSubmit={addTodo} className="todo-input-box">
           <span className="circle" />
@@ -135,6 +169,7 @@ export default function TodoTab() {
             onTouchMove={(e) => moveDrag(todo.id, e.touches[0].clientX)}
             onTouchEnd={() => endDrag(todo.id)}
           >
+            {/* 삭제 버튼 */}
             <button
               onClick={() => deleteTodo(todo.id)}
               className={`delete-btn ${openDelete[todo.id] ? "show" : ""}`}
@@ -142,6 +177,7 @@ export default function TodoTab() {
               삭제
             </button>
 
+            {/* 할 일 아이템 */}
             <div
               className={`todo-item ${todo.completed ? "done" : ""}`}
               style={{
