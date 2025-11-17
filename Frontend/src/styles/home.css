@@ -1,345 +1,449 @@
 /* ===========================
- 📍 Home 탭 스타일 (핑크 베이지 톤)
+   📍 HOME TAB - Refactored
 =========================== */
 
-/* 전체 컨테이너 */
 #home-container {
-  background-color: #fffdfd;
   min-height: 100vh;
+  padding: calc(var(--navbar-height) + var(--space-xl)) var(--space-lg) var(--space-3xl);
+  background: var(--color-background);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 90px 16px 40px;
 }
 
-/* 섹션 공통 */
+/* ========================================
+   SECTION LAYOUT
+======================================== */
 #home-container section {
-  width: 100%;
-  max-width: 460px;
-  margin-bottom: 40px;
+  width: 92%;
+  max-width: var(--container-max-width);
+  margin-bottom: var(--space-2xl);
+  animation: fadeSlideUp 0.5s ease;
 }
 
-/* 섹션 제목 */
+#home-container section:nth-child(1) { animation-delay: 0.05s; }
+#home-container section:nth-child(2) { animation-delay: 0.1s; }
+#home-container section:nth-child(3) { animation-delay: 0.15s; }
+
+/* Section Title */
 #home-container h2 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #444;
-  margin-bottom: 10px;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-lg);
 }
 
-/* 구분선 */
+/* Divider */
 .divider {
   border: none;
-  height: 1px;
-  background-color: #f3baba;
+  height: 2px;
+  background: linear-gradient(to right, 
+    transparent 0%, 
+    var(--color-border) 50%, 
+    transparent 100%
+  );
+  margin: var(--space-lg) 0;
   opacity: 0.6;
-  margin: 12px 0;
 }
 
-/* 카드 기본형 */
+/* ========================================
+   HOME CARD BASE
+======================================== */
 .home-card {
-  background-color: #fff;
-  border: 1.5px solid #f3baba;
-  border-radius: 16px;
-  box-shadow: 0 2px 5px rgba(240, 146, 146, 0.08);
-  padding: 16px;
-  transition: all 0.25s ease;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
   cursor: pointer;
 }
 
 .home-card:hover {
-  background-color: #fff8f8;
+  background: var(--color-surface-hover);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
-/* 카드 내 텍스트 */
 .home-card p,
 .home-card span {
-  color: #444;
-  font-size: 0.9rem;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
 }
 
-/* 🩷 ToDo 섹션 */
+/* ========================================
+   🩷 TODO SECTION
+======================================== */
 #todo-section .todo-empty {
   text-align: center;
-  color: #aaa;
-  font-size: 0.9rem;
-  margin-bottom: 10px;
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-base);
+  padding: var(--space-xl);
 }
 
 .todo-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 0;
-  border-bottom: 1px solid #f5d3d3;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border-lighter);
+  transition: all var(--transition-fast);
 }
 
 .todo-item:last-child {
   border-bottom: none;
 }
 
-.todo-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid #f09292;
+.todo-item:hover {
+  padding-left: var(--space-sm);
 }
 
-/* ToDo 버튼 */
+.todo-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2.5px solid var(--color-primary);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.todo-item:hover .todo-dot {
+  transform: scale(1.15);
+  border-color: var(--color-primary-dark);
+}
+
 .todo-btn {
-  background: #ffe6e6;
-  color: #f09292;
+  background: var(--color-border-lighter);
+  color: var(--color-primary);
   border: none;
-  border-radius: 24px;
-  padding: 8px 14px;
-  font-weight: 600;
-  font-size: 0.85rem;
+  border-radius: var(--radius-full);
+  padding: var(--space-md) var(--space-xl);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
   cursor: pointer;
-  transition: 0.2s;
+  transition: all var(--transition-base);
+  margin-top: var(--space-lg);
+  width: 100%;
 }
 
 .todo-btn:hover {
-  background: #ffdcdc;
+  background: var(--color-primary-lighter);
+  transform: scale(1.02);
 }
 
-/* ==============================
-   🕐 시간표 미리보기
-============================== */
+/* ========================================
+   🕐 TIMETABLE PREVIEW
+======================================== */
 #timetable-section {
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto 40px;
+  width: 92%;
+  max-width: var(--container-max-width);
+  margin: 0 auto var(--space-2xl);
 }
 
 #timetable-section h2 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #444;
-  margin-bottom: 10px;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-lg);
 }
 
-/* 시간표 전체 박스 */
+/* Timetable Box */
 .timetable-box {
-  background: #fffdfd;
-  border: 1.5px solid #f3caca;
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 2px 6px rgba(240, 146, 146, 0.15);
-  transition: 0.25s ease;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
   cursor: pointer;
 }
 
 .timetable-box:hover {
-  background: #fff8f8;
+  background: var(--color-surface-hover);
   transform: scale(1.01);
+  box-shadow: var(--shadow-lg);
 }
 
-/* 요일별 grid */
+/* Grid Layout */
 .timetable-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
+  gap: var(--space-md);
 }
 
-/* 각 요일 칸 */
+/* Day Cell */
 .timetable-cell {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  min-height: 70px;
-  border-radius: 14px;
-  background: #fffafa;
-  border: 1px solid #ffe1e1;
-  padding: 6px;
-  transition: all 0.2s ease;
+  gap: var(--space-sm);
+  min-height: 80px;
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  background: var(--color-background);
+  border: 1px solid var(--color-border-lighter);
+  transition: all var(--transition-base);
 }
 
 .timetable-cell:hover {
-  background: #fff7f7;
-  border-color: #f3baba;
+  background: var(--color-surface-hover);
+  border-color: var(--color-border);
+  transform: translateY(-2px);
 }
 
-/* 과목 이름 pill */
+/* Subject Item */
 .timetable-item {
   display: inline-block;
-  color: #fff;
-  background: #f8b6b6;
-  border-radius: 20px;  /* ✅ 완전 둥글게 */
-  padding: 6px 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.2;
+  background: var(--color-primary-light);
+  color: white;
+  border-radius: var(--radius-full);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
   text-align: center;
-  box-shadow: 0 2px 3px rgba(240, 146, 146, 0.15);
-  transition: all 0.2s ease;
+  line-height: 1.3;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
 }
 
 .timetable-item:hover {
+  background: var(--color-primary);
   transform: scale(1.05);
-  background: #f49d9d;
+  box-shadow: var(--shadow-md);
 }
 
-/* 빈 칸 */
+/* Empty State */
 .timetable-empty {
-  color: #ccc;
-  font-size: 0.8rem;
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-xs);
   text-align: center;
 }
 
-/* 등록된 시간표 없을 때 */
 .timetable-empty-box {
   text-align: center;
-  background: #fffdfd;
-  border: 1.5px dashed #f3caca;
-  border-radius: 16px;
-  padding: 30px 10px;
-  color: #999;
+  background: var(--color-background);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3xl) var(--space-xl);
+  color: var(--color-text-disabled);
 }
 
 .timetable-btn {
-  background: #ffe6e6;
-  color: #f36c6c;
+  background: var(--color-border-lighter);
+  color: var(--color-primary);
   border: none;
-  border-radius: 25px;
-  padding: 8px 16px;
-  font-size: 0.85rem;
-  margin-top: 10px;
+  border-radius: var(--radius-full);
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  margin-top: var(--space-lg);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-base);
 }
 
 .timetable-btn:hover {
-  background: #ffd4d4;
+  background: var(--color-primary-lighter);
+  transform: scale(1.02);
 }
 
-
-/* ==============================
-   📅 캘린더 미리보기
-============================== */
+/* ========================================
+   📅 CALENDAR PREVIEW
+======================================== */
 #calendar-preview {
-  width: 100%;
-  max-width: 480px;
+  width: 92%;
+  max-width: var(--container-max-width);
   margin: 0 auto;
-  text-align: center;
 }
 
 .calendar-header {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #444;
-  margin-bottom: 10px;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-lg);
+  text-align: center;
 }
 
-/* 캘린더 전체 박스 */
+/* Calendar Box */
 .calendar-box {
-  background: #fffdfd;
-  border: 1.5px solid #f3caca;
-  border-radius: 16px;
-  padding: 14px;
-  box-shadow: 0 2px 6px rgba(240, 146, 146, 0.15);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
   cursor: pointer;
-  transition: 0.25s ease;
+  transition: all var(--transition-base);
 }
 
 .calendar-box:hover {
-  background: #fff8f8;
+  background: var(--color-surface-hover);
   transform: scale(1.01);
+  box-shadow: var(--shadow-lg);
 }
 
-/* 요일 헤더 행 */
-.calendar-header-row {
-  margin-bottom: 6px;
-}
-
-/* 공통 캘린더 그리드 */
+/* Calendar Grid */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: var(--space-xs);
 }
 
-/* 요일 칸 */
+/* Day Header */
 .calendar-day-header {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #777;
-  padding: 4px 0;
-  border-radius: 10px;
-  background: #fff5f5;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-tertiary);
+  text-align: center;
+  padding: var(--space-sm) 0;
+  border-radius: var(--radius-md);
+  background: var(--color-background);
 }
 
 .calendar-day-header.sunday {
-  color: #f09292;
-  background: #ffeaea;
-}
-.calendar-day-header.saturday {
-  color: #8fb6ff;
-  background: #edf4ff;
+  color: var(--color-primary);
+  background: rgba(240, 146, 146, 0.1);
 }
 
-/* 날짜 칸 */
+.calendar-day-header.saturday {
+  color: #5A88FF;
+  background: rgba(90, 136, 255, 0.1);
+}
+
+/* Day Cell */
 .calendar-day-cell {
-  min-height: 54px;
-  border-radius: 12px;
-  background: #fff;
-  border: 1px solid #ffe1e1;
+  min-height: 60px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-lighter);
+  padding: var(--space-sm) var(--space-xs);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 6px 4px;
-  font-size: 0.75rem;
-  color: #555;
-  transition: all 0.2s ease;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+  transition: all var(--transition-fast);
 }
 
 .calendar-day-cell:hover {
-  background: #fff7f7;
-  border-color: #f3baba;
+  background: var(--color-surface-hover);
+  border-color: var(--color-border);
   transform: translateY(-2px);
 }
 
 .calendar-day-cell.sunday {
-  color: #f09292;
+  color: var(--color-primary);
 }
+
 .calendar-day-cell.saturday {
-  color: #4c74d1;
+  color: #5A88FF;
 }
 
-/* 날짜 숫자 */
+/* Date Number */
 .calendar-date {
-  font-weight: 600;
-  margin-bottom: 2px;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-xs);
 }
 
-/* 일정 아이템 */
+/* Event Badge */
 .calendar-event {
-  background: #ffe6e6;
-  color: #f36c6c;
-  border-radius: 10px;
-  padding: 2px 6px;
-  font-size: 0.65rem;
+  background: var(--color-border-lighter);
+  color: var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-xs);
+  font-size: 10px;
   margin-top: 2px;
-  line-height: 1.3;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   max-width: 90%;
 }
 
-/* +N 더보기 */
+/* More indicator */
 .calendar-more {
-  font-size: 0.65rem;
-  color: #aaa;
-  margin-top: 1px;
+  font-size: 10px;
+  color: var(--color-text-disabled);
+  margin-top: 2px;
 }
 
-/* 하단 전체보기 */
+/* Calendar Footer */
 .calendar-footer {
-  color: #f09292;
-  font-size: 0.8rem;
-  margin-top: 8px;
-  font-weight: 500;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin-top: var(--space-md);
+  text-align: center;
+}
+
+/* ========================================
+   📱 RESPONSIVE DESIGN
+======================================== */
+@media (max-width: 768px) {
+  #home-container {
+    padding: calc(var(--navbar-height) + var(--space-lg)) var(--space-md) var(--space-2xl);
+  }
+  
+  .timetable-grid {
+    gap: var(--space-sm);
+  }
+  
+  .timetable-cell {
+    min-height: 70px;
+    padding: var(--space-sm);
+  }
+  
+  .calendar-day-cell {
+    min-height: 54px;
+    padding: var(--space-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  #home-container h2 {
+    font-size: var(--font-size-md);
+  }
+  
+  .timetable-box,
+  .calendar-box {
+    padding: var(--space-md);
+  }
+  
+  .timetable-grid {
+    gap: 6px;
+  }
+  
+  .timetable-cell {
+    min-height: 60px;
+    padding: 6px;
+  }
+  
+  .timetable-item {
+    font-size: 10px;
+    padding: 4px var(--space-sm);
+  }
+  
+  .calendar-grid {
+    gap: 4px;
+  }
+  
+  .calendar-day-cell {
+    min-height: 48px;
+    padding: 4px 2px;
+  }
+  
+  .calendar-event {
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+}
+
+/* ========================================
+   ♿ ACCESSIBILITY
+======================================== */
+.home-card:focus-visible,
+.timetable-box:focus-visible,
+.calendar-box:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
 }

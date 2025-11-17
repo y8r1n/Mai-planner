@@ -1,26 +1,19 @@
-/* ===== 페이지 전체 ===== */
+/* ===========================
+   📚 SUBJECT PAGE - Refactored
+=========================== */
+
 .subject-page {
   min-height: 100vh;
-  padding: 90px 24px 24px;
-  max-width: 500px;
+  padding: calc(var(--navbar-height) + var(--space-xl)) var(--space-lg) var(--space-3xl);
+  max-width: var(--container-max-width);
   margin: 0 auto;
-  background: linear-gradient(180deg, #fffdfd 0%, #fafafa 100%);
-  animation: subjectFadeIn 0.8s ease;
-  color: #444;
+  background: var(--color-background);
+  animation: fadeSlideUp 0.5s ease;
 }
 
-@keyframes subjectFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ===== 상단 헤더 ===== */
+/* ========================================
+   HEADER
+======================================== */
 .subject-header {
   position: sticky;
   top: 0;
@@ -28,327 +21,434 @@
   align-items: center;
   justify-content: center;
   height: 60px;
-  padding: 16px;
-  background: #fffdfd;
-  border-bottom: 1px solid #ffe6e6;
-  z-index: 100;
+  padding: var(--space-lg);
+  background: var(--color-background-alt);
+  border-bottom: 1px solid var(--color-border-lighter);
+  z-index: var(--z-sticky);
+  margin-bottom: var(--space-lg);
 }
 
-/* 뒤로가기 버튼 */
+/* Back Button */
 .back-btn {
   position: absolute;
-  left: 16px;
-  border: none;
+  left: var(--space-lg);
   background: none;
-  color: #f09292;
+  border: none;
+  color: var(--color-primary);
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
 }
 
 .back-btn:hover {
-  color: #e86b6b;
+  background: var(--color-surface-hover);
   transform: scale(1.1);
 }
 
-/* 과목 제목 */
+/* Subject Title */
 .subject-title {
-  font-weight: 600;
-  color: #444;
-  font-size: 1.1rem;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
   text-align: center;
-  line-height: 60px;
 }
 
-/* ===== 탭 ===== */
+/* ========================================
+   TABS
+======================================== */
 .subject-tabs {
   position: sticky;
   top: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 40px;
-  padding: 10px 0;
-  background: #fffdfd;
-  border-bottom: 1px solid #ffe6e6;
-  z-index: 99;
+  gap: var(--space-3xl);
+  padding: var(--space-lg) 0;
+  background: var(--color-background-alt);
+  border-bottom: 1px solid var(--color-border-lighter);
+  z-index: calc(var(--z-sticky) - 1);
+  margin-bottom: var(--space-xl);
 }
 
 .tab-item {
+  position: relative;
   background: transparent;
   border: none;
-  font-size: 0.93rem;
-  color: #888;
+  font-size: var(--font-size-base);
+  color: var(--color-text-tertiary);
+  padding: var(--space-sm) var(--space-xs);
   cursor: pointer;
-  padding: 4px 2px 8px;
-  transition: all 0.25s ease;
+  transition: all var(--transition-base);
+  font-weight: var(--font-weight-medium);
 }
 
 .tab-item:hover {
-  color: #f09292;
+  color: var(--color-primary);
   transform: translateY(-1px);
 }
 
 .tab-item.active {
-  color: #f09292;
-  font-weight: 600;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
 }
 
-/* 밑줄 */
+/* Tab Underline */
 .tab-underline {
- position: absolute;
-  bottom: -2px;
-  height: 2px;
-  background: #f09292;
-  border-radius: 2px;
-  /* ✅ transform 대신 left 변경만 애니메이션 */
-  transition: left 0.25s ease, width 0.25s ease;
+  position: absolute;
+  bottom: -17px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: left var(--transition-base), width var(--transition-base);
 }
 
-/* ===== 콘텐츠 전체 ===== */
+/* ========================================
+   CONTENT AREA
+======================================== */
 .content-area {
   display: flex;
-  gap: 24px;
+  gap: var(--space-xl);
   flex-wrap: wrap;
-  margin-top: 24px;
 }
 
-/* ===== 왼쪽 주차 리스트 ===== */
+/* ========================================
+   WEEK LIST (Left Sidebar)
+======================================== */
 .week-list {
   width: 28%;
-  min-width: 130px;
+  min-width: 140px;
 }
 
 .week-list h4 {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 10px;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
 }
 
 .week-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 10px;
-  border: 1.8px solid #f3baba;
-  border-radius: 10px;
-  background: #fff;
-  color: #555;
-  margin-bottom: 8px;
+  padding: var(--space-md) var(--space-lg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 1px 4px rgba(243, 186, 186, 0.12);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--font-size-sm);
 }
 
 .week-item:hover {
-  background: #fff8f8;
-  transform: translateX(2px);
+  background: var(--color-surface-hover);
+  transform: translateX(3px);
+  box-shadow: var(--shadow-md);
 }
 
 .week-item.active {
-  background: #fff0f0;
-  border-color: #f09292;
-  color: #f09292;
-  font-weight: 600;
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-md);
 }
 
+/* Delete Week Button */
 .delete-week {
   border: none;
   background: none;
-  color: #f09292;
+  color: var(--color-primary);
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: color 0.2s;
+  font-size: var(--font-size-base);
+  transition: color var(--transition-fast);
+  opacity: 0.6;
 }
 
 .delete-week:hover {
-  color: #d25a5a;
+  color: var(--color-error);
+  opacity: 1;
 }
 
-/* 주차 추가 */
+/* Add Week Button */
 .add-week-btn {
   width: 100%;
   text-align: left;
-  font-size: 0.85rem;
-  color: #b8b8b8;
-  margin-top: 10px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-disabled);
+  padding: var(--space-sm) var(--space-md);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-base);
+  border-radius: var(--radius-md);
 }
 
 .add-week-btn:hover {
-  color: #f09292;
-  transform: translateX(3px);
+  color: var(--color-primary);
+  background: var(--color-surface-hover);
+  transform: translateX(4px);
 }
 
-/* ===== 오른쪽 학습 콘텐츠 ===== */
+/* ========================================
+   WEEK CONTENT (Right Main Area)
+======================================== */
 .week-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--space-lg);
 }
 
 .week-content h4 {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: #444;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
 }
 
-/* ===== 공통 콘텐츠 박스 ===== */
+/* ========================================
+   CONTENT BOX
+======================================== */
 .content-box {
-  border: 1px solid #f3baba;
-  border-radius: 12px;
-  background: #fff;
-  padding: 12px 14px;
-  min-height: 80px;
-  font-size: 0.9rem;
-  color: #444;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 6px rgba(243, 186, 186, 0.12);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  padding: var(--space-lg);
+  min-height: 100px;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
 }
 
 .content-box:hover {
-  box-shadow: 0 3px 10px rgba(243, 186, 186, 0.2);
+  box-shadow: var(--shadow-md);
+}
+
+.content-box.editable {
+  cursor: text;
 }
 
 .content-box.editable:focus-within {
-  background: #fff8f8;
-  border-color: #f09292;
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
 }
 
-/* ===== 업로드 박스 ===== */
+/* ========================================
+   UPLOAD BOX
+======================================== */
 .upload-box {
-  border: 1.5px dashed #f3baba;
-  border-radius: 12px;
-  padding: 22px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
   text-align: center;
-  color: #aaa;
+  color: var(--color-text-disabled);
   cursor: pointer;
-  transition: all 0.25s ease;
-  background: #fff;
+  transition: all var(--transition-base);
+  background: var(--color-surface);
 }
 
 .upload-box:hover {
-  background: #fff8f8;
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
   transform: scale(1.01);
 }
 
-/* ===== AI 섹션 ===== */
+/* ========================================
+   AI SUMMARY SECTION
+======================================== */
 .ai-summary-box {
-  border: 1px solid #f3baba;
-  border-radius: 12px;
-  padding: 14px;
-  background: #fffdfd;
-  box-shadow: 0 2px 6px rgba(243, 186, 186, 0.1);
-  transition: all 0.3s ease;
+  border: 2px solid var(--color-secondary-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  background: linear-gradient(135deg, #fffbfc 0%, #fff7f9 100%);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
 }
 
 .ai-summary-box:hover {
-  background: #fff8f8;
+  background: linear-gradient(135deg, #fff7f9 0%, #fff3f6 100%);
+  box-shadow: var(--shadow-lg);
 }
 
 .ai-text {
   white-space: pre-wrap;
-  line-height: 1.5;
-  color: #444;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
 }
 
+/* AI Chat Preview */
 .ai-chat-preview {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 18px;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
 }
 
 .chat-preview-item {
-  border: 1px solid #ffdce5;
-  border-radius: 12px;
-  padding: 10px 14px;
-  background: #fff;
+  border: 1.5px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-base);
+  font-size: var(--font-size-sm);
 }
 
 .chat-preview-item:hover {
-  background: #fff6f6;
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
+/* AI Chat Button */
 .ai-chat-btn {
   width: 100%;
-  background: #f3baba;
+  background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 10px;
-  padding: 10px 0;
-  font-weight: 600;
-  font-size: 0.9rem;
+  border-radius: var(--radius-md);
+  padding: var(--space-lg) 0;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
 }
 
 .ai-chat-btn:hover {
-  background: #f9b0b0;
-  transform: scale(1.03);
+  background: var(--color-primary-dark);
+  transform: scale(1.02);
+  box-shadow: var(--shadow-lg);
 }
 
-/* ===== 복습 탭 ===== */
+/* ========================================
+   REVIEW TAB
+======================================== */
 .quiz-item,
 .wrong-note-item {
   width: 100%;
-  background: #fff;
-  border: 1px solid #f3baba;
-  border-radius: 10px;
-  padding: 8px 0;
-  font-size: 0.88rem;
-  color: #444;
-  margin-bottom: 6px;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg) 0;
+  text-align: center;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
 }
 
 .quiz-item:hover,
 .wrong-note-item:hover {
-  background: #fff8f8;
-  color: #f09292;
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  transform: scale(1.02);
+  box-shadow: var(--shadow-md);
 }
 
+/* Quiz Add Button */
 .quiz-add-btn {
   width: 100%;
-  border: 1.5px dashed #ffbebe;
-  border-radius: 10px;
-  background: #fffdfd;
-  color: #f09292;
-  padding: 10px 0;
-  font-size: 0.9rem;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  color: var(--color-primary);
+  padding: var(--space-lg) 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all var(--transition-base);
 }
 
 .quiz-add-btn:hover {
-  background: #ffecec;
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
   transform: scale(1.02);
 }
 
-/* ===== 반응형 ===== */
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
 @media (max-width: 768px) {
   .subject-page {
-    max-width: 95%;
-    padding: 70px 16px;
+    padding: calc(var(--navbar-height) + var(--space-lg)) var(--space-md) var(--space-2xl);
   }
-
+  
   .content-area {
     flex-direction: column;
+    gap: var(--space-xl);
   }
-
+  
   .week-list {
     width: 100%;
+    min-width: auto;
   }
-
+  
   .subject-tabs {
-    gap: 20px;
+    gap: var(--space-2xl);
   }
+}
+
+@media (max-width: 480px) {
+  .subject-header {
+    padding: var(--space-md);
+  }
+  
+  .back-btn {
+    left: var(--space-md);
+    font-size: 1.3rem;
+    width: 36px;
+    height: 36px;
+  }
+  
+  .subject-title {
+    font-size: var(--font-size-md);
+  }
+  
+  .subject-tabs {
+    gap: var(--space-xl);
+    padding: var(--space-md) 0;
+  }
+  
+  .tab-item {
+    font-size: var(--font-size-sm);
+  }
+  
+  .week-item {
+    padding: var(--space-sm) var(--space-md);
+  }
+  
+  .content-box,
+  .ai-summary-box {
+    padding: var(--space-md);
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+.back-btn:focus-visible,
+.tab-item:focus-visible,
+.week-item:focus-visible,
+.content-box:focus-visible,
+.ai-chat-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }

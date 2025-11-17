@@ -1,0 +1,604 @@
+/* ========================================
+   🎨 GLOBAL DESIGN SYSTEM
+   ========================================
+   통일된 디자인 시스템으로 전체 UI 일관성 확보
+   모바일 최적화 및 컴포넌트 기반 스타일링
+======================================== */
+
+/* ========================================
+   📐 CSS VARIABLES (Design Tokens)
+======================================== */
+:root {
+  /* Color Palette - Pink Beige Theme */
+  --color-primary: #f09292;
+  --color-primary-light: #f8b6b6;
+  --color-primary-lighter: #ffd7d7;
+  --color-primary-dark: #e86b6b;
+  
+  --color-secondary: #f7adc0;
+  --color-secondary-light: #f7c6c6;
+  
+  --color-background: #fffaf9;
+  --color-background-alt: #fffdfd;
+  --color-surface: #ffffff;
+  --color-surface-hover: #fff8f8;
+  
+  --color-border: #f3baba;
+  --color-border-light: #ffdce5;
+  --color-border-lighter: #ffe6e6;
+  
+  --color-text-primary: #444444;
+  --color-text-secondary: #6b5552;
+  --color-text-tertiary: #777777;
+  --color-text-disabled: #aaaaaa;
+  
+  --color-error: #f05c82;
+  --color-success: #17a574;
+  --color-warning: #f0c14a;
+  
+  /* Spacing Scale (mobile-first) */
+  --space-xs: 0.25rem;   /* 4px */
+  --space-sm: 0.5rem;    /* 8px */
+  --space-md: 0.75rem;   /* 12px */
+  --space-lg: 1rem;      /* 16px */
+  --space-xl: 1.5rem;    /* 24px */
+  --space-2xl: 2rem;     /* 32px */
+  --space-3xl: 3rem;     /* 48px */
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(243, 186, 186, 0.12);
+  --shadow-md: 0 2px 6px rgba(243, 186, 186, 0.15);
+  --shadow-lg: 0 4px 12px rgba(243, 186, 186, 0.18);
+  --shadow-xl: 0 6px 20px rgba(243, 186, 186, 0.22);
+  
+  /* Typography */
+  --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.85rem;   /* 13.6px */
+  --font-size-base: 0.9rem;  /* 14.4px */
+  --font-size-md: 0.95rem;   /* 15.2px */
+  --font-size-lg: 1.1rem;    /* 17.6px */
+  --font-size-xl: 1.3rem;    /* 20.8px */
+  --font-size-2xl: 1.5rem;   /* 24px */
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Layout */
+  --container-max-width: 480px;
+  --container-padding: 5%;
+  --navbar-height: 64px;
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --transition-slow: 0.35s ease;
+  
+  /* Z-index layers */
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-navbar: 100;
+}
+
+/* ========================================
+   🌍 GLOBAL STYLES
+======================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ========================================
+   📦 LAYOUT UTILITIES
+======================================== */
+.container {
+  width: 90%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+.page-wrapper {
+  min-height: 100vh;
+  padding-top: calc(var(--navbar-height) + var(--space-xl));
+  padding-bottom: var(--space-3xl);
+  background: var(--color-background);
+}
+
+.content-section {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto var(--space-2xl);
+}
+
+.section-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-lg);
+}
+
+/* ========================================
+   🔘 BUTTON COMPONENTS
+======================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Button Variants */
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: var(--color-border-lighter);
+  color: var(--color-primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-primary-lighter);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-border);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-sm);
+}
+
+.btn-lg {
+  padding: var(--space-lg) var(--space-2xl);
+  font-size: var(--font-size-md);
+}
+
+/* Icon Button */
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.btn-icon-sm {
+  width: 28px;
+  height: 28px;
+}
+
+.btn-icon-lg {
+  width: 44px;
+  height: 44px;
+}
+
+/* ========================================
+   🃏 CARD COMPONENTS
+======================================== */
+.card {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.card-interactive {
+  cursor: pointer;
+}
+
+.card-interactive:hover {
+  background: var(--color-surface-hover);
+}
+
+.card-flat {
+  box-shadow: none;
+  border: 1px solid var(--color-border-light);
+}
+
+.card-elevated {
+  box-shadow: var(--shadow-xl);
+  border: none;
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border-lighter);
+}
+
+.card-title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+/* ========================================
+   📝 INPUT COMPONENTS
+======================================== */
+.input {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-background-alt);
+}
+
+.input::placeholder {
+  color: var(--color-text-disabled);
+}
+
+.input-rounded {
+  border-radius: var(--radius-full);
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+/* Input Group */
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.input-group input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+/* ========================================
+   🏷️ BADGE & TAG COMPONENTS
+======================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.badge-primary {
+  background: var(--color-border-lighter);
+  color: var(--color-primary);
+}
+
+.badge-success {
+  background: #e6fff2;
+  color: var(--color-success);
+}
+
+.badge-error {
+  background: #fff1f4;
+  color: var(--color-error);
+}
+
+/* ========================================
+   📑 TAB COMPONENTS
+======================================== */
+.tabs {
+  position: sticky;
+  top: var(--navbar-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2xl);
+  padding: var(--space-md) 0;
+  background: var(--color-background-alt);
+  border-bottom: 1px solid var(--color-border-lighter);
+  z-index: var(--z-sticky);
+}
+
+.tab-item {
+  position: relative;
+  background: transparent;
+  border: none;
+  font-size: var(--font-size-base);
+  color: var(--color-text-tertiary);
+  padding: var(--space-sm) var(--space-xs);
+  cursor: pointer;
+  transition: color var(--transition-base);
+}
+
+.tab-item:hover {
+  color: var(--color-primary);
+}
+
+.tab-item.active {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -13px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-primary);
+  border-radius: 2px;
+}
+
+/* ========================================
+   🔔 MODAL COMPONENTS
+======================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal-backdrop);
+  animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  width: 90%;
+  max-width: 380px;
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  margin-bottom: var(--space-lg);
+}
+
+.modal-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.modal-body {
+  margin-bottom: var(--space-xl);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
+/* ========================================
+   ⚡ ANIMATIONS
+======================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease;
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease;
+}
+
+/* ========================================
+   📱 UTILITY CLASSES
+======================================== */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+.gap-lg { gap: var(--space-lg); }
+
+.mb-sm { margin-bottom: var(--space-sm); }
+.mb-md { margin-bottom: var(--space-md); }
+.mb-lg { margin-bottom: var(--space-lg); }
+.mb-xl { margin-bottom: var(--space-xl); }
+
+.mt-sm { margin-top: var(--space-sm); }
+.mt-md { margin-top: var(--space-md); }
+.mt-lg { margin-top: var(--space-lg); }
+.mt-xl { margin-top: var(--space-xl); }
+
+.p-sm { padding: var(--space-sm); }
+.p-md { padding: var(--space-md); }
+.p-lg { padding: var(--space-lg); }
+
+/* ========================================
+   📱 RESPONSIVE BREAKPOINTS
+======================================== */
+@media (max-width: 768px) {
+  :root {
+    --container-padding: 4%;
+  }
+  
+  .page-wrapper {
+    padding-top: calc(var(--navbar-height) + var(--space-lg));
+  }
+  
+  .modal {
+    width: 92%;
+    padding: var(--space-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 15px;
+  }
+  
+  .tabs {
+    gap: var(--space-lg);
+  }
+  
+  .btn {
+    padding: var(--space-sm) var(--space-lg);
+  }
+}
+
+/* ========================================
+   🎯 ACCESSIBILITY
+======================================== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   🌙 SCROLLBAR STYLING
+======================================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-light);
+}

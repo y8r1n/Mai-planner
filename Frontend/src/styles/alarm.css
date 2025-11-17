@@ -1,164 +1,322 @@
-/* =========================================================
-   📱 알림 페이지 전체 레이아웃
-========================================================= */
+/* src/styles/alarm.css - 개선 버전 */
+
 .alarm-page {
   min-height: 100vh;
-  background: #fff;
-  padding: 2rem 1.25rem;
-  box-sizing: border-box;
+  background: linear-gradient(to bottom, #fef3f5, #ffffff);
+  padding: 80px 20px 40px;
 }
 
 .alarm-container {
-  max-width: 42rem;
+  max-width: 800px;
   margin: 0 auto;
 }
 
-/* =========================================================
-   🔖 제목
-========================================================= */
-.alarm-title {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 1rem;
-}
-
-/* =========================================================
-   🟣 필터 버튼 영역
-========================================================= */
-.alarm-filter-wrap {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  overflow-x: auto;
-  padding-bottom: 0.25rem;
-}
-
-.alarm-filter-btn {
-  padding: 0.45rem 0.9rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  border-radius: 9999px;
-  background: #f3f4f6;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.25s ease;
-}
-
-.alarm-filter-btn.active {
-  background: #fda4af;
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(253, 164, 175, 0.35);
-}
-
-.alarm-filter-btn:hover:not(.active) {
-  background: #e5e7eb;
-}
-
-/* =========================================================
-   📌 알림 리스트
-========================================================= */
-.alarm-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-/* Empty UI */
-.alarm-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 3rem;
-  color: #9ca3af;
-  font-size: 0.9rem;
-}
-
-/* =========================================================
-   🔔 알림 카드
-========================================================= */
-.alarm-card {
-  background: #fef1f5;
-  border-radius: 1rem;
-  padding: 1.25rem;
-  position: relative;
-  display: flex;
-  gap: 0.75rem;
-
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
-  cursor: pointer;
-}
-
-.alarm-card:hover {
-  box-shadow: 0 4px 10px rgba(253, 164, 175, 0.35);
-  transform: translateY(-2px);
-}
-
-/* delete button */
-.alarm-delete {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 12px;
-  height: 12px;
-  background: #f87171;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.alarm-delete:hover {
-  background: #dc2626;
-}
-
-/* icon */
-.alarm-icon {
-  font-size: 1.6rem;
-  line-height: 1;
-  flex-shrink: 0;
-  margin-top: 0.15rem;
-}
-
-/* =========================================================
-   📝 알림 내용
-========================================================= */
-.alarm-content {
-  flex: 1;
-}
-
+/* 헤더 */
 .alarm-header {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 0.35rem;
-  font-size: 0.72rem;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.alarm-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 22px; /* 28px → 22px */
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.alarm-title svg {
+  width: 32px;  /* 종 아이콘 크기 증가 */
+  height: 32px;
+}
+
+.alarm-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.alarm-action-btn {
+  width: 48px;  /* 44px → 48px */
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 3px solid #e5e7eb; /* 2.5px → 3px */
+  border-radius: 14px; /* 12px → 14px */
   color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* 그림자 강화 */
+}
+
+.alarm-action-btn svg {
+  width: 24px;  /* 22px → 24px */
+  height: 24px;
+  stroke-width: 2.5;
+}
+
+.alarm-action-btn:hover {
+  background: #f3f4f6;
+  border-color: #f092a0;
+  color: #f092a0;
+  transform: scale(1.08); /* 1.05 → 1.08 */
+  box-shadow: 0 4px 12px rgba(240, 146, 160, 0.3); /* 그림자 강화 */
+}
+
+.alarm-action-btn.danger:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: #fef2f2;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); /* 그림자 강화 */
+}
+
+/* 호버하지 않을 때도 약간의 색상 힌트 */
+.alarm-action-btn:first-of-type {
+  border-color: #d1fae5; /* 초록 힌트 */
+}
+
+.alarm-action-btn.danger {
+  border-color: #fecaca; /* 빨강 힌트 */
+}
+
+/* 필터 */
+.alarm-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 8px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #fce7eb;
+}
+
+.filter-btn {
+  flex: 1;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  background: #fef3f5;
+  color: #f092a0;
+}
+
+.filter-btn.active {
+  background: #f092a0;
+  color: white;
+}
+
+/* 알림 리스트 */
+.alarm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 알림 카드 */
+.alarm-card {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: white;
+  border: 2px solid #fce7eb;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.alarm-card.unread {
+  border-color: #f092a0;
+  box-shadow: 0 2px 8px rgba(240, 146, 160, 0.15);
+}
+
+.alarm-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(240, 146, 160, 0.2);
+  border-color: #f092a0;
+}
+
+.alarm-card.read {
+  opacity: 0.7;
+}
+
+/* 삭제 버튼 */
+.alarm-delete {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+.alarm-card:hover .alarm-delete {
+  opacity: 1;
+}
+
+.alarm-delete:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+/* 아이콘 */
+.alarm-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fef3f5;
+  border-radius: 12px;
+  font-size: 24px;
+}
+
+/* 내용 */
+.alarm-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.alarm-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .alarm-tab {
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .alarm-dot {
   color: #d1d5db;
+  font-size: 12px;
+}
+
+.alarm-time {
+  font-size: 12px;
+  color: #9ca3af;
 }
 
 .alarm-message {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 0.35rem;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  line-height: 1.5;
 }
 
 .alarm-details {
-  margin-top: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
 }
 
 .alarm-details p {
-  font-size: 0.76rem;
-  color: #4b5563;
-  margin: 0.2rem 0;
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* 읽지 않음 배지 */
+.unread-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #f092a0;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+/* 빈 상태 */
+.alarm-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.alarm-empty p {
+  margin-top: 16px;
+  font-size: 16px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* 모바일 대응 */
+@media (max-width: 640px) {
+  .alarm-page {
+    padding: 70px 16px 30px;
+  }
+
+  .alarm-title {
+    font-size: 20px; /* 모바일에서도 적당한 크기 */
+  }
+
+  .alarm-title svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .alarm-action-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .alarm-action-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .alarm-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .alarm-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .alarm-message {
+    font-size: 15px;
+  }
+
+  .filter-btn {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
 }
