@@ -1,4 +1,7 @@
+// src/App.jsx
 import { Routes, Route } from "react-router-dom";
+
+// 📌 페이지 컴포넌트
 import NavBar from "./components/NavBar.jsx";
 import Home from "./components/Home.jsx";
 import TodoTab from "./components/TodoTab.jsx";
@@ -11,10 +14,14 @@ import Subject from "./components/Subject.jsx";
 import MentorChat from "./components/MentorChat.jsx";
 import QuizAI from "./components/QuizAI.jsx";
 import ReviewDetail from "./components/Reviewdetail.jsx";
+import Alarm from "./components/Alarm.jsx";
+import ClearNotifications from "./components/ClearNotifications.jsx";
+
+// 📌 전역 컨텍스트
 import { NotificationProvider } from "./contexts/NotificationContext.jsx";
-import Alarm from "./components/Alarm.jsx"; 
-import ClearNotifications from "./components/ClearNotifications"; 
 import { AppProvider } from "./contexts/AppContext.jsx";
+
+// 📌 전역 UI 컴포넌트
 import LoadingSpinner from "./common/LoadingSpinner.jsx";
 import ErrorMessage from "./common/ErrorMessage.jsx";
 import Toast from "./common/Toast.jsx";
@@ -23,28 +30,34 @@ function App() {
   return (
     <AppProvider>
       <NotificationProvider>
-        {/* 전역 UI 컴포넌트 */}
+        {/* 🔥 전역 UI 컴포넌트 */}
         <LoadingSpinner />
         <ErrorMessage />
         <Toast />
 
-        {/* 공통 네비게이터 */}
+        {/* 🔥 공통 네비게이션 */}
         <NavBar />
 
-        {/* 라우트 */}
+        {/* 🔥 라우트 */}
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/TodoTab" element={<TodoTab />} />
-          <Route path="/Calendar" element={<Calendar />} />
-          <Route path="/School" element={<School />} />
-          <Route path="/imagediary" element={<ImageDiary />} />
-          <Route path="/Study" element={<Study />} />
+
+          {/* 기본 페이지 */}
+          <Route path="/todotab" element={<TodoTab />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/school" element={<School />} />
           <Route path="/withai" element={<Withai />} />
+          <Route path="/study" element={<Study />} />
+          <Route path="/imagediary" element={<ImageDiary />} />
+
+          {/* 과목 상세 & 주차 상세 */}
           <Route path="/subject/:id" element={<Subject />} />
-          <Route path="/Mentorchat/:subjectId/:weekId" element={<MentorChat />} />
-          <Route path="/QuizAI/:subjectId/:weekId" element={<QuizAI />} />
-          <Route path="/ReviewDetail/:subjectId/:weekId/:noteId" element={<ReviewDetail />} />
-          <Route path="/Alarm" element={<Alarm />} />
+          <Route path="/mentorchat/:subjectId/:weekId" element={<MentorChat />} />
+          <Route path="/quizai/:subjectId/:weekId" element={<QuizAI />} />
+          <Route path="/reviewdetail/:subjectId/:weekId/:noteId" element={<ReviewDetail />} />
+
+          {/* 알림 */}
+          <Route path="/alarm" element={<Alarm />} />
           <Route path="/clear-notifications" element={<ClearNotifications />} />
         </Routes>
       </NotificationProvider>
