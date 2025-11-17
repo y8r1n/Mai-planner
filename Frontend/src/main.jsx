@@ -14,11 +14,11 @@ import "./styles/error.css";
 import "./styles/toast.css";
 
 // 🎨 리팩터링된 컴포넌트 스타일
-import "./styles/navbar-refactored.css";
-import "./styles/home-refactored.css";
-import "./styles/WithAi-refactored.css";
-import "./styles/Subject-refactored.css";
-import "./styles/todotab-refactored.css";
+import "./styles/navbar.css";
+import "./styles/home.css";
+import "./styles/WithAi.css";
+import "./styles/Subject.css";
+import "./styles/todotab.css";
 
 // 🎨 기존 스타일
 import "./styles/alarm.css";
