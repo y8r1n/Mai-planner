@@ -31,6 +31,8 @@ export default function School() {
   const korDays = ["월", "화", "수", "목", "금"];
   const colors = ["#f8b6b6", "#f3a6b6", "#f8c2c2", "#fcbfcf", "#f4a5a5"];
 
+  
+
   // ------------------------------
   // 🔥 Firestore 실시간 반영
   // ------------------------------

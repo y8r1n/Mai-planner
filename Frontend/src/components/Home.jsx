@@ -99,31 +99,31 @@ export default function Home() {
             onClick={() => navigate("/School")}
           >
             <div className="timetable-grid">
-              {["Mon", "Tue", "Wed", "Thu", "Fri"].map((dayKey) => {
-                const firestoreDay = timetableDayMap[dayKey]; // "월" ~ "금"
-                const list = timetable
-                  .filter((s) => s.day === firestoreDay)
-                  .slice(0, 2);
+  {["Mon", "Tue", "Wed", "Thu", "Fri"].map((engDay) => {
+    const list = timetable
+      .filter((s) => s.day === engDay)
+      .slice(0, 2);
 
-                return (
-                  <div key={dayKey} className="timetable-cell">
-                    {list.length === 0 ? (
-                      <span className="timetable-empty">-</span>
-                    ) : (
-                      list.map((s) => (
-                        <span
-                          key={s.id}
-                          className="timetable-item"
-                          style={{ backgroundColor: s.color || "#f8b6b6" }}
-                        >
-                          {s.title}
-                        </span>
-                      ))
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+    return (
+      <div key={engDay} className="timetable-cell">
+        {list.length === 0 ? (
+          <span className="timetable-empty">-</span>
+        ) : (
+          list.map((s) => (
+            <span
+              key={s.id}
+              className="timetable-item"
+              style={{ backgroundColor: s.color || "#f8b6b6" }}
+            >
+              {s.title}
+            </span>
+          ))
+        )}
+      </div>
+    );
+  })}
+</div>
+
           </div>
         ) : (
           <div className="timetable-empty-box">
