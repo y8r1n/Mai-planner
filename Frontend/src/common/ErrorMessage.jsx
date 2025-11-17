@@ -1,6 +1,6 @@
 // src/components/common/ErrorMessage.jsx
 import React from 'react';
-import { useApp } from '../../contexts/AppContext';
+import { useApp } from '../contexts/AppContext';
 import { AlertCircle, X } from 'lucide-react';
 import '../../styles/error.css';
 

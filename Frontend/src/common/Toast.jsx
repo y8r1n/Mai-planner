@@ -1,6 +1,6 @@
 // src/components/common/Toast.jsx
 import React, { useEffect, useState } from 'react';
-import { useApp } from '../../contexts/AppContext';
+import { useApp } from '../contexts/AppContext';
 import { CheckCircle, AlertCircle, Info, X } from 'lucide-react';
 import '../../styles/toast.css';
 
