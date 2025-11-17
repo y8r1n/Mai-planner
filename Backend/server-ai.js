@@ -33,6 +33,7 @@ const serviceAccount = JSON.parse(
   fs.readFileSync(serviceAccountPath, "utf8")
 );
 
+
 /* ========================================================================== */
 /* 🚀 Express Init */
 /* ========================================================================== */
@@ -90,7 +91,7 @@ const db = getFirestore(clientApp);
 /* ========================================================================== */
 async function callOpenAI(prompt, model = "gpt-4o-mini", jsonMode = false) {
   try {
-    const apiBase = process.env.VITE_API_BASE || "https://api.openai.com";
+  const apiBase = process.env.OPENAI_API_BASE || "https://api.openai.com";
 
     const body = {
       model,
