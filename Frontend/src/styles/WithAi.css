@@ -1,288 +1,1212 @@
-/* ========== 🌸 기본 레이아웃 ========== */
+/* =====================================
+   🌸 WithAI Tab - Refactored
+   ===================================== */
+
 .withai-page {
-  background-color: #fafafa;
   min-height: 100vh;
-  padding: 2rem 0;
+  padding: calc(var(--navbar-height) + var(--space-xl)) 0 var(--space-3xl);
+  background: var(--color-background);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+/* ========================================
+   ✨ PAGE HEADER & TITLE
+======================================== */
+.withai-header {
+  margin-bottom: 24px;
+  text-align: center;
+}
 
-/* ====== WITHAI 상단바 ====== */
+.withai-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  background: none; 
+  box-shadow: none;
+}
+
+.title-icon {
+  font-size: 1.8rem;
+}
+
+.title-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.title-ai {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f092a0;
+  text-transform: uppercase;
+}
+
+.title-timeline {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #333;
+}
+
+/* ========================================
+   📊 TOP BAR (날짜 선택 및 추가)
+======================================== */
 .withai-topbar {
+  width: 92%;
+  max-width: var(--container-max-width);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg) var(--space-xl);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--space-2xl);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  max-width: 420px;
-  background: #fffdfd;
-  border: 2px solid #f5cdd5;
-  border-radius: 20px;
-  padding: 0.7rem 1rem;
-  box-shadow: 0 2px 8px rgba(255, 170, 190, 0.15);
-  margin-bottom: 1.8rem;
   position: relative;
-  margin-top: 1.8rem;
 }
 
-/* ▶ 버튼 */
+/* Play Button */
 .withai-playbtn {
-  color: #f7a1a1;
-  font-size: 1rem;
+  color: var(--color-primary);
+  font-size: 1.8rem; /* 훨씬 크게! */
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
 }
-.withai-playbtn:hover { transform: scale(1.2); }
 
-/* 날짜 텍스트 */
+.withai-playbtn:hover {
+  transform: scale(1.2);
+}
+
+/* Date Display */
 .withai-date {
-  color: #7d6664;
-  font-size: 0.88rem;
+  flex: 1;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: color 0.2s ease;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
 }
-.withai-date:hover { color: #f28aa5; }
 
-/* 추가하기 버튼 */
+.withai-date:hover {
+  color: var(--color-primary);
+  background: var(--color-surface-hover);
+}
+
+/* Add Button */
 .withai-addbtn {
-  color: #e76588;
-  font-size: 0.85rem;
-  border-radius: 10px;
-  padding: 4px 10px;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  background: var(--color-border-lighter);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-lg);
   cursor: pointer;
-  transition: all 0.25s ease;
-}
-.withai-addbtn:hover {
-  background: #ffc8d6;
-  color: #fff;
+  transition: all var(--transition-base);
 }
 
-/* 드롭다운 */
+.withai-addbtn:hover {
+  background: var(--color-primary-light);
+  color: white;
+  transform: scale(1.05);
+}
+
+/* ========================================
+   📅 DATE DROPDOWN
+======================================== */
 .withai-dropdown {
   position: absolute;
-  top: 3.2rem;
+  top: calc(100% + var(--space-md));
   left: 50%;
   transform: translateX(-50%);
-  width: 200px;
-  background: #fffafc;
-  border: 2px solid #f5cfd6;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(255, 175, 190, 0.2);
-  z-index: 30;
-  overflow-y: auto;
-  opacity: 0;
+  width: 220px;
   max-height: 0;
-  transition: all 0.3s ease;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  opacity: 0;
+  z-index: var(--z-dropdown);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .withai-dropdown.open {
+  max-height: 280px;
   opacity: 1;
-  max-height: 200px;
+  overflow-y: auto;
 }
+
 .withai-dropdown p {
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
   text-align: center;
-  font-size: 0.85rem;
-  color: #6d5b5a;
-  padding: 0.6rem;
-  transition: all 0.2s;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border-bottom: 1px solid var(--color-border-lighter);
 }
+
+.withai-dropdown p:last-child {
+  border-bottom: none;
+}
+
 .withai-dropdown p:hover {
-  background: #fff1f4;
-  color: #e85d8c;
+  background: var(--color-surface-hover);
+  color: var(--color-primary);
 }
 
-/* =============== 타임라인 구조 =============== */
-:root {
-  --rail-x: 28px;
-  --rail-w: 2px;
-  --dot: 18px;
-  --rail-top: 22px;
-  --rail-bottom: 22px;
-}
-
-/* 타임라인 컨테이너 */
+/* ========================================
+   ⏱️ TIMELINE CONTAINER
+======================================== */
 .withai-timeline {
+  width: 92%;
+  max-width: var(--container-max-width);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-2xl) var(--space-xl);
+  box-shadow: var(--shadow-md);
   position: relative;
-  padding-left: calc(var(--rail-x) + 20px);
-  background: #ffffff;
-  border: 2px solid #f4cfd3;
-  border-radius: 25px;
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-  width: 100%;
-  max-width: 420px;
-  box-shadow: 0 4px 12px rgba(255, 160, 175, 0.1);
+  animation: fadeSlideUp 0.5s ease;
 }
 
-/* 세로 레일 */
+/* Timeline Rail (세로선) */
 .withai-timeline::before {
-  content: "";
+  content: '';
   position: absolute;
-  left: var(--rail-x);
-  top: var(--rail-top);
-  bottom: var(--rail-bottom);
-  width: var(--rail-w);
-  background: #f8d4dc;
-  transform: translateX(-50%);
+  left: 32px;
+  top: var(--space-2xl);
+  bottom: var(--space-2xl);
+  width: 3px;
+  background: linear-gradient(to bottom, 
+    var(--color-border-light) 0%, 
+    var(--color-border) 50%, 
+    var(--color-border-light) 100%
+  );
+  border-radius: 2px;
   z-index: 0;
 }
 
-/* 각 아이템 */
+/* ========================================
+   📌 TIMELINE ITEM
+======================================== */
 .withai-item {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1.6rem;
-  z-index: 1;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-2xl);
+  padding-left: 52px;
+  z-index: var(--z-base);
+  opacity: 0;
+  animation: fadeSlideUp 0.4s ease forwards;
 }
-.withai-item:last-child { margin-bottom: 0; }
 
-/* 동그라미 */
-.withai-item .withai-circle {
+.withai-item:last-child {
+  margin-bottom: 0;
+}
+
+.withai-item:nth-child(1) { animation-delay: 0.05s; }
+.withai-item:nth-child(2) { animation-delay: 0.1s; }
+.withai-item:nth-child(3) { animation-delay: 0.15s; }
+.withai-item:nth-child(4) { animation-delay: 0.2s; }
+.withai-item:nth-child(5) { animation-delay: 0.25s; }
+
+/* ========================================
+   ⭕ TIMELINE DOT
+======================================== */
+.withai-circle {
   position: absolute;
-  left: var(--rail-x);
-  top: 0.25rem;
-  transform: translateX(-50%);
-  width: var(--dot);
-  height: var(--dot);
-  border: 2px solid #f4a4b7;
+  left: 0;
+  top: 2px;
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--color-primary-light);
   border-radius: 50%;
-  background-color: #fff8f8;
-  transition: all 0.25s ease;
-  flex-shrink: 0;
+  background: var(--color-surface);
   cursor: pointer;
-  left: -20px;
-}
-.withai-item .withai-circle.checked {
-  background-color: #f7adc0;
-  border-color: #f7adc0;
-  box-shadow: 0 0 6px rgba(247,173,192,0.6);
+  transition: all var(--transition-base);
+  z-index: var(--z-base);
+  box-shadow: 0 0 0 0 rgba(240, 146, 146, 0);
 }
 
-/* 아이템 내용 */
-.withai-item .withai-content {
+.withai-circle:hover {
+  transform: scale(1.2);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(240, 146, 146, 0.2);
+}
+
+/* ========================================
+   ⏰ 시간 기반 상태 스타일
+======================================== */
+
+/* 완료된 일정 - 채워진 동그라미 */
+.withai-circle.completed {
+  background: linear-gradient(135deg, #f092a0 0%, #e85a8c 100%);
+  border-color: #e85a8c;
+  box-shadow: 0 0 0 4px rgba(240, 146, 146, 0.15);
+}
+
+.withai-circle.completed::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* 진행중인 일정 - 펄스 애니메이션 */
+.withai-circle.current {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border-color: #f59e0b;
+  animation: currentPulse 2s ease-in-out infinite;
+}
+
+.withai-circle.current::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid #fbbf24;
+  animation: ripple 2s ease-out infinite;
+}
+
+@keyframes currentPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* 미래 일정 - 기본 스타일 유지 */
+.withai-circle.future {
+  background: var(--color-surface);
+  border-color: var(--color-primary-light);
+}
+
+.withai-circle.checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(240, 146, 146, 0.25);
+}
+
+.withai-circle.checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* AI Item Dot (dashed border) */
+.withai-item.ai .withai-circle {
+  border-style: dashed;
+  border-color: var(--color-secondary);
+  background: linear-gradient(135deg, #fffafc 0%, #fff5f8 100%);
+}
+
+/* ========================================
+   📝 TIMELINE CONTENT
+======================================== */
+.withai-content {
   flex: 1;
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border-lighter);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: all var(--transition-base);
 }
-.withai-item .withai-content h4 {
-  color: #5a4a49;
-  font-size: 0.95rem;
-  font-weight: 600;
+
+.withai-item:hover .withai-content {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-sm);
 }
-.withai-item .withai-content .withai-time {
-  font-size: 0.8rem;
-  color: #a08885;
-  margin-top: 2px;
+
+.withai-content h4 {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-xs);
+  line-height: 1.4;
 }
-/* ========================= ✏️🗑️ 수정 / 삭제 버튼 ========================= */
+
+.withai-time {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-top: var(--space-xs);
+}
+
+.withai-time::before {
+  content: '🕐';
+  font-size: 13px;
+}
+
+/* ========================================
+   ✏️ EDIT BUTTONS
+======================================== */
 .withai-editbtns {
   position: absolute;
-  top: 0.5rem;
-  right: 0.8rem;
+  top: var(--space-md);
+  right: var(--space-md);
   display: flex;
-  gap: 0.4rem;
-  opacity: 0;
+  gap: var(--space-sm);
+  opacity: 0; /* 호버 시에만 보이게 */
   pointer-events: none;
-  transform: translateY(-2px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  z-index: 20; /* 🔹 버튼이 항상 위로 */
+  transform: translateY(-4px);
+  transition: all var(--transition-base);
+  z-index: var(--z-dropdown);
 }
 
-/* hover 시 나타남 */
+/* 호버 시 나타남 */
 .withai-item:hover .withai-editbtns {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
 }
 
-/* 버튼 스타일 */
 .withai-editbtns button {
-  background: #ffffff;
-  border: 1px solid #f5b9c9;
-  border-radius: 8px;
-  color: #e85a8c;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
-  width: 28px;
-  height: 28px;
+  background: white;
+  border: 2px solid;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 1px 3px rgba(240, 150, 160, 0.15);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  font-size: 1.3rem;
 }
 
-.withai-editbtns button:hover {
-  background: #f7adc0;
-  color: #fff;
-  transform: scale(1.05);
-  box-shadow: 0 3px 6px rgba(230, 150, 160, 0.25);
+/* 편집 버튼 (초록색) */
+.withai-editbtns button:first-child {
+  border-color: #66BB6A;
 }
 
-/* 아이콘이 확실히 보이게 */
+.withai-editbtns button:first-child::before {
+  content: '✏️';
+}
+
+.withai-editbtns button:first-child:hover {
+  background: #66BB6A;
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(102, 187, 106, 0.4);
+}
+
+/* 삭제 버튼 (빨간색) */
+.withai-editbtns button:last-child {
+  border-color: #EF5350;
+}
+
+.withai-editbtns button:last-child::before {
+  content: '🗑️';
+}
+
+.withai-editbtns button:last-child:hover {
+  background: #EF5350;
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
+}
+
 .withai-editbtns svg {
-  width: 15px;
-  height: 15px;
-  stroke-width: 2.2;
-  color: inherit;
+  display: none; /* 이모지만 사용 */
 }
 
-/* ========== AI 추천 멘트 / 플랜 카드 ========== */
-.withai-item.ai .withai-circle {
-  border-style: dashed;
-  border-color: #f5b1c1;
-  background: #fffafc;
-}
-
+/* ========================================
+   🤖 AI RECOMMENDATION CARD
+======================================== */
 .withai-aiplan-card {
-  width: 100%;
-  max-width: 420px;
-  background: linear-gradient(135deg, #fff7f9 0%, #ffeef4 100%);
-  border: 1.8px solid #f7c9d8;
-  border-radius: 22px;
-  box-shadow: 0 4px 12px rgba(255, 185, 200, 0.18);
-  padding: 1.2rem 1.4rem;
-  margin-bottom: 1.8rem;
+  width: 92%;
+  max-width: var(--container-max-width);
+  background: linear-gradient(135deg, #fffbfc 0%, #fff5f8 100%);
+  border: 2px solid var(--color-secondary-light);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-2xl);
+  box-shadow: var(--shadow-lg);
   animation: fadeSlideUp 0.6s ease forwards;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
 }
+
+.withai-aiplan-card::before {
+  content: '✨';
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  font-size: 2.5rem;
+  opacity: 0.4;
+}
+
 .withai-aiplan-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(255, 180, 195, 0.25);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-secondary);
 }
+
 .withai-aiplan-card h3 {
-  font-size: 0.95rem;
-  color: #e76087;
-  font-weight: 600;
-  margin-bottom: 0.4rem;
+  font-size: var(--font-size-md);
+  color: var(--color-secondary);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
+
+.withai-aiplan-card h3::before {
+  content: '🤖';
+  font-size: 1.5rem;
+}
+
 .withai-aiplan-card p {
-  font-size: 0.88rem;
-  color: #6f5d5d;
-  line-height: 1.6;
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
   white-space: pre-line;
 }
 
-/* ========== 애니메이션 ========== */
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.withai-item {
-  opacity: 0;
-  transform: translateY(10px);
-  animation: fadeSlideUp 0.4s ease forwards;
-}
-.withai-item.ai {
-  animation-delay: 0.1s;
+/* AI Item Special Styling */
+.withai-item.ai .withai-content {
+  background: linear-gradient(135deg, #fffafc 0%, #fff7f9 100%);
+  border-color: var(--color-secondary-light);
 }
 
-/* 반응형 */
-@media (max-width: 480px) {
-  :root {
-    --rail-x: 22px;
-    --dot: 16px;
+.withai-item.ai .withai-content h4 {
+  color: var(--color-secondary);
+}
+
+/* ========================================
+   🎨 EMPTY STATE
+======================================== */
+.withai-empty {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-xl);
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-base);
+}
+
+.withai-empty::before {
+  content: '📅';
+  display: block;
+  font-size: 3rem;
+  margin-bottom: var(--space-lg);
+  opacity: 0.5;
+}
+
+/* ========================================
+   📱 RESPONSIVE DESIGN
+======================================== */
+@media (max-width: 768px) {
+  .withai-timeline::before {
+    left: 28px;
   }
-  .withai-timeline { padding-left: calc(var(--rail-x) + 18px); }
+  
+  .withai-item {
+    padding-left: 48px;
+    gap: var(--space-lg);
+  }
+  
+  .withai-circle {
+    width: 20px;
+    height: 20px;
+    border-width: 2.5px;
+  }
+  
+  .withai-content {
+    padding: var(--space-md);
+  }
+  
+  .withai-content h4 {
+    font-size: var(--font-size-base);
+  }
+  
+  .withai-editbtns button {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .withai-topbar {
+    padding: var(--space-md) var(--space-lg);
+  }
+  
+  .withai-playbtn {
+    font-size: 1rem;
+    width: 32px;
+    height: 32px;
+  }
+  
+  .withai-date {
+    font-size: var(--font-size-sm);
+  }
+  
+  .withai-addbtn {
+    font-size: var(--font-size-xs);
+    padding: var(--space-xs) var(--space-md);
+  }
+  
+  .withai-timeline {
+    padding: var(--space-xl) var(--space-lg);
+  }
+  
+  .withai-timeline::before {
+    left: 24px;
+  }
+  
+  .withai-item {
+    padding-left: 42px;
+    margin-bottom: var(--space-xl);
+  }
+  
+  .withai-circle {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .withai-aiplan-card {
+    padding: var(--space-lg);
+  }
+}
+
+/* ========================================
+   ♿ ACCESSIBILITY
+======================================== */
+.withai-circle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.withai-editbtns button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   ➕ ADD/EDIT TASK MODAL (일정 추가/수정)
+======================================== */
+.withai-task-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal-backdrop);
+  animation: fadeIn 0.2s ease;
+}
+
+.withai-task-content {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  width: 90%;
+  max-width: 420px;
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.3s ease;
+}
+
+.withai-task-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 2px solid var(--color-border-lighter);
+}
+
+.withai-task-header h3 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.withai-task-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.withai-task-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.withai-task-label {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.withai-task-input {
+  width: 100%;
+  padding: var(--space-lg);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.withai-task-input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-background-alt);
+  box-shadow: 0 0 0 4px rgba(240, 146, 146, 0.15);
+}
+
+.withai-task-input::placeholder {
+  color: var(--color-text-disabled);
+}
+
+.withai-time-group {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.withai-time-input {
+  flex: 1;
+}
+
+.withai-time-separator {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-tertiary);
+  padding-top: 1.5rem;
+}
+
+.withai-task-buttons {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border-lighter);
+}
+
+.withai-btn-task-cancel {
+  flex: 1;
+  padding: var(--space-lg) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-tertiary);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.withai-btn-task-cancel:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.withai-btn-task-submit {
+  flex: 2;
+  padding: var(--space-lg) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: white;
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.withai-btn-task-submit:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ========================================
+   📝 EDIT MODAL (팝업 형태)
+======================================== */
+.withai-edit-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal-backdrop);
+  animation: fadeIn 0.2s ease;
+}
+
+.withai-edit-content {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  width: 90%;
+  max-width: 400px;
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.3s ease;
+}
+
+.withai-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 2px solid var(--color-border-lighter);
+}
+
+.withai-edit-header h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.withai-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.withai-edit-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.withai-edit-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.withai-edit-input {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.withai-edit-input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-background-alt);
+  box-shadow: 0 0 0 3px rgba(240, 146, 146, 0.1);
+}
+
+.withai-edit-buttons {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border-lighter);
+}
+
+.withai-btn-save {
+  flex: 2;
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: white;
+  background: #66BB6A;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.withai-btn-save:hover {
+  background: #4CAF50;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.withai-btn-cancel-edit {
+  flex: 1;
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-tertiary);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.withai-btn-cancel-edit:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ========================================
+   🗑️ DELETE CONFIRMATION MODAL
+======================================== */
+.withai-delete-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  animation: fadeIn 0.2s ease;
+}
+
+.withai-delete-content {
+  background: var(--color-surface);
+  border: 2px solid #EF5350;
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  width: 90%;
+  max-width: 360px;
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.3s ease;
+  text-align: center;
+}
+
+.withai-delete-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-lg);
+}
+
+.withai-delete-text {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.withai-delete-subtext {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-xl);
+}
+
+.withai-delete-buttons {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.withai-btn-delete-confirm {
+  flex: 1;
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: white;
+  background: #EF5350;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.withai-btn-delete-confirm:hover {
+  background: #D32F2F;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
+}
+
+.withai-btn-delete-cancel {
+  flex: 1;
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.withai-btn-delete-cancel:hover {
+  background: var(--color-surface-hover);
+}
+
+/* ========================================
+   ⚙️ AI SETTINGS MODAL
+======================================== */
+.withai-settings-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal-backdrop);
+  animation: fadeIn 0.2s ease;
+}
+
+.withai-settings-content {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  width: 90%;
+  max-width: 420px;
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.3s ease;
+}
+
+.withai-settings-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 2px solid var(--color-border-lighter);
+}
+
+.withai-settings-header h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.withai-settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.withai-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.withai-form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.withai-form-input {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.withai-form-input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-background-alt);
+  box-shadow: 0 0 0 3px rgba(240, 146, 146, 0.1);
+}
+
+.withai-form-input::placeholder {
+  color: var(--color-text-disabled);
+}
+
+.withai-data-summary {
+  background: linear-gradient(135deg, #fffbfc 0%, #fff7f9 100%);
+  border: 1.5px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin: var(--space-lg) 0;
+}
+
+.withai-data-summary h4 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.withai-data-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border-lighter);
+}
+
+.withai-data-item:last-child {
+  border-bottom: none;
+}
+
+.withai-data-label {
+  color: var(--color-text-tertiary);
+}
+
+.withai-data-value {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+}
+
+.withai-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: #fff8e1;
+  border: 1px solid #ffd54f;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  color: #f57c00;
+  line-height: 1.5;
+}
+
+.withai-modal-buttons {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border-lighter);
+}
+
+.withai-btn-cancel {
+  flex: 1;
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-tertiary);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.withai-btn-cancel:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.withai-btn-generate {
+  flex: 2;
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: white;
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.withai-btn-generate:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.withai-btn-generate:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.withai-loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.withai-error-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: #ffebee;
+  border: 1px solid #ef5350;
+  border-radius: var(--radius-md);
+  color: #c62828;
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-lg);
 }
