@@ -1,18 +1,18 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import path from "path";
-import { fileURLToPath } from "url";
-
-// ESM 환경에서 __dirname 만들기
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export default defineConfig({
-  root: "",
+  plugins: [react()],
+  root: ".",  // 프론트 루트
   build: {
-    outDir: "dist",
+    outDir: "dist",   // vercel이 자동으로 dist 읽음
+    emptyOutDir: true,
+  },
+  server: {
+    open: true,
   },
 });
+
 
 
 
