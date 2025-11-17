@@ -78,49 +78,58 @@ export default function MentorChat() {
   }, [subjectId, weekId, activeChatId]);
 
   // ✅ 새 메시지 전송 (OpenAI 연동)
-  const sendMessage = async () => {
-    if (!input.trim()) return;
-    const newMsg = { role: "user", content: input.trim() };
-    const updatedMessages = [...messages, newMsg];
-    setMessages(updatedMessages);
-    setInput("");
-    setLoading(true);
+const sendMessage = async () => {
+  if (!input.trim()) return;
 
-    try {
-      const res = await mentorChat.post("/message", {
-        messages: updatedMessages,
-        subjectId, weekId, subjectName,
-      });
+  // 새 메시지 추가
+  const newMsg = { role: "user", content: input.trim() };
+  const updatedMessages = [...messages, newMsg];
+  setMessages(updatedMessages);
+  setInput("");
+  setLoading(true);
 
-      if (res.data?.success) {
-        const reply = { role: "assistant", content: res.data.reply };
-        const newMsgs = [...updatedMessages, reply];
-        setMessages(newMsgs);
+  // 🔥 메시지 구조 표준화 (백엔드에 맞게 변환)
+  const normalized = updatedMessages.map((m) => ({
+  role: m.role || m.sender || "user",
+  content: m.content || m.text || "",
+}));
 
-        // ✅ Firestore에 저장
-        if (activeChatId) {
-          await updateDoc(
-            doc(db, "subjects", subjectId, "weeks", weekId, "chats", activeChatId),
-            { messages: newMsgs, updatedAt: serverTimestamp() }
-          );
-        } else {
-          const ref = await addDoc(chatsCol, {
-            title: `멘토와의 대화`,
-            messages: newMsgs,
-            createdAt: serverTimestamp(),
-          });
-          setActiveChatId(ref.id);
-        }
+  try {
+    const res = await mentorChat.post("/message", {
+      messages: normalized,
+      subjectName,  // 백엔드는 이것만 읽음
+    });
+
+    if (res.data?.success) {
+      const reply = { role: "assistant", content: res.data.reply };
+      const newMsgs = [...updatedMessages, reply];
+      setMessages(newMsgs);
+
+      // Firestore 저장
+      if (activeChatId) {
+        await updateDoc(
+          doc(db, "subjects", subjectId, "weeks", weekId, "chats", activeChatId),
+          { messages: newMsgs, updatedAt: serverTimestamp() }
+        );
       } else {
-        alert("응답을 받을 수 없어요. 다시 시도해주세요.");
+        const ref = await addDoc(chatsCol, {
+          title: `멘토와의 대화`,
+          messages: newMsgs,
+          createdAt: serverTimestamp(),
+        });
+        setActiveChatId(ref.id);
       }
-    } catch (err) {
-      console.error("❌ MentorChat Error:", err);
-      alert("서버 연결 실패!");
-    } finally {
-      setLoading(false);
+    } else {
+      alert("응답을 받을 수 없어요.");
     }
-  };
+  } catch (err) {
+    console.error("❌ MentorChat Error:", err);
+    alert("서버 연결 실패!");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // 🔹 대화 저장 (수동)
   const saveChat = async () => {
