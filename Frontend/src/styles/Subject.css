@@ -25,7 +25,7 @@
   background: var(--color-background-alt);
   border-bottom: 1px solid var(--color-border-lighter);
   z-index: var(--z-sticky);
-  margin-bottom: var(--space-lg);
+  margin-bottom: 0;
 }
 
 /* Back Button */
@@ -65,7 +65,7 @@
 ======================================== */
 .subject-tabs {
   position: sticky;
-  top: 60px;
+  top: var(--navbar-height);
   display: flex;
   justify-content: center;
   align-items: center;
