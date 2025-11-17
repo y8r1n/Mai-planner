@@ -1,3 +1,4 @@
+//  server-ai.js
 /* ========================================================================== */
 /* 📦 Imports */
 /* ========================================================================== */
@@ -85,10 +86,12 @@ const clientApp = initializeApp({
 const db = getFirestore(clientApp);
 
 /* ========================================================================== */
-/* 🧠 공통 OpenAI Request Handler */
+/* 🧠 공통 OpenAI Request Handler (안정화 버전) */
 /* ========================================================================== */
 async function callOpenAI(prompt, model = "gpt-4o-mini", jsonMode = false) {
   try {
+    const apiBase = process.env.VITE_API_BASE || "https://api.openai.com";
+
     const body = {
       model,
       messages: [{ role: "user", content: prompt }],
@@ -99,22 +102,24 @@ async function callOpenAI(prompt, model = "gpt-4o-mini", jsonMode = false) {
     }
 
     const res = await axios.post(
-      `${process.env.VITE_API_BASE}/v1/chat/completions`,
+      `${apiBase}/v1/chat/completions`,
       body,
       {
         headers: {
           Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
           "Content-Type": "application/json",
         },
+        timeout: 10000, // 10초 타임아웃 추가 (서버 멈춤 방지)
       }
     );
 
     return res.data.choices?.[0]?.message?.content?.trim();
   } catch (e) {
     console.error("❌ OpenAI 요청 오류:", e.response?.data || e.message);
-    throw new Error("OpenAI 요청 실패");
+    throw new Error("OpenAI 요청 실패 (callOpenAI)");
   }
 }
+
 
 /* ========================================================================== */
 /* 🎯 Helper: JSON 안전 파싱 */
