@@ -14,7 +14,7 @@ import ReviewDetail from "./components/Reviewdetail.jsx";
 import { NotificationProvider } from "./contexts/NotificationContext.jsx";
 import Alarm from "./components/Alarm.jsx"; 
 import ClearNotifications from "./components/ClearNotifications"; 
-import { AppProvider } from "./contexts/AppContext .jsx";
+import { AppProvider } from "./contexts/AppContext.jsx";
 import LoadingSpinner from "./common/LoadingSpinner.jsx";
 import ErrorMessage from "./common/ErrorMessage.jsx";
 import Toast from "./common/Toast.jsx";
