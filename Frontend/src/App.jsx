@@ -15,7 +15,7 @@ import { NotificationProvider } from "./contexts/NotificationContext.jsx";
 import Alarm from "./components/Alarm"; 
 import ClearNotifications from "./components/ClearNotifications"; 
 import { AppProvider } from "./contexts/AppContext";
-import LoadingSpinner from "./components/common/LoadingSpinner,jsx";
+import LoadingSpinner from "./components/common/LoadingSpinner.jsx";
 import ErrorMessage from "./components/common/ErrorMessage";
 import Toast from "./components/common/Toast";
 
