@@ -1,5 +1,5 @@
 /* ============================
-   📍 GLOBAL NAVBAR - Refactored
+   📍 GLOBAL NAVBAR - FIXED VERSION
 ============================ */
 
 #global-nav {
@@ -7,22 +7,21 @@
   top: 0;
   left: 0;
   right: 0;
-  width: 100%;
-  height: var(--navbar-height);
-  background: var(--color-background-alt);
+  height: 60px;              /* 🔥 고정값으로 변경 */
+  background: var(--color-background-alt, #fff);
   box-shadow: var(--shadow-md);
-  z-index: var(--z-navbar);
+  z-index: 999;              /* 충분한 값 */
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all var(--transition-base);
+  padding: 0 16px;
 }
 
-/* Safe area for mobile devices */
+/* Safe area 제거 (🔥 문제 원인) */
 @supports (padding-top: env(safe-area-inset-top)) {
   #global-nav {
-    padding-top: env(safe-area-inset-top);
-    height: calc(var(--navbar-height) + env(safe-area-inset-top));
+    padding-top: 0;          /* 🔥 강제 제거 */
+    height: 60px;            /* 고정 유지 */
   }
 }
 
@@ -35,233 +34,63 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 var(--space-lg);
 }
 
 /* ========================================
-   NAV LINKS (Center section)
+   NAV LINKS
 ======================================== */
 .nav-links {
   display: flex;
   align-items: center;
-  gap: var(--space-2xl);
-  flex: 1;
-  justify-content: center;
+  gap: 32px;
 }
 
 .nav-btn {
   position: relative;
   background: none;
   border: none;
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-tertiary);
+  font-size: 15px;
+  font-weight: 600;
+  color: #666;
   cursor: pointer;
-  padding: var(--space-sm) var(--space-xs);
-  transition: all var(--transition-base);
-  white-space: nowrap;
+  padding: 8px 4px;
+  transition: 0.2s;
 }
 
-.nav-btn:hover {
-  color: var(--color-primary);
-  transform: translateY(-1px);
-}
-
-/* Active state */
 .nav-btn.active {
-  color: var(--color-primary);
+  color: var(--color-primary, #0066ff);
 }
 
 .nav-btn.active::after {
   content: '';
   position: absolute;
-  bottom: -8px;
+  bottom: -4px;
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
   height: 3px;
-  background: var(--color-primary);
-  border-radius: var(--radius-full);
+  background: var(--color-primary, #0066ff);
+  border-radius: 999px;
   animation: underlineExpand 0.3s ease;
 }
 
-@keyframes underlineExpand {
-  from {
-    width: 0;
-    opacity: 0;
-  }
-  to {
-    width: 60%;
-    opacity: 1;
-  }
-}
-
 /* ========================================
-   NAV ICONS (Right section)
+   ICONS
 ======================================== */
 .nav-icons {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: 20px;
 }
 
 .icon-btn {
-  position: relative;
   background: none;
   border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;  /* 40px → 44px */
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-}
-
-.icon-btn:hover {
-  transform: scale(1.15); /* 1.12 → 1.15 */
-  background: var(--color-surface-hover);
-}
-
-.icon-btn:active {
-  transform: scale(1.08); /* 1.05 → 1.08 */
-}
-
-/* Icon colors */
-.icon-btn:first-child {
-  color: var(--color-warning);
-}
-
-.icon-btn:last-child {
-  color: var(--color-primary);
-}
-
-/* 알림 버튼 추가 스타일 */
-.notification-btn svg {
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-}
-
-/* ========================================
-   NOTIFICATION BADGE
-======================================== */
-.notification-btn {
-  position: relative;
-}
-
-.notification-badge {
-  position: absolute;
-  top: 2px;      /* 4px → 2px */
-  right: 2px;    /* 4px → 2px */
-  min-width: 20px;  /* 18px → 20px */
-  height: 20px;     /* 18px → 20px */
-  background: var(--color-error);
-  color: white;
-  font-size: 11px;  /* 10px → 11px */
-  font-weight: var(--font-weight-bold);
-  border-radius: var(--radius-full);
+  cursor: pointer;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 0 var(--space-xs);
-  border: 2px solid var(--color-background-alt);
-  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4); /* 그림자 강화 */
-  animation: badgePulse 2s ease-in-out infinite;
-}
-
-@keyframes badgePulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-/* ========================================
-   RESPONSIVE DESIGN
-======================================== */
-@media (max-width: 768px) {
-  .nav-container {
-    padding: 0 var(--space-md);
-  }
-  
-  .nav-links {
-    gap: var(--space-xl);
-  }
-  
-  .nav-btn {
-    font-size: var(--font-size-sm);
-  }
-  
-  .nav-icons {
-    gap: var(--space-md);
-  }
-  
-  .icon-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .nav-container {
-    padding: 0 var(--space-sm);
-  }
-  
-  .nav-links {
-    gap: var(--space-lg);
-  }
-  
-  .nav-btn {
-    font-size: var(--font-size-xs);
-    padding: var(--space-xs);
-  }
-  
-  .nav-btn.active::after {
-    bottom: -6px;
-    width: 80%;
-    height: 2px;
-  }
-  
-  .icon-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
-  }
-  
-  .notification-badge {
-    min-width: 16px;
-    height: 16px;
-    font-size: 9px;
-    top: 2px;
-    right: 2px;
-  }
-}
-
-/* ========================================
-   ACCESSIBILITY
-======================================== */
-.nav-btn:focus-visible,
-.icon-btn:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 3px;
-  border-radius: var(--radius-sm);
-}
-
-/* Reduce motion for users who prefer it */
-@media (prefers-reduced-motion: reduce) {
-  .nav-btn,
-  .icon-btn,
-  .notification-badge {
-    animation: none;
-    transition: none;
-  }
-  
-  .nav-btn:hover,
-  .icon-btn:hover {
-    transform: none;
-  }
+  align-items: center;
 }
