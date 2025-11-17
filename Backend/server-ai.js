@@ -33,7 +33,7 @@ const serviceAccount = JSON.parse(
 /* ========================================================================== */
 const app = express();
 
-// 🔥 CORS 완전 정상화
+// 🔥 CORS
 const allowedOrigins = [
   "http://localhost:5173",
   "https://mai-planner.vercel.app",
