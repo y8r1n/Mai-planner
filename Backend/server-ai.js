@@ -11,12 +11,6 @@ import detect from "detect-port";
 import FormData from "form-data";
 import admin from "firebase-admin";
 
-// Firebase Client SDK
-import { initializeApp } from "firebase/app";
-import { getFirestore, addDoc, collection, serverTimestamp } from "firebase/firestore";
-
-dotenv.config();
-
 /* ========================================================================== */
 /* 🔐 Load Firebase Admin Secret */
 /* ========================================================================== */
@@ -73,18 +67,6 @@ if (!admin.apps.length) {
 const adminDb = admin.firestore();
 const bucket = admin.storage().bucket();
 
-/* ========================================================================== */
-/* 🔥 Firebase Client Init */
-/* ========================================================================== */
-const clientApp = initializeApp({
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MSG_ID,
-  appId: process.env.FIREBASE_APP_ID,
-});
-const db = getFirestore(clientApp);
 
 /* ========================================================================== */
 /* 🧠 공통 OpenAI Request Handler (안정화 버전) */
@@ -319,13 +301,14 @@ Only English.`
     });
 
     // Firestore 기록
-    await addDoc(collection(db, "imageDiary"), {
-      userId,
-      emotion: cleanEmotion,
-      diaryText,
-      imageUrl: url,
-      createdAt: serverTimestamp(),
-    });
+  await adminDb.collection("imageDiary").add({
+  userId,
+  emotion: cleanEmotion,
+  diaryText,
+  imageUrl: url,
+  createdAt: admin.firestore.FieldValue.serverTimestamp(),
+});
+
 
     res.json({ success: true, imageUrl: url });
   } catch (e) {
