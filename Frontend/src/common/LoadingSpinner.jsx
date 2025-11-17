@@ -1,7 +1,7 @@
 // src/components/common/LoadingSpinner.jsx
 import React from 'react';
 import { useApp } from '../contexts/AppContext';
-import '../../styles/loading.css';
+import '../styles/loading.css';
 
 export default function LoadingSpinner() {
   const { loading, loadingMessage } = useApp();

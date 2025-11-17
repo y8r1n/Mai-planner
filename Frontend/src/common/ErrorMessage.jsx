@@ -2,7 +2,7 @@
 import React from 'react';
 import { useApp } from '../contexts/AppContext';
 import { AlertCircle, X } from 'lucide-react';
-import '../../styles/error.css';
+import '../styles/error.css';
 
 export default function ErrorMessage() {
   const { error, clearError } = useApp();

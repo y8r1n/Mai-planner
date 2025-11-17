@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { CheckCircle, AlertCircle, Info, X } from 'lucide-react';
-import '../../styles/toast.css';
+import '../styles/toast.css';
 
 const icons = {
   success: CheckCircle,
