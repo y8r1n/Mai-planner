@@ -36,23 +36,21 @@ const app = express();
 // 🔥 CORS 완전 정상화
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://mai-planner.vercel.app"
+  "https://mai-planner.vercel.app",
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error("Not allowed by CORS"), false);
-    },
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
-app.use(express.json({ limit: "10mb" }));
+// OPTIONS 요청을 반드시 통과시키기!
+app.options("*", cors());
+
 
 /* ========================================================================== */
 /* 🔥 Firebase Admin Init */
