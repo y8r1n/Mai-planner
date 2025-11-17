@@ -13,8 +13,11 @@
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.5"
   },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^5.1.0",
-    "vite": "^7.2.2"
-  }
+  "dependencies": {
+  "react": "...",
+  "react-dom": "...",
+  "axios": "...",
+  "vite": "^7.2.2",
+  "@vitejs/plugin-react": "^5.1.0"
+}
 }
