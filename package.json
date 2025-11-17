@@ -10,11 +10,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "node server-ai.js"
-
   },
   "dependencies": {
     "@google-cloud/storage": "^7.17.3",
-    "axios": "^1.13.2",
+    "axios": "^1.6.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dayjs": "^1.11.19",

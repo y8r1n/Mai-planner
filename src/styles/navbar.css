@@ -2,21 +2,19 @@
  📍 Global NavBar (핑크 베이지 테마)
 ============================ */
 
-#global-nav {
-  position: fixed;
+/* 수정*/
+.global-nav {
+  position: sticky;
   top: 0;
-  left: 0;
   width: 100%;
+  padding: 12px 16px;
   background: #fffdfd;
-  box-shadow: 0 1px 6px rgba(240, 146, 146, 0.15);
-  z-index: 50;
+  z-index: 1000;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  height: 64px;
-  transition: 0.3s ease;
-  
 }
+
 
 /* 내부 컨테이너 */
 .nav-container {
