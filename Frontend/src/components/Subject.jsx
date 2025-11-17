@@ -17,7 +17,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
-import "../styles/Subject-refactored.css";
+import "../styles/Subject.css";
 import {
   getStorage,
   ref,

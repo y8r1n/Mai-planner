@@ -9,7 +9,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
-import "../styles/todotab-refactored.css";
+import "../styles/todotab.css";
 
 export default function TodoTab() {
   const [todos, setTodos] = useState([]);

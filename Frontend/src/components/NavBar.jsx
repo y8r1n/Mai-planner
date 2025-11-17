@@ -3,6 +3,8 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useNotifications } from "../contexts/NotificationContext";
 import { Bell } from "lucide-react";
+import "../styles/navbar.css";
+
 
 export default function NavBar() {
   const navigate = useNavigate();
