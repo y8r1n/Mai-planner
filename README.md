@@ -206,6 +206,18 @@ serviceAccountKey.json → GitHub에 절대 업로드 ❌
 <img width="570" height="1363" alt="스크린샷 2025-11-18 141321" src="https://github.com/user-attachments/assets/b3301e0b-6f31-460a-a9a3-3266f9d2e37d" />
 
 
+*-연습문제집 플로우 
+
+<img width="1100" height="1340" alt="스크린샷 2025-11-18 162153" src="https://github.com/user-attachments/assets/4eac0825-2ac3-4116-8da6-49b859088a76" />
+<img width="1087" height="1347" alt="스크린샷 2025-11-18 162204" src="https://github.com/user-attachments/assets/60cd1acd-46f5-4d71-a5e2-dbc53556cec2" />
+<img width="1091" height="1317" alt="스크린샷 2025-11-18 162213" src="https://github.com/user-attachments/assets/1f156cf3-036a-4fa8-b2eb-13bba83b1f0e" />
+<img width="1100" height="1332" alt="스크린샷 2025-11-18 162237" src="https://github.com/user-attachments/assets/58b1f4d7-53ee-4409-b50d-95194825d68c" />
+
+
+
+
+
+
 
 
 > ImageDiary
