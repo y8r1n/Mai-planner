@@ -125,37 +125,6 @@ function safeJsonParse(text) {
   }
 }
 
-/* ========================================================================== */
-/* 🧭 WITH AI — 일정 추천 */
-/* ========================================================================== */
-app.post("/api/with-ai/recommend", async (req, res) => {
-  const { day = "오늘", subject = "공부", mood = "" } = req.body;
-
-  const prompt = `
-"${day}" 하루 동안 "${subject}" 관련 추천 활동 3가지를 제안해줘.
-기분: ${mood}
-JSON 배열만 출력.
-  `;
-
-  try {
-    const result = await callOpenAI(prompt, "gpt-4o-mini", true);
-    const json = safeJsonParse(result);
-
-    await adminDb.collection("withAI_recommendations").add({
-      day,
-      subject,
-      mood,
-      recommendations: json,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-
-    res.json({ success: true, recommendations: json });
-  } catch (e) {
-    console.error("❌ 일정 추천 오류:", e);
-    res.status(500).json({ success: false, error: e.message });
-  }
-});
-
 
 /* ========================================================================== */
 /* 🤖 WITH AI — AI 일정 자동 생성 (NEW!) */
@@ -272,24 +241,28 @@ ${eventsText}
     const result = await callOpenAI(prompt, "gpt-4o", false);
 
     // JSON 파싱
-    let aiResponse = result.trim();
-    aiResponse = aiResponse
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
+    let aiResponse = result.trim().replace(/```json|```/g, "").trim();
 
-    console.log("📝 AI 응답:", aiResponse.substring(0, 200) + "...");
+    console.log("📝 AI raw 응답:", aiResponse.substring(0, 200) + "...");
 
-    const schedule = JSON.parse(aiResponse);
+    let schedule;
+    try {
+      schedule = JSON.parse(aiResponse);
+    } catch (err) {
+      console.error("❌ AI 일정 JSON 파싱 실패:", aiResponse);
+      return res.status(500).json({
+        success: false,
+        error: "AI 응답 JSON 파싱 실패",
+      });
+    }
 
-    // Firestore에 저장 (Client SDK 사용)
+    // Firestore(Admin SDK) 저장
     const savePromises = [];
     if (schedule.schedule && Array.isArray(schedule.schedule)) {
       for (const item of schedule.schedule) {
-        // todo, break, meal 타입만 저장 (timetable, event는 이미 존재)
         if (["todo", "break", "meal"].includes(item.type)) {
           savePromises.push(
-            addDoc(collection(db, "calendar"), {
+            adminDb.collection("calendar").add({
               title: item.task,
               time: item.time,
               end: item.end || "",
@@ -298,7 +271,7 @@ ${eventsText}
               type: "calendar",
               aiGenerated: true,
               createdBy: "ai",
-              createdAt: serverTimestamp(),
+              createdAt: admin.firestore.FieldValue.serverTimestamp(),
             })
           );
         }
@@ -325,6 +298,7 @@ ${eventsText}
     });
   }
 });
+
 
 
 /* ========================================================================== */
