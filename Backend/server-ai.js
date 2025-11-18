@@ -148,6 +148,177 @@ JSON 배열만 출력.
   }
 });
 
+
+/* ========================================================================== */
+/* 🤖 WITH AI — AI 일정 자동 생성 (NEW!) */
+/* ========================================================================== */
+app.post("/api/with-ai/generate", async (req, res) => {
+  try {
+    const {
+      selectedDate,
+      startTime,
+      endTime,
+      todos = [],
+      timetable = [],
+      events = [],
+      userName = "사용자",
+    } = req.body;
+
+    console.log("📅 AI 일정 생성 요청:", {
+      selectedDate,
+      startTime,
+      endTime,
+      todosCount: todos.length,
+      timetableCount: timetable.length,
+      eventsCount: events.length,
+    });
+
+    // 입력 검증
+    if (!selectedDate || !startTime || !endTime) {
+      return res.status(400).json({
+        success: false,
+        error: "필수 정보가 누락되었습니다. (날짜, 시작시간, 종료시간)",
+      });
+    }
+
+    // 프롬프트 생성
+    const todosText =
+      todos.length > 0
+        ? todos
+            .map(
+              (t, i) =>
+                `${i + 1}. ${t.title} ${
+                  t.priority ? `(우선순위: ${t.priority})` : ""
+                }`
+            )
+            .join("\n")
+        : "없음";
+
+    const timetableText =
+      timetable.length > 0
+        ? timetable
+            .map((t, i) => `${i + 1}. ${t.title} (${t.start} ~ ${t.end})`)
+            .join("\n")
+        : "없음";
+
+    const eventsText =
+      events.length > 0
+        ? events
+            .map((e, i) => `${i + 1}. ${e.title} ${e.time ? `(${e.time})` : ""}`)
+            .join("\n")
+        : "없음";
+
+    const prompt = `
+📅 날짜: ${selectedDate}
+⏰ 가용 시간: ${startTime} ~ ${endTime}
+👤 사용자: ${userName}
+
+📋 **오늘의 할 일 (ToDo):**
+${todosText}
+
+🏫 **시간표:**
+${timetableText}
+
+📌 **기타 일정:**
+${eventsText}
+
+---
+
+**요청사항:**
+위 정보를 바탕으로 ${startTime}부터 ${endTime}까지의 최적화된 하루 일정을 생성해주세요.
+
+**생성 규칙:**
+1. 시간표는 반드시 포함하고, 고정된 시간에 배치
+2. 할 일(ToDo)은 우선순위와 예상 소요 시간을 고려하여 배치
+3. 집중력이 높은 오전/오후 시간대에 중요한 작업 배치
+4. 각 작업 사이에 적절한 휴식 시간 포함 (10-15분)
+5. 점심/저녁 시간 고려 (12:00-13:00, 18:00-19:00)
+6. 각 일정에 대한 간단한 이유 설명 포함
+7. 시간이 겹치지 않도록 배치
+8. 시간표와 기타 일정은 이미 고정이므로 그 사이에 할 일을 배치
+
+**응답 형식 (반드시 JSON만 출력):**
+{
+  "schedule": [
+    {
+      "time": "09:00",
+      "end": "09:30",
+      "task": "작업 이름",
+      "type": "todo|timetable|break|meal",
+      "reason": "이 시간에 배치한 이유"
+    }
+  ],
+  "summary": "전체 일정에 대한 한 줄 요약"
+}
+
+**중요:** 
+- 반드시 JSON 형식으로만 응답
+- 시간표와 기타 일정은 이미 등록되어 있으므로 JSON에 포함하지 않음
+- 할 일(ToDo)과 휴식, 식사 시간만 JSON에 포함
+- 모든 시간은 HH:MM 형식 (예: 09:00, 14:30)
+- DO NOT OUTPUT ANYTHING OTHER THAN VALID JSON
+`;
+
+    // OpenAI API 호출
+    console.log("🤖 OpenAI API 호출 중...");
+    const result = await callOpenAI(prompt, "gpt-4o", false);
+
+    // JSON 파싱
+    let aiResponse = result.trim();
+    aiResponse = aiResponse
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+
+    console.log("📝 AI 응답:", aiResponse.substring(0, 200) + "...");
+
+    const schedule = JSON.parse(aiResponse);
+
+    // Firestore에 저장 (Client SDK 사용)
+    const savePromises = [];
+    if (schedule.schedule && Array.isArray(schedule.schedule)) {
+      for (const item of schedule.schedule) {
+        // todo, break, meal 타입만 저장 (timetable, event는 이미 존재)
+        if (["todo", "break", "meal"].includes(item.type)) {
+          savePromises.push(
+            addDoc(collection(db, "calendar"), {
+              title: item.task,
+              time: item.time,
+              end: item.end || "",
+              date: selectedDate,
+              reason: item.reason || "",
+              type: "calendar",
+              aiGenerated: true,
+              createdBy: "ai",
+              createdAt: serverTimestamp(),
+            })
+          );
+        }
+      }
+    }
+
+    await Promise.all(savePromises);
+
+    console.log(`✅ ${savePromises.length}개 일정 저장 완료`);
+
+    // 응답 반환
+    res.json({
+      success: true,
+      schedule: schedule.schedule || [],
+      summary: schedule.summary || "AI가 최적화된 일정을 생성했습니다.",
+      totalTasks: savePromises.length,
+    });
+  } catch (error) {
+    console.error("❌ AI 일정 생성 오류:", error);
+    res.status(500).json({
+      success: false,
+      error: "AI 일정 생성 중 오류가 발생했습니다.",
+      details: error.message,
+    });
+  }
+});
+
+
 /* ========================================================================== */
 /* 💬 Mentor Chat */
 /* ========================================================================== */
