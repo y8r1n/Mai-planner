@@ -142,17 +142,36 @@ serviceAccountKey.json → GitHub에 절대 업로드 ❌
 📸 스크린샷 (Screenshots)
 
 > Home Tab 
--Todo list
--timetable 
--calender
 사용자의 일정을 등록시 볼 수 있는 화면 
 
-<img width="1462" height="1365" alt="스크린샷 2025-11-18 141236" src="https://github.com/user-attachments/assets/719406eb-f730-4643-ad26-840f4ecd7840" />
-<img width="1509" height="1363" alt="스크린샷 2025-11-18 141225" src="https://github.com/user-attachments/assets/2e2ddcff-8a23-4ecd-b700-e7bdb6a16896" />
-<img width="1835" height="1368" alt="스크린샷 2025-11-18 141220" src="https://github.com/user-attachments/assets/c5befdbd-d981-4e69-b51b-e9259cffe9bc" />
-<img width="1755" height="1398" alt="스크린샷 2025-11-18 141201" src="https://github.com/user-attachments/assets/2d3919bb-db8d-473a-8eba-c85481593129" />
-<img width="1481" height="1403" alt="스크린샷 2025-11-18 141032" src="https://github.com/user-attachments/assets/3ccaa319-3a29-4ecc-b6f7-d368a8694dec" />
-<img width="1489" height="1360" alt="스크린샷 2025-11-18 141243" src="https://github.com/user-attachments/assets/88fa0f44-57c1-4b61-a8c0-3e528670449d" />
+
+<img width="1481" height="1403" alt="스크린샷 2025-11-18 141032" src="https://github.com/user-attachments/assets/2fcc7cc1-cc57-4e83-8b07-73edc0dda131" />
+
+
+*-Todo list
+
+
+<img width="1755" height="1398" alt="스크린샷 2025-11-18 141201" src="https://github.com/user-attachments/assets/6af6896c-ef80-4673-a077-a068d0aef83d" />
+
+*-timetable 
+
+
+
+<img width="1835" height="1368" alt="스크린샷 2025-11-18 141220" src="https://github.com/user-attachments/assets/08a9ea66-ff21-44ac-a9b7-a39698f64e46" />
+<img width="1509" height="1363" alt="스크린샷 2025-11-18 141225" src="https://github.com/user-attachments/assets/8bca3182-e082-4191-85fa-9b049c7a820d" />
+
+
+
+*-calender
+
+
+
+<img width="1462" height="1365" alt="스크린샷 2025-11-18 141236" src="https://github.com/user-attachments/assets/2ef299d3-be31-464a-8da7-8f4a194e401c" />
+<img width="1489" height="1360" alt="스크린샷 2025-11-18 141243" src="https://github.com/user-attachments/assets/6114bac6-6099-494b-bef4-ad254b1fe8df" />
+
+
+
+
 
 
 
