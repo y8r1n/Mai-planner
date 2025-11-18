@@ -86,8 +86,13 @@ ai-planner/
 npm install
 npm run dev
 
+혹은 
+
+npm run build 
+npm run dev 
+
 로컬 주소:
-http://localhost:5173
+http://localhost:4173
 
 #▶ 2. 🔥 백엔드(Node.js Express) 실행
 
