@@ -156,8 +156,13 @@ serviceAccountKey.json → GitHub에 절대 업로드 ❌
 
 
 
+
+
+
 > With AI
 상단의 ✨ 버튼 누를 시 AI 추천 타임라인 일정 생성
+
+
 
 <img width="1486" height="1360" alt="스크린샷 2025-11-18 141253" src="https://github.com/user-attachments/assets/67fba359-6f50-4ae8-9d6e-a2e67a77b83d" />
 <img width="2099" height="1351" alt="스크린샷 2025-11-18 160842" src="https://github.com/user-attachments/assets/44eb36de-debe-45dc-b55c-172dd4f08e23" />
@@ -168,8 +173,12 @@ serviceAccountKey.json → GitHub에 절대 업로드 ❌
 
 
 
+
+
 > Subject
-채팅봇과 연습문제집&해설 제공, 본인이 등록한 과목으로 복습 가능 
+채팅봇과 연습문제집&해설 제공, 본인이 등록한 과목으로 복습 가능
+
+
 
 <img width="1360" height="1370" alt="스크린샷 2025-11-18 141308" src="https://github.com/user-attachments/assets/bcdd9e03-36d5-406c-8e25-69b4db933ff4" />
 <img width="570" height="1356" alt="스크린샷 2025-11-18 141646" src="https://github.com/user-attachments/assets/784d4ca1-a5b2-4e7b-9b76-9fc73554decc" />
@@ -178,8 +187,11 @@ serviceAccountKey.json → GitHub에 절대 업로드 ❌
 <img width="570" height="1363" alt="스크린샷 2025-11-18 141321" src="https://github.com/user-attachments/assets/b3301e0b-6f31-460a-a9a3-3266f9d2e37d" />
 
 
+
+
 > ImageDiary
 오늘의 기분과 간단한 메시지로 이미지 일기 생성
+
 <img width="2547" height="1363" alt="스크린샷 2025-11-18 141657" src="https://github.com/user-attachments/assets/93ee3020-4a07-4ee1-917b-241c9e411ddb" />
 
 
