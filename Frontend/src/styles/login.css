@@ -1,0 +1,375 @@
+/* ===========================
+   🔐 LOGIN PAGE
+=========================== */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-background) 0%, var(--color-primary-lighter) 100%);
+  padding: var(--space-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 배경 장식 */
+.login-page::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-primary-lighter) 0%, transparent 70%);
+  top: -250px;
+  right: -250px;
+  opacity: 0.3;
+}
+
+.login-page::after {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-secondary-light) 0%, transparent 70%);
+  bottom: -200px;
+  left: -200px;
+  opacity: 0.2;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  z-index: 1;
+  animation: fadeSlideUp 0.6s ease;
+}
+
+/* ========================================
+   HEADER
+======================================== */
+.login-header {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.logo-icon {
+  font-size: 3rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.logo h1 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.login-subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ========================================
+   LOGIN CARD
+======================================== */
+.login-card {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-lighter);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-3xl);
+  box-shadow: var(--shadow-xl);
+  backdrop-filter: blur(10px);
+}
+
+.login-card h2 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+  text-align: center;
+}
+
+.login-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+/* ========================================
+   ERROR MESSAGE
+======================================== */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: rgba(240, 92, 130, 0.1);
+  border: 1.5px solid var(--color-error);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-xl);
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.error-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   GOOGLE LOGIN BUTTON
+======================================== */
+.google-login-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  background: white;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.google-login-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  transition: left 0.5s;
+}
+
+.google-login-btn:hover {
+  background: var(--color-background);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.google-login-btn:hover::before {
+  left: 100%;
+}
+
+.google-login-btn:active {
+  transform: translateY(0);
+}
+
+.google-login-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.google-login-btn:disabled:hover {
+  transform: none;
+}
+
+.google-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   SPINNER
+======================================== */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--color-border-lighter);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+   FOOTER
+======================================== */
+.login-footer {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--color-border-lighter);
+}
+
+.terms-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-disabled);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.terms-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: color var(--transition-fast);
+}
+
+.terms-link:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+/* ========================================
+   FEATURES SECTION
+======================================== */
+.features-section {
+  margin-top: var(--space-3xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1.5px solid var(--color-border-lighter);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  backdrop-filter: blur(10px);
+  transition: all var(--transition-base);
+}
+
+.feature-item:hover {
+  background: white;
+  border-color: var(--color-border);
+  transform: translateX(4px);
+  box-shadow: var(--shadow-md);
+}
+
+.feature-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.feature-text h3 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.feature-text p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+@media (max-width: 480px) {
+  .login-page {
+    padding: var(--space-lg);
+  }
+  
+  .login-card {
+    padding: var(--space-2xl);
+  }
+  
+  .logo h1 {
+    font-size: var(--font-size-xl);
+  }
+  
+  .logo-icon {
+    font-size: 2.5rem;
+  }
+  
+  .login-card h2 {
+    font-size: var(--font-size-lg);
+  }
+  
+  .google-login-btn {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--font-size-sm);
+  }
+  
+  .features-section {
+    margin-top: var(--space-2xl);
+    gap: var(--space-md);
+  }
+  
+  .feature-item {
+    padding: var(--space-md);
+    gap: var(--space-md);
+  }
+  
+  .feature-icon {
+    font-size: 1.5rem;
+  }
+  
+  .feature-text h3 {
+    font-size: var(--font-size-sm);
+  }
+  
+  .feature-text p {
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+.google-login-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.terms-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+  border-radius: 2px;
+}

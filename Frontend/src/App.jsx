@@ -17,6 +17,7 @@ import QuizAI from "./components/QuizAI.jsx";
 import ReviewDetail from "./components/Reviewdetail.jsx";
 import Alarm from "./components/Alarm.jsx";
 import ClearNotifications from "./components/ClearNotifications.jsx";
+import Login from "./components/Login.jsx";
 
 // 전역 컨텍스트
 import { NotificationProvider } from "./contexts/NotificationContext.jsx";
@@ -48,6 +49,8 @@ function App() {
             <Route path="/withai" element={<Withai />} />
             <Route path="/study" element={<Study />} />
             <Route path="/imagediary" element={<ImageDiary />} />
+            <Route path="/login" element={<Login />} />
+
 
             {/* 상세 페이지 */}
             <Route path="/subject/:id" element={<Subject />} />
