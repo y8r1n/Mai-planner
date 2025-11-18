@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   root: ".",  // 프론트 루트
   build: {
-    outDir: "dist",   // vercel이 자동으로 dist 읽음
+    outDir: "dist",  
     emptyOutDir: true,
   },
   server: {

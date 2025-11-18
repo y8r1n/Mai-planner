@@ -5,7 +5,7 @@ import axios from "axios";
 // 자동 환경 감지
 const BASE_URL = import.meta.env.DEV
   ? "http://localhost:4003"
-  : "https://mai-planner-backend.onrender.com";
+  : "https://mai-planner.onrender.com";
 
 // =========================
 // 그룹별 axios 인스턴스
