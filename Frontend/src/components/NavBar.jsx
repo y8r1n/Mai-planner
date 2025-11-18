@@ -11,7 +11,7 @@ export default function NavBar() {
   const { unreadCount } = useNotifications();
 
   // 현재 경로 (소문자 통일)
-  const currentPath = location.pathname.toLowerCase();
+  const currentPath = location.pathname;
 
   const links = [
     { name: "HOME", path: "/" },
