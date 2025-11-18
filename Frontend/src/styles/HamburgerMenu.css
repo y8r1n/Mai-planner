@@ -15,8 +15,8 @@
 /* 메뉴 사이드바 */
 .hamburger-menu {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 60px;
+  right: 0px;
   bottom: 0;
   width: 320px;
   max-width: 85vw;
