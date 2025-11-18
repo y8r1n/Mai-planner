@@ -57,6 +57,11 @@ app.use(
 // 🔥 Express5 / path-to-regexp 호환되는 OPTIONS 패턴
 app.options(/.*/, cors());
 
+// 🔥 JSON Body 파서
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true }));
+
+
 /* ========================================================================== */
 /* 🔥 Firebase Admin Init */
 /* ========================================================================== */
