@@ -16,7 +16,7 @@ export default function NavBar() {
   const links = [
     { name: "HOME", path: "/" },
     { name: "WITH AI", path: "/withai" },
-    { name: "SUBJECT", path: "/study" },   // ← 여기는 건들지 말기
+    { name: "SUBJECT", path: "/study" },   
     { name: "IMAGE DIARY", path: "/imagediary" },
   ];
 
