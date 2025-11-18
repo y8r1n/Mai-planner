@@ -39,7 +39,6 @@ const allowedOrigins = [
   "https://mai-planner.vercel.app",
 ];
 
-// Express 공식 패턴 — origin 검증 + 모든 OPTIONS 허용
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -55,9 +54,8 @@ app.use(
   })
 );
 
-// 🔥 OPTIONS(프리플라이트) 요청 전체 허용
-app.options("*", cors());
-
+// 🔥 Express5 / path-to-regexp 호환되는 OPTIONS 패턴
+app.options(/.*/, cors());
 
 /* ========================================================================== */
 /* 🔥 Firebase Admin Init */
