@@ -33,27 +33,30 @@ const serviceAccount = JSON.parse(
 /* ========================================================================== */
 const app = express();
 
-// 🔥 CORS
+// CORS 설정 (안정화)
 const allowedOrigins = [
   "http://localhost:5173",
   "https://mai-planner.vercel.app",
-  "https://mai-planner.vercel.app/",
-
 ];
 
+// Express 공식 패턴 — origin 검증 + 모든 OPTIONS 허용
 app.use(
   cors({
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
-// OPTIONS 요청을 반드시 통과시키기!
-app.options("/api/*", cors());
-app.options("/", cors());
-
+// 🔥 OPTIONS(프리플라이트) 요청 전체 허용
+app.options("*", cors());
 
 
 /* ========================================================================== */
