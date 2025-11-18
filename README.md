@@ -145,6 +145,7 @@ serviceAccountKey.json → GitHub에 절대 업로드 ❌
 -Todo list
 -timetable 
 -calender
+사용자의 일정을 등록시 볼 수 있는 화면 
 
 <img width="1462" height="1365" alt="스크린샷 2025-11-18 141236" src="https://github.com/user-attachments/assets/719406eb-f730-4643-ad26-840f4ecd7840" />
 <img width="1509" height="1363" alt="스크린샷 2025-11-18 141225" src="https://github.com/user-attachments/assets/2e2ddcff-8a23-4ecd-b700-e7bdb6a16896" />
@@ -156,11 +157,19 @@ serviceAccountKey.json → GitHub에 절대 업로드 ❌
 
 
 > With AI
+상단의 ✨ 버튼 누를 시 AI 추천 타임라인 일정 생성
 
 <img width="1486" height="1360" alt="스크린샷 2025-11-18 141253" src="https://github.com/user-attachments/assets/67fba359-6f50-4ae8-9d6e-a2e67a77b83d" />
+<img width="2099" height="1351" alt="스크린샷 2025-11-18 160842" src="https://github.com/user-attachments/assets/44eb36de-debe-45dc-b55c-172dd4f08e23" />
+<img width="2160" height="1348" alt="스크린샷 2025-11-18 160902" src="https://github.com/user-attachments/assets/1c54f15c-28dc-4625-8c91-bb745144fb09" />
+<img width="2132" height="1330" alt="스크린샷 2025-11-18 160853" src="https://github.com/user-attachments/assets/84ed776b-4577-436b-984e-156d51fcdb4e" />
+
+
+
 
 
 > Subject
+채팅봇과 연습문제집&해설 제공, 본인이 등록한 과목으로 복습 가능 
 
 <img width="1360" height="1370" alt="스크린샷 2025-11-18 141308" src="https://github.com/user-attachments/assets/bcdd9e03-36d5-406c-8e25-69b4db933ff4" />
 <img width="570" height="1356" alt="스크린샷 2025-11-18 141646" src="https://github.com/user-attachments/assets/784d4ca1-a5b2-4e7b-9b76-9fc73554decc" />
@@ -170,7 +179,7 @@ serviceAccountKey.json → GitHub에 절대 업로드 ❌
 
 
 > ImageDiary
-
+오늘의 기분과 간단한 메시지로 이미지 일기 생성
 <img width="2547" height="1363" alt="스크린샷 2025-11-18 141657" src="https://github.com/user-attachments/assets/93ee3020-4a07-4ee1-917b-241c9e411ddb" />
 
 
