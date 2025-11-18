@@ -138,11 +138,14 @@ serviceAccountKey.json → GitHub에 절대 업로드 ❌
 모든 API KEY는 .env 또는 Render Secret에서 관리
 서버는 CORS 정책으로 Vercel URL만 허용
 
-#SCreenshot📸
+
+📸 스크린샷 (Screenshots)
+
 > Home Tab 
 -Todo list
 -timetable 
 -calender
+
 <img width="1462" height="1365" alt="스크린샷 2025-11-18 141236" src="https://github.com/user-attachments/assets/719406eb-f730-4643-ad26-840f4ecd7840" />
 <img width="1509" height="1363" alt="스크린샷 2025-11-18 141225" src="https://github.com/user-attachments/assets/2e2ddcff-8a23-4ecd-b700-e7bdb6a16896" />
 <img width="1835" height="1368" alt="스크린샷 2025-11-18 141220" src="https://github.com/user-attachments/assets/c5befdbd-d981-4e69-b51b-e9259cffe9bc" />
@@ -151,17 +154,23 @@ serviceAccountKey.json → GitHub에 절대 업로드 ❌
 <img width="1489" height="1360" alt="스크린샷 2025-11-18 141243" src="https://github.com/user-attachments/assets/88fa0f44-57c1-4b61-a8c0-3e528670449d" />
 
 
+
 > With AI
+
 <img width="1486" height="1360" alt="스크린샷 2025-11-18 141253" src="https://github.com/user-attachments/assets/67fba359-6f50-4ae8-9d6e-a2e67a77b83d" />
 
+
 > Subject
+
 <img width="1360" height="1370" alt="스크린샷 2025-11-18 141308" src="https://github.com/user-attachments/assets/bcdd9e03-36d5-406c-8e25-69b4db933ff4" />
 <img width="570" height="1356" alt="스크린샷 2025-11-18 141646" src="https://github.com/user-attachments/assets/784d4ca1-a5b2-4e7b-9b76-9fc73554decc" />
 <img width="578" height="1349" alt="스크린샷 2025-11-18 141407" src="https://github.com/user-attachments/assets/8727243f-477c-4e69-803d-5464f8e284e9" />
 <img width="573" height="1353" alt="스크린샷 2025-11-18 141333" src="https://github.com/user-attachments/assets/7f98f311-2729-4725-b3e0-01a8d65c5493" />
 <img width="570" height="1363" alt="스크린샷 2025-11-18 141321" src="https://github.com/user-attachments/assets/b3301e0b-6f31-460a-a9a3-3266f9d2e37d" />
 
+
 > ImageDiary
+
 <img width="2547" height="1363" alt="스크린샷 2025-11-18 141657" src="https://github.com/user-attachments/assets/93ee3020-4a07-4ee1-917b-241c9e411ddb" />
 
 
@@ -172,4 +181,3 @@ serviceAccountKey.json → GitHub에 절대 업로드 ❌
 
 
 
-📸 스크린샷 (Screenshots)
