@@ -10,18 +10,33 @@ export default function NavBar() {
   const location = useLocation();
   const { unreadCount } = useNotifications();
 
+  // 현재 경로 (소문자 통일)
   const currentPath = location.pathname.toLowerCase();
 
   const links = [
     { name: "HOME", path: "/" },
     { name: "WITH AI", path: "/withai" },
-    { name: "SUBJECT", path: "/study" },
+    { name: "SUBJECT", path: "/study" },   // ← 여기는 건들지 말기
     { name: "IMAGE DIARY", path: "/imagediary" },
   ];
 
+  // active 판별 로직 수정
   const isActive = (path) => {
+    // 홈
     if (path === "/") return currentPath === "/";
-    return currentPath.startsWith(path);
+
+    // SUBJECT (Study.jsx)
+    if (path === "/study") 
+      return currentPath.startsWith("/study");
+    
+
+    // WITH AI
+    if (path === "/withai") return currentPath.startsWith("/withai");
+
+    // IMAGE DIARY
+    if (path === "/imagediary") return currentPath.startsWith("/imagediary");
+
+    return false;
   };
 
   return (
