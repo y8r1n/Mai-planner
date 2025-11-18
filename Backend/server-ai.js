@@ -37,6 +37,8 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "https://mai-planner.vercel.app",
+  "https://mai-planner.vercel.app/",
+
 ];
 
 app.use(
