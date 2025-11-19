@@ -126,7 +126,70 @@ function safeJsonParse(text) {
 }
 
 /* ========================================================================== */
-/* 🤖 WITH AI — AI 일정 자동 생성 (calendarEvents 기반) */
+/* 🤖 WITH AI — 추천 문구 생성 (프론트의 withai recommend용) */
+/* ========================================================================== */
+app.post("/api/with-ai/recommend", async (req, res) => {
+  try {
+    const { userId, day, subject, mood = "", todos = [] } = req.body;
+
+    if (!userId)
+      return res.status(400).json({
+        success: false,
+        error: "userId가 필요합니다.",
+      });
+
+    const todoText =
+      todos.length > 0
+        ? todos.map((t, i) => `${i + 1}. ${t.title}`).join("\n")
+        : "없음";
+
+    const prompt = `
+🗓 날짜: ${day}
+📌 주제: ${subject}
+🙂 기분: ${mood}
+
+오늘의 할 일:
+${todoText}
+
+위 정보를 바탕으로,
+"오늘 하루를 잘 보낼 수 있도록 3가지 추천 활동"을 JSON 배열 ONLY로 출력해줘.
+
+형식:
+[
+  { "title": "추천 이름", "description": "설명" },
+  ...
+]
+    `;
+
+    const result = await callOpenAI(prompt, "gpt-4o-mini", true);
+    const json = safeJsonParse(result);
+
+    // Firestore 저장 (옵션)
+    await adminDb
+      .collection("withAI_recommendations")
+      .add({
+        userId,
+        day,
+        subject,
+        mood,
+        recommendations: json,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+    res.json({ success: true, recommendations: json });
+  } catch (e) {
+    console.error("❌ recommend 오류:", e);
+    res.json({
+      success: false,
+      recommendations: [],
+    });
+  }
+});
+
+
+
+/* ========================================================================== */
+/* 🤖 WITH AI — AI 일정 자동 생성 (calendarEvents 기반, 카테고리 자동 분류 포함) */
 /* ========================================================================== */
 app.post("/api/with-ai/generate", async (req, res) => {
   try {
@@ -137,7 +200,6 @@ app.post("/api/with-ai/generate", async (req, res) => {
       todos = [],
       timetable = [],
       events = [],
-      userName = "사용자",
       userId,
     } = req.body;
 
@@ -151,19 +213,51 @@ app.post("/api/with-ai/generate", async (req, res) => {
       userId,
     });
 
-    /* 🔥 userId 필요 */
-    if (!userId) {
+    /* ----------------------------
+      필수값 체크
+    ----------------------------- */
+    if (!userId)
       return res.status(400).json({
         success: false,
         error: "userId가 필요합니다.",
       });
-    }
 
-    if (!selectedDate || !startTime || !endTime) {
+    if (!selectedDate || !startTime || !endTime)
       return res.status(400).json({
         success: false,
         error: "날짜, 시작/종료 시간이 필요합니다.",
       });
+
+    /* ========================================================================
+       🔥 카테고리 프리셋 (프론트와 동일하게!)
+    ======================================================================== */
+    const CATEGORY_PRESETS = [
+      { key: "leisure", label: "여가", emoji: "🧘" },
+      { key: "study", label: "공부", emoji: "📚" },
+      { key: "workout", label: "운동", emoji: "🏋" },
+      { key: "meeting", label: "약속", emoji: "🤝" },
+      { key: "meal", label: "식사", emoji: "🍽" },
+      { key: "self", label: "자기계발", emoji: "✨" },
+      { key: "etc", label: "기타", emoji: "📅" },
+    ];
+
+    function autoDetectCategory(title) {
+      const t = title.toLowerCase();
+
+      if (t.includes("운동") || t.includes("헬스") || t.includes("스트레칭"))
+        return CATEGORY_PRESETS.find((c) => c.key === "workout");
+      if (t.includes("스터디") || t.includes("공부") || t.includes("과제"))
+        return CATEGORY_PRESETS.find((c) => c.key === "study");
+      if (t.includes("밥") || t.includes("식사") || t.includes("점심"))
+        return CATEGORY_PRESETS.find((c) => c.key === "meal");
+      if (t.includes("약속") || t.includes("만남") || t.includes("모임"))
+        return CATEGORY_PRESETS.find((c) => c.key === "meeting");
+      if (t.includes("휴식") || t.includes("쉬기"))
+        return CATEGORY_PRESETS.find((c) => c.key === "leisure");
+      if (t.includes("자기계발") || t.includes("독서"))
+        return CATEGORY_PRESETS.find((c) => c.key === "self");
+
+      return CATEGORY_PRESETS.find((c) => c.key === "etc"); // default
     }
 
     /* ----------------------------
@@ -249,14 +343,26 @@ ${eventsText}
 
     const schedule = aiJson.schedule || [];
 
-    /* ==========================================================================
-        🔥 저장 위치: calendarEvents (전역 루트 컬렉션)
-        => 프론트가 읽는 컬렉션과 동일하게 맞춤
-    ========================================================================== */
+    /* ======================================================================
+        🔥 저장 위치 : calendarEvents (root)
+        프론트와 100% 일치
+    ======================================================================= */
     const calendarRef = adminDb.collection("calendarEvents");
 
-    const saveTasks = schedule.map((item) =>
-      calendarRef.add({
+    const saveTasks = schedule.map(async (item) => {
+      const category = autoDetectCategory(item.task);
+
+      // 중복 체크
+      const dupSnap = await calendarRef
+        .where("userId", "==", userId)
+        .where("date", "==", selectedDate)
+        .where("time", "==", item.time)
+        .where("title", "==", item.task)
+        .get();
+
+      if (!dupSnap.empty) return null;
+
+      return calendarRef.add({
         userId,
         title: item.task,
         time: item.time,
@@ -265,13 +371,14 @@ ${eventsText}
         reason: item.reason || "",
         type: item.type || "todo",
         aiGenerated: true,
+        categoryKey: category.key,
+        categoryLabel: category.label,
+        categoryEmoji: category.emoji,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      })
-    );
+      });
+    });
 
     await Promise.all(saveTasks);
-
-    console.log(`✅ ${saveTasks.length}개 AI 일정 저장 완료 (calendarEvents)`);
 
     return res.json({
       success: true,

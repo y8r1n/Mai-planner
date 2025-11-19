@@ -345,6 +345,7 @@
    📝 TIMELINE CONTENT
 ======================================== */
 .withai-content {
+  position: relative;  
   flex: 1;
   background: var(--color-background-alt);
   border: 1px solid var(--color-border-lighter);
@@ -421,7 +422,7 @@
 
 /* 편집 버튼 (초록색) */
 .withai-editbtns button:first-child {
-  border-color: #66BB6A;
+ border-color: #FFB7C5;
 }
 
 .withai-editbtns button:first-child::before {
@@ -429,14 +430,14 @@
 }
 
 .withai-editbtns button:first-child:hover {
-  background: #66BB6A;
-  transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(102, 187, 106, 0.4);
+  background: #FFB7C5;
+  box-shadow: 0 4px 12px rgba(255, 183, 197, 0.4);
 }
+
 
 /* 삭제 버튼 (빨간색) */
 .withai-editbtns button:last-child {
-  border-color: #EF5350;
+  border-color: #FF8FA3;
 }
 
 .withai-editbtns button:last-child::before {
@@ -444,9 +445,8 @@
 }
 
 .withai-editbtns button:last-child:hover {
-  background: #EF5350;
-  transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
+  background: #FF8FA3;
+  box-shadow: 0 4px 12px rgba(255, 143, 163, 0.4);
 }
 
 .withai-editbtns svg {
@@ -1209,4 +1209,42 @@
   color: #c62828;
   font-size: var(--font-size-sm);
   margin-top: var(--space-lg);
+}
+
+/* =======================
+   CATEGORY PILL BUTTON
+=========================*/
+
+.category-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.category-pill {
+  padding: 6px 12px;
+  background: #ffeef3;
+  border: 1.5px solid #ffb9c7;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.category-pill:hover {
+  background: #ffd8e3;
+}
+
+.category-pill.active {
+  background: #ff8ea3;
+  border-color: #ff8ea3;
+  color: white;
+}
+
+.category-pill .emoji {
+  font-size: 15px;
 }

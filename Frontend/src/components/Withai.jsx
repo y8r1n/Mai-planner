@@ -25,6 +25,18 @@ import { useAuthState } from "react-firebase-hooks/auth";
 
 dayjs.locale("ko");
 
+/* ---------------------------------------
+   🏷 카테고리 프리셋
+---------------------------------------- */
+const CATEGORY_PRESETS = [
+  { key: "leisure", label: "여가", emoji: "🧸" },
+  { key: "study", label: "공부", emoji: "📚" },
+  { key: "workout", label: "운동", emoji: "💪" },
+  { key: "meal", label: "식사", emoji: "🍽️" },
+  { key: "selfdev", label: "자기계발", emoji: "✨" },
+  { key: "etc", label: "기타", emoji: "🗂️" },
+];
+
 export default function Withai() {
   /* ----------------------------
       AUTH
@@ -52,10 +64,10 @@ export default function Withai() {
   /* ----------------------------
       STATE
   ----------------------------- */
-  const [timeline, setTimeline] = useState([]);
+  const [timeline, setTimeline] = useState([]);      // 순수 타임라인 일정
   const [todos, setTodos] = useState([]);
   const [timetable, setTimetable] = useState([]);
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState([]);          // fromEvent 등 외부/AI 일정
 
   const [suggestions, setSuggestions] = useState([]);
   const [aiPlan, setAiPlan] = useState(null);
@@ -68,7 +80,13 @@ export default function Withai() {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const [showTaskModal, setShowTaskModal] = useState(false);
-  const [newTask, setNewTask] = useState({ title: "", time: "", end: "" });
+  const [newTask, setNewTask] = useState({
+    title: "",
+    time: "",
+    end: "",
+    category: "",        // preset key 또는 "custom" 또는 ""
+    customCategory: "",
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
 
@@ -76,12 +94,13 @@ export default function Withai() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const [startTask, setStartTask] = useState({ title: "기상", time: "07:00" });
-  const [endTask, setEndTask] = useState({ title: "하루 마무리", time: "23:00" });
+  const [endTask, setEndTask] = useState({
+    title: "하루 마무리",
+    time: "23:00",
+  });
 
   const [currentTime, setCurrentTime] = useState(dayjs());
   const aiFetching = useRef(false);
-
-  const today = dayjs();
 
   /* ----------------------------
       현재 시간 업데이트
@@ -89,12 +108,12 @@ export default function Withai() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(dayjs());
-    }, 60_000);
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
 
   /* ----------------------------
-      안전한 time 변환
+      safeTime 변환
   ----------------------------- */
   const safeTime = (t) => {
     if (!t) return "00:00";
@@ -107,7 +126,7 @@ export default function Withai() {
   };
 
   /* ----------------------------
-      날짜 리스트 생성
+      날짜 목록 생성
   ----------------------------- */
   useEffect(() => {
     const start = dayjs().subtract(7, "day");
@@ -122,7 +141,7 @@ export default function Withai() {
   }, []);
 
   /* ----------------------------
-      Todo 구독
+      Todos 구독
   ----------------------------- */
   useEffect(() => {
     const qTodos = query(
@@ -146,17 +165,16 @@ export default function Withai() {
       collection(db, "users", userId, "timetable"),
       (snap) => {
         const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const dayStr = dayNames[dayjs(selectedDate).day()];
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const dayStr = days[dayjs(selectedDate).day()];
         setTimetable(data.filter((t) => t.day === dayStr));
       }
     );
-
     return () => unsub();
   }, [selectedDate, userId]);
 
   /* ----------------------------
-      CalendarEvents 구독 (날짜별)
+      CalendarEvents 구독
   ----------------------------- */
   useEffect(() => {
     const q = query(
@@ -167,45 +185,55 @@ export default function Withai() {
 
     const unsub = onSnapshot(q, (snap) => {
       const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setEvents(data);
-      setTimeline(data.filter((e) => !e.fromTimetable && !e.fromEvent));
+
+      // 순수 타임라인 (직접 + AI 일정) : fromTimetable/fromEvent 없는 애들
+      const pureTimeline = data.filter(
+        (e) => !e.fromTimetable && !e.fromEvent
+      );
+
+      // 외부/연동/AI 전용 이벤트 (fromEvent === true 등)
+      const externalEvents = data.filter((e) => e.fromEvent);
+
+      setTimeline(pureTimeline);
+      setEvents(externalEvents);
     });
 
     return () => unsub();
   }, [selectedDate, userId]);
 
   /* ----------------------------
-      combinedTimeline
+      Combined Timeline
   ----------------------------- */
   const combinedTimeline = useMemo(() => {
-    const base = [...timeline];
+    // 1) 순수 타임라인 복사
+    const base = timeline.map((t) => ({ ...t }));
 
-    timetable.forEach((t) => {
+    // 2) 주간 시간표
+    timetable.forEach((t) =>
       base.push({
         id: `tt-${t.id}`,
         title: `📚 ${t.title}`,
         time: t.start,
         end: t.end,
         fromTimetable: true,
-      });
-    });
+      })
+    );
 
-    events.forEach((e) => {
+    // 3) 외부/AI 이벤트 (fromEvent)
+    events.forEach((e) =>
       base.push({
+        ...e,
         id: `evt-${e.id}`,
-        title: `📅 ${e.title}`,
-        time: e.time || "00:00",
-        end: e.end || "",
         fromEvent: true,
-      });
-    });
+      })
+    );
 
     base.sort((a, b) => safeTime(a.time).localeCompare(safeTime(b.time)));
     return base;
   }, [timeline, timetable, events]);
 
   /* ----------------------------
-      일정 간 공백 → suggestions
+      일정 간 공백 계산 → 추천 문구
   ----------------------------- */
   useEffect(() => {
     const tasks = [
@@ -214,7 +242,8 @@ export default function Withai() {
       { id: "end", title: endTask.title, time: safeTime(endTask.time) },
     ];
 
-    const newSuggestions = [];
+    const newSug = [];
+
     for (let i = 0; i < tasks.length - 1; i++) {
       const current = tasks[i];
       const next = tasks[i + 1];
@@ -226,118 +255,114 @@ export default function Withai() {
 
       if (diff < 10) continue;
 
-      const gapText =
+      const gap =
         diff >= 60
           ? `${Math.floor(diff / 60)}시간 ${diff % 60}분`
           : `${diff}분`;
 
-      newSuggestions.push({
+      newSug.push({
         id: `${current.id}-gap`,
         after: current.id,
-        text: `💬 다음 일정까지 ${gapText} 남았어요 ☕`,
+        text: `💬 다음 일정까지 ${gap} 남았어요 ☕`,
       });
     }
 
-    setSuggestions(newSuggestions);
+    setSuggestions(newSug);
   }, [combinedTimeline, selectedDate, startTask, endTask]);
 
   /* ----------------------------
-      일정 저장
+      일정 저장 / 수정 (+중복 방지 & 카테고리)
   ----------------------------- */
   const saveTask = async () => {
     if (!newTask.title.trim()) return;
 
+    // 카테고리 해석
+    const preset = CATEGORY_PRESETS.find(
+      (c) => c.key === newTask.category
+    );
+
+    let categoryKey = "";
+    let categoryLabel = "";
+    let categoryEmoji = "";
+
+    if (preset) {
+      categoryKey = preset.key;
+      categoryLabel = preset.label;
+      categoryEmoji = preset.emoji;
+    } else if (
+      newTask.category === "custom" &&
+      newTask.customCategory.trim()
+    ) {
+      categoryKey = "custom";
+      categoryLabel = newTask.customCategory.trim();
+      categoryEmoji = "";
+    }
+
     const data = {
       userId,
-      title: newTask.title,
+      title: newTask.title.trim(),
       time: safeTime(newTask.time),
       end: safeTime(newTask.end),
       date: selectedDate,
       aiGenerated: false,
+      categoryKey,
+      categoryLabel,
+      categoryEmoji,
       createdAt: new Date(),
     };
 
     try {
       if (isEditing && editId) {
+        // 수정
         await updateDoc(fsDoc(db, "calendarEvents", editId), data);
       } else {
+        // 추가 - 중복 방지 (같은 날짜 + 같은 시간 + 같은 제목)
+        const dupQ = query(
+          collection(db, "calendarEvents"),
+          where("userId", "==", userId),
+          where("date", "==", selectedDate),
+          where("time", "==", data.time),
+          where("title", "==", data.title)
+        );
+        const dupSnap = await getDocs(dupQ);
+        if (!dupSnap.empty) {
+          alert("같은 시간, 같은 제목의 일정이 이미 있어요.");
+          return;
+        }
+
         await addDoc(collection(db, "calendarEvents"), data);
       }
-
-      setShowTaskModal(false);
-      setNewTask({ title: "", time: "", end: "" });
-      setIsEditing(false);
-      setEditId(null);
-    } catch (err) {
-      console.error(err);
+    } catch (e) {
+      console.error(e);
       setError("일정 저장 실패");
     }
+
+    setShowTaskModal(false);
+    setNewTask({
+      title: "",
+      time: "",
+      end: "",
+      category: "",
+      customCategory: "",
+    });
+    setIsEditing(false);
+    setEditId(null);
   };
 
   /* ----------------------------
       일정 삭제
   ----------------------------- */
   const deleteTask = async (id) => {
-    if (!window.confirm("삭제할까요?")) return;
+    if (!window.confirm("삭제하시겠습니까?")) return;
     try {
       await deleteDoc(fsDoc(db, "calendarEvents", id));
-    } catch (err) {
-      console.error(err);
+    } catch (e) {
+      console.error(e);
     }
   };
 
   /* ----------------------------
-      AI 일정 생성
-  ----------------------------- */
-  const generateAISchedule = async () => {
-    setIsGenerating(true);
-    setError(null);
-
-    try {
-      // 기존 AI 일정 삭제
-      const qOld = query(
-        collection(db, "calendarEvents"),
-        where("userId", "==", userId),
-        where("date", "==", selectedDate),
-        where("aiGenerated", "==", true)
-      );
-
-      const old = await getDocs(qOld);
-      await Promise.all(old.docs.map((d) => deleteDoc(d.ref)));
-
-      // API 호출
-      const res = await withAI.post("/generate", {
-        userId,
-        selectedDate,
-        startTime: startTask.time,
-        endTime: endTask.time,
-        todos,
-        timetable,
-        events,
-      });
-
-      if (res.data?.success) {
-        await addDoc(collection(db, "notifications"), {
-          type: "ai_schedule",
-          title: "AI 일정 생성 완료",
-          message: "AI가 일정을 생성했습니다.",
-          userId,
-          createdAt: new Date(),
-        });
-
-        alert("AI 일정 생성 완료!");
-        setShowSettingsModal(false);
-      }
-    } catch (err) {
-      console.error(err);
-      setError("AI 일정 생성 실패");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  /* ----------------------------
-      AI 추천 fetch
+      AI 추천 문구 fetch
   ----------------------------- */
   useEffect(() => {
     if (!userId) return;
@@ -345,6 +370,7 @@ export default function Withai() {
 
     const fetchPlan = async () => {
       aiFetching.current = true;
+
       try {
         const res = await withAI.post("/recommend", {
           userId,
@@ -359,27 +385,64 @@ export default function Withai() {
             .map((r) => `🌸 ${r.title}\n${r.description}`)
             .join("\n\n");
           setAiPlan(plan);
-        } else {
-          setAiPlan("오늘은 여유롭게 하루를 보내보세요 ☕");
-        }
-      } catch (err) {
-        setAiPlan("오늘은 여유롭게 하루를 보내보세요 ☕");
-      } finally {
-        setTimeout(() => {
-          aiFetching.current = false;
-        }, 500);
+        } else setAiPlan("오늘은 가볍게 보내보세요 ☕");
+      } catch (e) {
+        console.error(e);
+        setAiPlan("오늘은 가볍게 보내보세요 ☕");
       }
+
+      setTimeout(() => {
+        aiFetching.current = false;
+      }, 600);
     };
 
     fetchPlan();
   }, [selectedDate, userId, todos]);
 
   /* ----------------------------
+      AI 일정 생성
+  ----------------------------- */
+  const generateAISchedule = async () => {
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      const qOld = query(
+        collection(db, "calendarEvents"),
+        where("userId", "==", userId),
+        where("date", "==", selectedDate),
+        where("aiGenerated", "==", true)
+      );
+
+      const oldDocs = await getDocs(qOld);
+      await Promise.all(oldDocs.docs.map((d) => deleteDoc(d.ref)));
+
+      await withAI.post("/generate", {
+        userId,
+        selectedDate,
+        startTime: startTask.time,
+        endTime: endTask.time,
+        todos,
+        timetable,
+        events,
+      });
+
+      alert("AI 일정 생성 완료!");
+      setShowSettingsModal(false);
+    } catch (e) {
+      console.error(e);
+      setError("AI 일정 생성 실패");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  /* ----------------------------
       RENDER
   ----------------------------- */
   return (
     <div className="withai-page">
-      {/* 헤더 */}
+      {/* HEADER */}
       <div className="withai-header">
         <h2 className="withai-title">
           <span className="title-icon">✨</span>
@@ -390,8 +453,9 @@ export default function Withai() {
         </h2>
       </div>
 
-      {/* TOP Bar */}
+      {/* TOP BAR */}
       <div className="withai-topbar">
+        {/* AI 설정 */}
         <button
           className="withai-playbtn"
           onClick={() => setShowSettingsModal(true)}
@@ -399,6 +463,7 @@ export default function Withai() {
           <Sparkles size={22} />
         </button>
 
+        {/* 날짜 */}
         <button
           className="withai-date"
           onClick={() => setShowDropdown((p) => !p)}
@@ -406,10 +471,17 @@ export default function Withai() {
           {dayjs(selectedDate).format("M월 D일 (ddd)")}
         </button>
 
+        {/* 일정추가 */}
         <button
           className="withai-addbtn"
           onClick={() => {
-            setNewTask({ title: "", time: "", end: "" });
+            setNewTask({
+              title: "",
+              time: "",
+              end: "",
+              category: "",
+              customCategory: "",
+            });
             setIsEditing(false);
             setShowTaskModal(true);
           }}
@@ -417,6 +489,7 @@ export default function Withai() {
           + 일정 추가
         </button>
 
+        {/* 날짜 드롭다운 */}
         <div className={`withai-dropdown ${showDropdown ? "open" : ""}`}>
           {dateList.map((d) => (
             <p
@@ -432,7 +505,7 @@ export default function Withai() {
         </div>
       </div>
 
-      {/* Error */}
+      {/* ERROR */}
       {error && (
         <div className="withai-error-message">
           <AlertCircle size={16} />
@@ -440,7 +513,7 @@ export default function Withai() {
         </div>
       )}
 
-      {/* AI 추천 */}
+      {/* AI 추천 카드 */}
       {aiPlan && (
         <div className="withai-aiplan-card">
           <h3>오늘의 AI 추천</h3>
@@ -448,139 +521,205 @@ export default function Withai() {
         </div>
       )}
 
-     {/* 타임라인 */}
-<div className="withai-timeline">
+      {/* TIMELINE */}
+      <div className="withai-timeline">
+        {/* =============== 기상 =============== */}
+        {(() => {
+          const start = dayjs(`${selectedDate} ${safeTime(startTask.time)}`);
 
-  {/* (1) 기상 */}
-  <div className="withai-item">
-    <button className="withai-circle current" disabled />
-    <div className="withai-content">
-      <h4>{startTask.title}</h4>
-      <div className="withai-time">{safeTime(startTask.time)}</div>
-    </div>
-  </div>
+          let status = "future";
+          if (currentTime.isSame(dayjs(selectedDate), "day")) {
+            if (currentTime.isAfter(start)) status = "completed";
+            if (currentTime.isSame(start, "minute")) status = "current";
+          }
 
-  {/* (2) 일정 리스트 */}
-  {combinedTimeline.length === 0 ? (
-    <div className="withai-empty">
-      <p>등록된 일정이 없습니다.</p>
-      <p>AI 버튼 또는 [+ 일정 추가]를 사용해보세요.</p>
-    </div>
-  ) : (
-    combinedTimeline.map((task) => {
-      const status = (() => {
-        const start = dayjs(`${selectedDate} ${safeTime(task.time)}`);
-        const end = dayjs(`${selectedDate} ${safeTime(task.end)}`);
+          const cls = ["withai-circle", status].join(" ");
 
-        if (!currentTime.isSame(dayjs(selectedDate), "day")) {
-          return "future";
-        }
-        if (currentTime.isBefore(start)) return "future";
-        if (currentTime.isAfter(end)) return "completed";
-        return "current";
-      })();
-
-      const circleClass = [
-        "withai-circle",
-        status === "completed" ? "completed" : "",
-        status === "current" ? "current" : "",
-        status === "future" ? "future" : "",
-      ]
-        .filter(Boolean)
-        .join(" ");
-
-      const gapAfter = suggestions.find((s) => s.after === task.id);
-
-      return (
-        <React.Fragment key={task.id}>
-          <div className="withai-item">
-            <button
-              className={circleClass}
-              onClick={() => {
-                if (!task.fromTimetable && !task.fromEvent) {
-                  setIsEditing(true);
-                  setEditId(task.id);
-                  setNewTask({
-                    title: task.title,
-                    time: safeTime(task.time),
-                    end: safeTime(task.end),
-                  });
-                  setShowTaskModal(true);
-                }
-              }}
-              disabled={task.fromTimetable || task.fromEvent}
-            />
-
-            <div className="withai-content">
-              <h4>{task.title}</h4>
-              <div className="withai-time">
-                {safeTime(task.time)} ~ {safeTime(task.end)}
+          return (
+            <div className="withai-item">
+              <button className={cls} disabled />
+              <div className="withai-content">
+                <h4>{startTask.title}</h4>
+                <div className="withai-time">{safeTime(startTask.time)}</div>
               </div>
+            </div>
+          );
+        })()}
 
-              <div style={{ marginTop: 4, fontSize: 12 }}>
-                {task.fromTimetable && (
-                  <span className="tag timetable">시간표</span>
-                )}
-                {task.fromEvent && (
-                  <span className="tag event">캘린더</span>
-                )}
-              </div>
+        {/* =============== 일정 리스트 =============== */}
+        {combinedTimeline.length === 0 ? (
+          <div className="withai-empty">
+            <p>등록된 일정이 없습니다.</p>
+            <p>AI 버튼 또는 [+ 일정 추가]를 사용해보세요.</p>
+          </div>
+        ) : (
+          combinedTimeline.map((task) => {
+            // 시간 상태 계산
+            const status = (() => {
+              const s = dayjs(`${selectedDate} ${safeTime(task.time)}`);
+              const e = dayjs(`${selectedDate} ${safeTime(task.end)}`);
 
-              {!task.fromTimetable && !task.fromEvent && (
-                <div className="withai-editbtns">
+              if (!currentTime.isSame(dayjs(selectedDate), "day"))
+                return "future";
+              if (currentTime.isBefore(s)) return "future";
+              if (currentTime.isAfter(e)) return "completed";
+              return "current";
+            })();
+
+            const cls = ["withai-circle", status].join(" ");
+
+            // 갭 메시지
+            const gap = suggestions.find((s) => s.after === task.id);
+
+            const editable = !task.fromTimetable && !task.fromEvent;
+
+            return (
+              <React.Fragment key={task.id}>
+                <div className="withai-item">
+                  {/* 동그라미 */}
                   <button
-                    type="button"
+                    className={cls}
+                    disabled={!editable}
                     onClick={() => {
+                      if (!editable) return;
+
+                      const preset = CATEGORY_PRESETS.find(
+                        (c) =>
+                          c.key === task.categoryKey ||
+                          c.label === task.categoryLabel
+                      );
+
                       setIsEditing(true);
                       setEditId(task.id);
                       setNewTask({
                         title: task.title,
                         time: safeTime(task.time),
                         end: safeTime(task.end),
+                        category: preset
+                          ? preset.key
+                          : task.categoryKey === "custom" ||
+                            (!preset && task.categoryLabel)
+                          ? "custom"
+                          : "",
+                        customCategory:
+                          !preset && task.categoryLabel
+                            ? task.categoryLabel
+                            : "",
                       });
                       setShowTaskModal(true);
                     }}
                   />
-                  <button
-                    type="button"
-                    onClick={() => deleteTask(task.id)}
-                  />
+
+                  {/* 내용 */}
+                  <div className="withai-content">
+                    <h4>{task.title}</h4>
+                    <div className="withai-time">
+                      {safeTime(task.time)} ~ {safeTime(task.end)}
+                    </div>
+
+                    {/* 태그/카테고리 영역 */}
+                    <div style={{ marginTop: 4, fontSize: 12 }}>
+                      {task.fromTimetable && (
+                        <span className="tag timetable">시간표</span>
+                      )}
+
+                      {(task.categoryLabel || task.categoryEmoji) && (
+                        <span className="category-pill-view">
+                          {task.categoryEmoji && (
+                            <span className="category-emoji">
+                              {task.categoryEmoji}
+                            </span>
+                          )}
+                          <span>{task.categoryLabel}</span>
+                        </span>
+                      )}
+                    </div>
+
+                    {/* ✏️ 수정 / 🗑 삭제 버튼 — 호버시 나타남 */}
+                    {editable && (
+                      <div className="withai-editbtns">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const preset = CATEGORY_PRESETS.find(
+                              (c) =>
+                                c.key === task.categoryKey ||
+                                c.label === task.categoryLabel
+                            );
+
+                            setIsEditing(true);
+                            setEditId(task.id);
+                            setNewTask({
+                              title: task.title,
+                              time: safeTime(task.time),
+                              end: safeTime(task.end),
+                              category: preset
+                                ? preset.key
+                                : task.categoryKey === "custom" ||
+                                  (!preset && task.categoryLabel)
+                                ? "custom"
+                                : "",
+                              customCategory:
+                                !preset && task.categoryLabel
+                                  ? task.categoryLabel
+                                  : "",
+                            });
+                            setShowTaskModal(true);
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => deleteTask(task.id)}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
+
+                {/* 갭 메시지 */}
+                {gap && (
+                  <div
+                    className="gap-suggestion"
+                    style={{
+                      marginLeft: 52,
+                      marginBottom: 16,
+                      fontSize: 12,
+                      color: "#888",
+                    }}
+                  >
+                    {gap.text}
+                  </div>
+                )}
+              </React.Fragment>
+            );
+          })
+        )}
+
+        {/* =============== 하루 마무리 =============== */}
+        {(() => {
+          const end = dayjs(`${selectedDate} ${safeTime(endTask.time)}`);
+
+          let status = "future";
+          if (currentTime.isSame(dayjs(selectedDate), "day")) {
+            if (currentTime.isAfter(end)) status = "completed";
+            if (currentTime.isSame(end, "minute")) status = "current";
+          }
+
+          const cls = ["withai-circle", status].join(" ");
+
+          return (
+            <div className="withai-item">
+              <button className={cls} disabled />
+              <div className="withai-content">
+                <h4>{endTask.title}</h4>
+                <div className="withai-time">{safeTime(endTask.time)}</div>
+              </div>
             </div>
-          </div>
+          );
+        })()}
+      </div>
 
-          {gapAfter && (
-            <div
-              className="gap-suggestion"
-              style={{
-                marginLeft: 52,
-                marginBottom: 16,
-                fontSize: 12,
-                color: "#888",
-              }}
-            >
-              {gapAfter.text}
-            </div>
-          )}
-        </React.Fragment>
-      );
-    })
-  )}
-
-  {/* (3) 하루 마무리 */}
-  <div className="withai-item">
-    <button className="withai-circle future" disabled />
-    <div className="withai-content">
-      <h4>{endTask.title}</h4>
-      <div className="withai-time">{safeTime(endTask.time)}</div>
-    </div>
-  </div>
-
-</div>
-
-
-      {/* 일정 추가/수정 모달 */}
+      {/* =============== 일정 추가/수정 모달 =============== */}
       {showTaskModal && (
         <div
           className="withai-task-modal"
@@ -645,6 +784,48 @@ export default function Withai() {
                   />
                 </div>
               </div>
+
+              {/* 카테고리 */}
+              <div className="withai-task-group">
+                <label className="withai-task-label">카테고리</label>
+
+                <div className="category-row">
+                  {CATEGORY_PRESETS.map((cat) => (
+                    <div
+                      key={cat.key}
+                      className={`category-pill ${
+                        newTask.category === cat.key ? "active" : ""
+                      }`}
+                      onClick={() =>
+                        setNewTask({
+                          ...newTask,
+                          category: cat.key,
+                          customCategory: "",
+                        })
+                      }
+                    >
+                      <span className="emoji">{cat.emoji}</span>
+                      {cat.label}
+                    </div>
+                  ))}
+                </div>
+
+                <input
+                  type="text"
+                  className="withai-task-input"
+                  placeholder="직접 카테고리 입력 (선택)"
+                  value={newTask.category === "custom"
+                    ? newTask.customCategory
+                    : ""}
+                  onChange={(e) =>
+                    setNewTask({
+                      ...newTask,
+                      category: "custom",
+                      customCategory: e.target.value,
+                    })
+                  }
+                />
+              </div>
             </div>
 
             <div className="withai-task-buttons">
@@ -659,6 +840,7 @@ export default function Withai() {
               >
                 취소
               </button>
+
               <button
                 type="button"
                 className="withai-btn-task-submit"
@@ -671,7 +853,7 @@ export default function Withai() {
         </div>
       )}
 
-      {/* AI 설정 모달 */}
+      {/* =============== AI 설정 모달 =============== */}
       {showSettingsModal && (
         <div
           className="withai-settings-modal"
@@ -713,21 +895,22 @@ export default function Withai() {
 
               <div className="withai-data-summary">
                 <h4>사용할 데이터 요약</h4>
+
                 <div className="withai-data-item">
                   <span className="withai-data-label">Todo</span>
                   <span className="withai-data-value">{todos.length}개</span>
                 </div>
+
                 <div className="withai-data-item">
                   <span className="withai-data-label">시간표</span>
                   <span className="withai-data-value">
                     {timetable.length}개
                   </span>
                 </div>
+
                 <div className="withai-data-item">
                   <span className="withai-data-label">캘린더 이벤트</span>
-                  <span className="withai-data-value">
-                    {events.length}개
-                  </span>
+                  <span className="withai-data-value">{events.length}개</span>
                 </div>
               </div>
 
@@ -744,9 +927,7 @@ export default function Withai() {
                 type="button"
                 className="withai-btn-cancel"
                 disabled={isGenerating}
-                onClick={() => {
-                  if (!isGenerating) setShowSettingsModal(false);
-                }}
+                onClick={() => !isGenerating && setShowSettingsModal(false)}
               >
                 닫기
               </button>
@@ -757,9 +938,7 @@ export default function Withai() {
                 disabled={isGenerating}
                 onClick={generateAISchedule}
               >
-                {isGenerating && (
-                  <span className="withai-loading-spinner" />
-                )}
+                {isGenerating && <span className="withai-loading-spinner" />}
                 <span style={{ marginLeft: isGenerating ? 8 : 0 }}>
                   AI 일정 생성
                 </span>
