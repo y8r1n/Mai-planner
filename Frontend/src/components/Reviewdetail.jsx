@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../services/firebase";
+import { db, auth } from "../services/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
 import "../styles/reviewdetail.css";
@@ -7,6 +7,9 @@ import { quizAI } from "../services/api";
 
 export default function ReviewDetail() {
   const { subjectId, weekId, noteId } = useParams();
+  
+  const userId = auth.currentUser?.uid || "test-user"; // ⭐ user 구조 반영
+
   const [note, setNote] = useState(null);
   const [flippedIndex, setFlippedIndex] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -25,20 +28,30 @@ export default function ReviewDetail() {
     };
   }, []);
 
-  /* 🔹 오답노트 불러오기 */
+  /* 🔹 오답노트 불러오기 (users/{uid}/subjects 기반) */
   useEffect(() => {
     if (!subjectId || !weekId || !noteId) return;
 
     const fetchNote = async () => {
       try {
-        const snap = await getDoc(
-          doc(db, "subjects", subjectId, "weeks", weekId, "notes", noteId)
+        const ref = doc(
+          db,
+          "users",
+          userId,
+          "subjects",
+          subjectId,
+          "weeks",
+          weekId,
+          "notes",
+          noteId
         );
+
+        const snap = await getDoc(ref);
 
         if (snap.exists()) {
           const data = snap.data();
 
-          // 🎯 explanation이 없는 경우도 대비해 필드 생성
+          // explanation 필드 안전 처리
           const safeWrongList = (data.wrongList || []).map((w) => ({
             ...w,
             explanation:
@@ -48,7 +61,6 @@ export default function ReviewDetail() {
           }));
 
           setNote({ ...data, wrongList: safeWrongList });
-          console.log("📘 불러온 노트:", safeWrongList);
         }
       } catch (e) {
         console.error("🔥 오답노트 불러오기 실패:", e);
@@ -56,74 +68,81 @@ export default function ReviewDetail() {
     };
 
     fetchNote();
-  }, [subjectId, weekId, noteId]);
+  }, [subjectId, weekId, noteId, userId]);
 
   /* 🔹 AI 해설 생성 */
- /* 🔹 AI 해설 생성 */
-const generateExplanations = async () => {
-  if (!note?.wrongList?.length) {
-    alert("오답이 없습니다.");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const res = await quizAI.post("/generate-explanations", {
-      subjectName: note.subjectName,
-      subjectId,
-      weekId,
-      questions: note.wrongList.map((w) => ({
-        question: w.question,
-        correctAnswer: w.correctAnswer,
-        myAnswer: w.myAnswer,
-      })),
-      userAnswers: note.wrongList.map((w) => w.myAnswer),
-    });
-
-    console.log("📦 API 응답:", res.data);
-
-    if (!res.data?.success) {
-      alert("해설 생성 실패 😢");
+  const generateExplanations = async () => {
+    if (!note?.wrongList?.length) {
+      alert("오답이 없습니다.");
       return;
     }
 
-    // 서버가 반환하는 [{ explanation: "..." }] 배열
-    const expList = Array.isArray(res.data.explanations)
-      ? res.data.explanations
-      : [];
+    setLoading(true);
 
-    // wrongList 에 explanation 붙이기
-    const updated = note.wrongList.map((item, i) => ({
-      ...item,
-      explanation: expList[i]?.explanation || "해설이 없습니다.",
-    }));
+    try {
+      const res = await quizAI.post("/generate-explanations", {
+        subjectName: note.subjectName,
+        subjectId,
+        weekId,
+        questions: note.wrongList.map((w) => ({
+          question: w.question,
+          correctAnswer: w.correctAnswer,
+          myAnswer: w.myAnswer,
+        })),
+        userAnswers: note.wrongList.map((w) => w.myAnswer),
+      });
 
-    // Firebase 저장
-    await updateDoc(
-      doc(db, "subjects", subjectId, "weeks", weekId, "notes", noteId),
-      { wrongList: updated }
-    );
+      if (!res.data?.success) {
+        alert("해설 생성 실패 😢");
+        return;
+      }
 
-    // 화면 즉시 갱신
-    setNote((prev) => ({
-      ...prev,
-      wrongList: updated,
-    }));
+      const expList = Array.isArray(res.data.explanations)
+        ? res.data.explanations
+        : [];
 
-    alert("해설 생성 완료!");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+      const updated = note.wrongList.map((item, i) => ({
+        ...item,
+        explanation: expList[i]?.explanation || "해설이 없습니다.",
+      }));
 
-  } catch (err) {
-    console.error("❌ 해설 생성 오류:", err);
-    alert("서버 오류 발생!");
-  } finally {
-    setLoading(false);
-  }
-};
+      // Firebase 업데이트 (⭐ user 구조 적용)
+      await updateDoc(
+        doc(
+          db,
+          "users",
+          userId,
+          "subjects",
+          subjectId,
+          "weeks",
+          weekId,
+          "notes",
+          noteId
+        ),
+        { wrongList: updated }
+      );
+
+      setNote((prev) => ({
+        ...prev,
+        wrongList: updated,
+      }));
+
+      alert("해설 생성 완료!");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } catch (err) {
+      console.error("❌ 해설 생성 오류:", err);
+      alert("서버 오류 발생!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   /* 🔹 유사 문제 다시 풀기 */
   const handleRetry = () => {
-    if (!note?.wrongList?.length) return alert("오답이 없습니다!");
+    if (!note?.wrongList?.length)
+      return alert("오답이 없습니다!");
+
     navigate(`/QuizAI/${subjectId}/${weekId}`);
   };
 

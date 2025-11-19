@@ -1,5 +1,5 @@
 /* ===========================
-   📚 SUBJECT PAGE - Refactored
+   📚 SUBJECT PAGE - 완전 리디자인
 =========================== */
 
 .subject-page {
@@ -25,10 +25,11 @@
   background: var(--color-background-alt);
   border-bottom: 1px solid var(--color-border-lighter);
   z-index: var(--z-sticky);
-  margin-bottom: 0;
+  margin-bottom: var(--space-xl);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
-/* Back Button */
 .back-btn {
   position: absolute;
   left: var(--space-lg);
@@ -52,7 +53,6 @@
   transform: scale(1.1);
 }
 
-/* Subject Title */
 .subject-title {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
@@ -65,7 +65,7 @@
 ======================================== */
 .subject-tabs {
   position: sticky;
-  top: var(--navbar-height);
+  top: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -75,6 +75,7 @@
   border-bottom: 1px solid var(--color-border-lighter);
   z-index: calc(var(--z-sticky) - 1);
   margin-bottom: var(--space-xl);
+  border-radius: var(--radius-md);
 }
 
 .tab-item {
@@ -99,7 +100,6 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* Tab Underline */
 .tab-underline {
   position: absolute;
   bottom: -17px;
@@ -110,7 +110,7 @@
 }
 
 /* ========================================
-   CONTENT AREA
+   CONTENT AREA - 새로운 레이아웃
 ======================================== */
 .content-area {
   display: flex;
@@ -119,27 +119,28 @@
 }
 
 /* ========================================
-   WEEK LIST (Left Sidebar)
+   WEEK LIST (주차 사이드바)
 ======================================== */
 .week-list {
-  width: 28%;
-  min-width: 140px;
+  width: 30%;
+  min-width: 160px;
 }
 
 .week-list h4 {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
+  padding-left: var(--space-sm);
 }
 
 .week-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-md) var(--space-lg);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  border: 2px solid var(--color-border-lighter);
+  border-radius: var(--radius-lg);
   background: var(--color-surface);
   color: var(--color-text-primary);
   margin-bottom: var(--space-md);
@@ -147,164 +148,424 @@
   transition: all var(--transition-base);
   box-shadow: var(--shadow-sm);
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 }
 
 .week-item:hover {
   background: var(--color-surface-hover);
-  transform: translateX(3px);
+  transform: translateX(4px);
   box-shadow: var(--shadow-md);
+  border-color: var(--color-border);
 }
 
 .week-item.active {
-  background: var(--color-surface-hover);
+  background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-primary-light) 100%);
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-primary-dark);
   font-weight: var(--font-weight-semibold);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
 }
 
-/* Delete Week Button */
 .delete-week {
   border: none;
   background: none;
-  color: var(--color-primary);
+  color: var(--color-text-tertiary);
   cursor: pointer;
-  font-size: var(--font-size-base);
-  transition: color var(--transition-fast);
+  font-size: 1.1rem;
+  transition: all var(--transition-fast);
   opacity: 0.6;
+  padding: var(--space-xs);
+  border-radius: 50%;
 }
 
 .delete-week:hover {
   color: var(--color-error);
   opacity: 1;
+  background: rgba(240, 92, 130, 0.1);
+  transform: scale(1.1);
 }
 
-/* Add Week Button */
 .add-week-btn {
   width: 100%;
-  text-align: left;
+  text-align: center;
   font-size: var(--font-size-sm);
-  color: var(--color-text-disabled);
-  padding: var(--space-sm) var(--space-md);
+  color: var(--color-primary);
+  padding: var(--space-lg);
   cursor: pointer;
   transition: all var(--transition-base);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--color-border);
+  background: var(--color-surface);
+  font-weight: var(--font-weight-medium);
+  margin-top: var(--space-md);
 }
 
 .add-week-btn:hover {
-  color: var(--color-primary);
-  background: var(--color-surface-hover);
-  transform: translateX(4px);
+  background: var(--color-primary-lighter);
+  border-color: var(--color-primary);
+  transform: scale(1.02);
+  box-shadow: var(--shadow-md);
 }
 
 /* ========================================
-   WEEK CONTENT (Right Main Area)
+   WEEK CONTENT (메인 콘텐츠 영역)
 ======================================== */
 .week-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-2xl);
 }
 
 .week-content h4 {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin-bottom: var(--space-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.week-content h4::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
 }
 
 /* ========================================
-   CONTENT BOX
+   CONTENT BOX - 개선된 디자인
 ======================================== */
 .content-box {
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border: 2px solid var(--color-border-lighter);
+  border-radius: var(--radius-xl);
   background: var(--color-surface);
-  padding: var(--space-lg);
-  min-height: 100px;
+  padding: var(--space-xl);
+  min-height: 120px;
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  line-height: 1.6;
+  line-height: 1.7;
   transition: all var(--transition-base);
   box-shadow: var(--shadow-sm);
 }
 
 .content-box:hover {
   box-shadow: var(--shadow-md);
+  border-color: var(--color-border);
 }
 
 .content-box.editable {
   cursor: text;
+  position: relative;
 }
 
-.content-box.editable:focus-within {
+.content-box.editable::after {
+  content: '✏️ 클릭하여 편집';
+  position: absolute;
+  bottom: var(--space-sm);
+  right: var(--space-md);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-disabled);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.content-box.editable:hover::after {
+  opacity: 1;
+}
+
+.content-box.editable:focus {
   background: var(--color-surface-hover);
   border-color: var(--color-primary);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
+  outline: none;
+}
+
+.content-box.editable:focus::after {
+  display: none;
+}
+
+.content-box:empty::before {
+  content: '여기를 클릭하여 내용을 입력하세요...';
+  color: var(--color-text-disabled);
+  font-style: italic;
 }
 
 /* ========================================
-   UPLOAD BOX
+   FILE UPLOAD SECTION - 드래그앤드롭 UI
 ======================================== */
-.upload-box {
-  border: 2px dashed var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-2xl);
-  text-align: center;
-  color: var(--color-text-disabled);
-  cursor: pointer;
-  transition: all var(--transition-base);
+.file-upload-section {
   background: var(--color-surface);
+  border: 2px solid var(--color-border-lighter);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-md);
 }
 
-.upload-box:hover {
-  background: var(--color-surface-hover);
+.file-dropzone {
+  border: 3px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3xl) var(--space-xl);
+  text-align: center;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: linear-gradient(135deg, var(--color-background) 0%, var(--color-surface) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.file-dropzone::before {
+  content: '📎';
+  position: absolute;
+  font-size: 4rem;
+  opacity: 0.1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all var(--transition-base);
+}
+
+.file-dropzone:hover {
+  background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-surface-hover) 100%);
   border-color: var(--color-primary);
   color: var(--color-primary);
   transform: scale(1.01);
 }
 
+.file-dropzone:hover::before {
+  opacity: 0.2;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.file-dropzone.dragging {
+  background: var(--color-primary-lighter);
+  border-color: var(--color-primary);
+  border-style: solid;
+}
+
+.dropzone-icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-md);
+}
+
+.dropzone-text {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--space-sm);
+}
+
+.dropzone-subtext {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-disabled);
+}
+
+/* 업로드 프로그레스 */
+.upload-progress {
+  margin-top: var(--space-lg);
+  background: var(--color-background);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--color-border-lighter);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--space-sm);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  transition: width 0.3s ease;
+  border-radius: var(--radius-full);
+}
+
+.progress-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+/* 파일 리스트 */
+.file-list {
+  margin-top: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.file-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-background);
+  border: 1.5px solid var(--color-border-lighter);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.file-list-item:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border);
+  transform: translateX(4px);
+}
+
+.file-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+.file-icon {
+  font-size: 1.5rem;
+}
+
+.file-name {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.file-actions button {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-weight: var(--font-weight-medium);
+}
+
+.file-actions button:hover {
+  background: var(--color-primary-lighter);
+  border-color: var(--color-primary);
+  transform: scale(1.05);
+}
+
+.file-list-footer {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border-lighter);
+}
+
+.file-list-footer button {
+  flex: 1;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: none;
+}
+
+.file-list-footer button:first-child {
+  background: var(--color-primary);
+  color: white;
+}
+
+.file-list-footer button:first-child:hover {
+  background: var(--color-primary-dark);
+  transform: scale(1.02);
+}
+
+.file-list-footer button.danger {
+  background: var(--color-border-lighter);
+  color: var(--color-error);
+}
+
+.file-list-footer button.danger:hover:not(:disabled) {
+  background: var(--color-error);
+  color: white;
+}
+
+.file-list-footer button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ========================================
-   AI SUMMARY SECTION
+   AI SUMMARY SECTION - 개선된 디자인
 ======================================== */
 .ai-summary-box {
   border: 2px solid var(--color-secondary-light);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
   background: linear-gradient(135deg, #fffbfc 0%, #fff7f9 100%);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-summary-box::before {
+  content: '🤖';
+  position: absolute;
+  font-size: 8rem;
+  opacity: 0.05;
+  right: -1rem;
+  bottom: -2rem;
+  pointer-events: none;
 }
 
 .ai-summary-box:hover {
   background: linear-gradient(135deg, #fff7f9 0%, #fff3f6 100%);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-2px);
 }
 
 .ai-text {
   white-space: pre-wrap;
-  line-height: 1.7;
+  line-height: 1.8;
   color: var(--color-text-secondary);
   font-size: var(--font-size-base);
+  position: relative;
+  z-index: 1;
 }
 
-/* AI Chat Preview */
+.ai-placeholder {
+  color: var(--color-text-disabled);
+  text-align: center;
+  font-style: italic;
+}
+
+/* AI Chat Preview - 카드형 디자인 */
 .ai-chat-preview {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--space-md);
   margin-bottom: var(--space-xl);
 }
 
 .chat-preview-item {
-  border: 1.5px solid var(--color-border-light);
-  border-radius: var(--radius-md);
-  padding: var(--space-md) var(--space-lg);
+  border: 2px solid var(--color-border-lighter);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
   background: var(--color-surface);
   cursor: pointer;
   transition: all var(--transition-base);
-  font-size: var(--font-size-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  box-shadow: var(--shadow-sm);
 }
 
 .chat-preview-item:hover {
@@ -314,73 +575,164 @@
   box-shadow: var(--shadow-md);
 }
 
+.chat-preview-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.chat-preview-title::before {
+  content: '💬';
+  font-size: 1.2rem;
+}
+
+.chat-preview-snippet {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 표준 방법: 2줄로 제한 */
+  -webkit-box-orient: vertical;
+}
+
+.no-chat-preview {
+  text-align: center;
+  padding: var(--space-3xl);
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-base);
+  line-height: 1.8;
+}
+
 /* AI Chat Button */
 .ai-chat-btn {
   width: 100%;
-  background: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   color: white;
   border: none;
-  border-radius: var(--radius-md);
-  padding: var(--space-lg) 0;
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   cursor: pointer;
   transition: all var(--transition-base);
   box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-chat-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.2) 100%);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.ai-chat-btn:hover::before {
+  transform: translateX(100%);
 }
 
 .ai-chat-btn:hover {
-  background: var(--color-primary-dark);
   transform: scale(1.02);
   box-shadow: var(--shadow-lg);
 }
 
 /* ========================================
-   REVIEW TAB
+   REVIEW TAB - 카드형 리스트
 ======================================== */
+.quiz-list-wrapper,
+.wrong-note-list-wrapper {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-lighter);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.quiz-list,
+.wrong-note-list {
+  display: grid;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
 .quiz-item,
 .wrong-note-item {
-  width: 100%;
-  background: var(--color-surface);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-lg) 0;
-  text-align: center;
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-background) 100%);
+  border: 2px solid var(--color-border-lighter);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg) var(--space-xl);
+  text-align: left;
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  margin-bottom: var(--space-md);
   cursor: pointer;
   transition: all var(--transition-base);
   box-shadow: var(--shadow-sm);
+  font-weight: var(--font-weight-medium);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.quiz-item::before {
+  content: '📝';
+  font-size: 1.5rem;
+}
+
+.wrong-note-item::before {
+  content: '❌';
+  font-size: 1.5rem;
 }
 
 .quiz-item:hover,
 .wrong-note-item:hover {
-  background: var(--color-surface-hover);
+  background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-surface-hover) 100%);
   border-color: var(--color-primary);
-  color: var(--color-primary);
-  transform: scale(1.02);
+  color: var(--color-primary-dark);
+  transform: translateX(4px);
   box-shadow: var(--shadow-md);
 }
 
-/* Quiz Add Button */
+.no-quiz,
+.no-wrong-note {
+  text-align: center;
+  padding: var(--space-2xl);
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-base);
+}
+
 .quiz-add-btn {
   width: 100%;
-  border: 2px dashed var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-background);
+  border: 3px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
   color: var(--color-primary);
-  padding: var(--space-lg) 0;
-  font-size: var(--font-size-base);
+  padding: var(--space-xl);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
 }
 
 .quiz-add-btn:hover {
-  background: var(--color-surface-hover);
+  background: var(--color-primary-lighter);
   border-color: var(--color-primary);
+  border-style: solid;
   transform: scale(1.02);
+  box-shadow: var(--shadow-md);
 }
 
 /* ========================================
@@ -404,11 +756,24 @@
   .subject-tabs {
     gap: var(--space-2xl);
   }
+  
+  .file-dropzone {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+  
+  .dropzone-icon {
+    font-size: 2rem;
+  }
+  
+  .ai-summary-box::before {
+    font-size: 6rem;
+  }
 }
 
 @media (max-width: 480px) {
   .subject-header {
     padding: var(--space-md);
+    height: 56px;
   }
   
   .back-btn {
@@ -432,12 +797,46 @@
   }
   
   .week-item {
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-md);
   }
   
   .content-box,
-  .ai-summary-box {
+  .ai-summary-box,
+  .file-upload-section,
+  .quiz-list-wrapper,
+  .wrong-note-list-wrapper {
+    padding: var(--space-lg);
+  }
+  
+  .week-content h4 {
+    font-size: var(--font-size-base);
+  }
+  
+  .file-dropzone {
+    padding: var(--space-xl) var(--space-md);
+  }
+  
+  .dropzone-icon {
+    font-size: 1.8rem;
+  }
+  
+  .dropzone-text {
+    font-size: var(--font-size-sm);
+  }
+  
+  .chat-preview-item {
     padding: var(--space-md);
+  }
+  
+  .ai-chat-btn {
+    padding: var(--space-lg);
+    font-size: var(--font-size-base);
+  }
+  
+  .quiz-item,
+  .wrong-note-item {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--font-size-sm);
   }
 }
 
@@ -448,7 +847,34 @@
 .tab-item:focus-visible,
 .week-item:focus-visible,
 .content-box:focus-visible,
-.ai-chat-btn:focus-visible {
+.file-dropzone:focus-visible,
+.ai-chat-btn:focus-visible,
+.quiz-item:focus-visible,
+.wrong-note-item:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* ========================================
+   LOADING STATES
+======================================== */
+.loading-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-border-lighter) 0%,
+    var(--color-surface-hover) 50%,
+    var(--color-border-lighter) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }

@@ -1,201 +1,242 @@
 // src/components/TodoTab.jsx
 import React, { useState, useEffect } from "react";
+import dayjs from "dayjs";
+import "dayjs/locale/ko";
 import {
   collection,
   addDoc,
+  onSnapshot,
   updateDoc,
   deleteDoc,
   doc,
-  onSnapshot,
+  query,
+  orderBy,
 } from "firebase/firestore";
-import { db } from "../services/firebase";
+import { db, auth } from "../services/firebase";
+import {
+  Calendar,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  X,
+} from "lucide-react";
 import "../styles/todotab.css";
 
+dayjs.locale("ko");
+
 export default function TodoTab() {
-  const [todos, setTodos] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [dateTodos, setDateTodos] = useState([]);
+  const [generalTodos, setGeneralTodos] = useState([]);
   const [newTodo, setNewTodo] = useState("");
   const [adding, setAdding] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [viewMode, setViewMode] = useState("date");
 
-  const todosCollection = collection(db, "todos");
+  // 로그인된 유저 ID
+  const userId = auth.currentUser?.uid;
 
-  /* ========================================================
-      🔥 실시간 구독 (fetchTodos 제거됨)
-  ======================================================== */
+  if (!userId) {
+    return (
+      <div style={{ padding: "80px 20px" }}>
+        <h3>로그인이 필요합니다.</h3>
+      </div>
+    );
+  }
+
+  /* 📌 날짜별 Todo 실시간 구독 */
   useEffect(() => {
-    const unsub = onSnapshot(todosCollection, (snap) => {
-      const data = snap.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      }));
-      setTodos(data);
-    });
-    return () => unsub();
-  }, []);
+    if (viewMode !== "date") return;
 
-  /* ========================================================
-      ➕ 할 일 추가
-  ======================================================== */
+    const dateStr = selectedDate.format("YYYY-MM-DD");
+
+    const q = query(
+      collection(db, "users", userId, "todos", dateStr, "tasks"),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsub = onSnapshot(q, (snap) => {
+      const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setDateTodos(data);
+    });
+
+    return () => unsub();
+  }, [userId, selectedDate, viewMode]);
+
+  /* 📌 일반 Todo 실시간 구독 */
+  useEffect(() => {
+    if (viewMode !== "general") return;
+
+    const q = query(
+      collection(db, "users", userId, "todos", "general", "tasks"),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsub = onSnapshot(q, (snap) => {
+      const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setGeneralTodos(data);
+    });
+
+    return () => unsub();
+  }, [userId, viewMode]);
+
+  /* ➕ Todo 추가 */
   const addTodo = async (e) => {
     e.preventDefault();
     if (!newTodo.trim()) return;
 
-    await addDoc(todosCollection, {
+    const todo = {
       title: newTodo.trim(),
       completed: false,
-      createdAt: Date.now(),
-    });
+      createdAt: new Date(),
+    };
 
-    setNewTodo("");
-    setAdding(false);
+    const dateStr = selectedDate.format("YYYY-MM-DD");
+
+    try {
+      const path =
+        viewMode === "date"
+          ? collection(db, "users", userId, "todos", dateStr, "tasks")
+          : collection(db, "users", userId, "todos", "general", "tasks");
+
+      await addDoc(path, todo);
+      setNewTodo("");
+      setAdding(false);
+    } catch (err) {
+      console.error("Todo 추가 실패:", err);
+    }
   };
 
-  /* ========================================================
-      ✔ 완료 / 미완료 토글
-  ======================================================== */
+  /* ✔ 완료 토글 */
   const toggleTodo = async (todo) => {
-    const ref = doc(db, "todos", todo.id);
-    await updateDoc(ref, { completed: !todo.completed });
+    const base =
+      viewMode === "date"
+        ? `users/${userId}/todos/${selectedDate.format("YYYY-MM-DD")}/tasks`
+        : `users/${userId}/todos/general/tasks`;
+
+    await updateDoc(doc(db, base, todo.id), {
+      completed: !todo.completed,
+    });
   };
 
-  /* ========================================================
-      🗑️ 삭제
-  ======================================================== */
-  const deleteTodo = async (id) => {
-    await deleteDoc(doc(db, "todos", id));
+  /* 🗑 삭제 */
+  const deleteTodo = async (todo) => {
+    const base =
+      viewMode === "date"
+        ? `users/${userId}/todos/${selectedDate.format("YYYY-MM-DD")}/tasks`
+        : `users/${userId}/todos/general/tasks`;
+
+    await deleteDoc(doc(db, base, todo.id));
   };
 
-  /* ========================================================
-      🔍 필터 적용
-  ======================================================== */
-  const filteredTodos = todos.filter((todo) => {
-    if (filter === "completed") return todo.completed;
+  /* 📌 필터 적용 */
+  const currentTodos = viewMode === "date" ? dateTodos : generalTodos;
+  const filteredTodos = currentTodos.filter((todo) => {
     if (filter === "active") return !todo.completed;
+    if (filter === "completed") return todo.completed;
     return true;
   });
 
-  /* ========================================================
-      👉 슬라이드 삭제 (드래그)
-  ======================================================== */
-  const [startX, setStartX] = useState(null);
-  const [offsetX, setOffsetX] = useState({});
-  const [openDelete, setOpenDelete] = useState({});
-
-  const startDrag = (id, clientX) => {
-    setStartX(clientX);
-  };
-
-  const moveDrag = (id, clientX) => {
-    if (startX === null) return;
-    const diff = clientX - startX;
-
-    // 왼쪽으로만 슬라이드 가능
-    if (diff < 0) {
-      setOffsetX((prev) => ({
-        ...prev,
-        [id]: Math.max(diff, -80),
-      }));
-    } else {
-      setOffsetX((prev) => ({
-        ...prev,
-        [id]: Math.min(diff, 0),
-      }));
-    }
-  };
-
-  const endDrag = (id) => {
-    if (offsetX[id] < -50) {
-      setOpenDelete((prev) => ({ ...prev, [id]: true }));
-      setOffsetX((prev) => ({ ...prev, [id]: -80 }));
-    } else {
-      setOpenDelete((prev) => ({ ...prev, [id]: false }));
-      setOffsetX((prev) => ({ ...prev, [id]: 0 }));
-    }
-    setStartX(null);
-  };
-
-  /* ========================================================
-      🎨 렌더
-  ======================================================== */
   return (
     <div id="todo-page">
-      {/* 상단 */}
+      {/* 헤더 */}
       <div className="todo-header">
         <h2>ToDo</h2>
         <button onClick={() => setAdding(!adding)} className="todo-add-btn">
-          ＋
+          <Plus size={20} />
         </button>
       </div>
 
+      {/* 날짜/일반 모드 */}
+      <div className="view-mode-switch">
+        <button
+          className={`mode-btn ${viewMode === "date" ? "active" : ""}`}
+          onClick={() => setViewMode("date")}
+        >
+          <Calendar size={16} /> 날짜별
+        </button>
+        <button
+          className={`mode-btn ${viewMode === "general" ? "active" : ""}`}
+          onClick={() => setViewMode("general")}
+        >
+          일반 목록
+        </button>
+      </div>
+
+      {/* 날짜 선택 */}
+      {viewMode === "date" && (
+        <div className="date-selector">
+          <button onClick={() => setSelectedDate((p) => p.subtract(1, "day"))}>
+            <ChevronLeft size={20} />
+          </button>
+
+          <div>
+            <div className="date-main">{selectedDate.format("M월 D일")}</div>
+            <div className="date-sub">{selectedDate.format("dddd")}</div>
+          </div>
+
+          <button onClick={() => setSelectedDate((p) => p.add(1, "day"))}>
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      )}
+
       {/* 필터 */}
       <div className="todo-filter">
-        {[
-          { key: "all", label: "전체" },
-          { key: "active", label: "미완료" },
-          { key: "completed", label: "완료" },
-        ].map((btn) => (
+        {["all", "active", "completed"].map((key) => (
           <button
-            key={btn.key}
-            onClick={() => setFilter(btn.key)}
-            className={`filter-btn ${filter === btn.key ? "active" : ""}`}
+            key={key}
+            onClick={() => setFilter(key)}
+            className={`filter-btn ${filter === key ? "active" : ""}`}
           >
-            {btn.label}
+            {key === "all" ? "전체" : key === "active" ? "미완료" : "완료"}
           </button>
         ))}
       </div>
 
-      {/* 할 일 추가 입력창 */}
+      {/* 입력창 */}
       {adding && (
         <form onSubmit={addTodo} className="todo-input-box">
           <span className="circle" />
           <input
+            autoFocus
             value={newTodo}
             onChange={(e) => setNewTodo(e.target.value)}
             placeholder="할 일 입력..."
           />
+          <button type="submit" className="submit-btn">
+            <Check size={18} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setAdding(false)}
+            className="cancel-btn"
+          >
+            <X size={18} />
+          </button>
         </form>
       )}
 
       {/* 리스트 */}
       <div className="todo-list">
+        {filteredTodos.length === 0 && <p className="todo-empty">등록된 할 일이 없습니다.</p>}
+
         {filteredTodos.map((todo) => (
-          <div
-            key={todo.id}
-            className="todo-item-wrapper"
-            onMouseDown={(e) => startDrag(todo.id, e.clientX)}
-            onMouseMove={(e) => moveDrag(todo.id, e.clientX)}
-            onMouseUp={() => endDrag(todo.id)}
-            onTouchStart={(e) => startDrag(todo.id, e.touches[0].clientX)}
-            onTouchMove={(e) => moveDrag(todo.id, e.touches[0].clientX)}
-            onTouchEnd={() => endDrag(todo.id)}
-          >
-            {/* 삭제 버튼 */}
-            <button
-              onClick={() => deleteTodo(todo.id)}
-              className={`delete-btn ${openDelete[todo.id] ? "show" : ""}`}
-            >
+          <div key={todo.id} className="todo-item-wrapper">
+            <button className="delete-btn" onClick={() => deleteTodo(todo)}>
               삭제
             </button>
 
-            {/* 할 일 아이템 */}
             <div
               className={`todo-item ${todo.completed ? "done" : ""}`}
-              style={{
-                transform: `translateX(${offsetX[todo.id] || 0}px)`,
-              }}
+              onClick={() => toggleTodo(todo)}
             >
-              <span
-                className={`check-circle ${todo.completed ? "checked" : ""}`}
-                onClick={() => toggleTodo(todo)}
-              />
+              <span className="check-circle" />
               <span className="todo-title">{todo.title}</span>
             </div>
           </div>
         ))}
-
-        {filteredTodos.length === 0 && (
-          <p className="todo-empty">등록된 할 일이 없습니다.</p>
-        )}
       </div>
     </div>
   );

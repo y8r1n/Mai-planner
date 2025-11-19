@@ -1,136 +1,176 @@
-// src/components/Home.jsx (또는 Home 컴포넌트 파일)
+// src/components/Home.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
-import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../services/firebase";
+import {
+  collection,
+  onSnapshot,
+  query,
+  orderBy
+} from "firebase/firestore";
+import { db, auth } from "../services/firebase";
 import "../styles/home.css";
+
+dayjs.locale("ko");
 
 export default function Home() {
   const navigate = useNavigate();
+  const userId = auth.currentUser?.uid;
 
-  const [todos, setTodos] = useState([]);
-  const [timetable, setTimetables] = useState([]);
+  const [todayTodos, setTodayTodos] = useState([]);
+  const [timetable, setTimetable] = useState([]);
   const [events, setEvents] = useState([]);
+
   const [calendarDate, setCalendarDate] = useState(dayjs());
   const [days, setDays] = useState([]);
 
-  // 🔹 시간표용 요일 매핑 (영어 -> 한글)
-  const timetableDayMap = {
-    Mon: "월",
-    Tue: "화",
-    Wed: "수",
-    Thu: "목",
-    Fri: "금",
-  };
+  const today = dayjs().format("YYYY-MM-DD");
 
-  // 🔥 Firestore 실시간 구독
+  /* -------------------------------
+      ✔ 오늘의 Todo 실시간 구독
+  -------------------------------- */
   useEffect(() => {
-    const unsubTodos = onSnapshot(collection(db, "todos"), (snap) => {
-      setTodos(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    if (!userId) return;
+
+    const q = query(
+      collection(db, "users", userId, "todos", today, "tasks"),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsub = onSnapshot(q, (snap) => {
+      const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setTodayTodos(data);
     });
 
-    const unsubTimetable = onSnapshot(collection(db, "timetable"), (snap) => {
-      setTimetables(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
+    return () => unsub();
+  }, [userId, today]);
 
-    const unsubEvents = onSnapshot(collection(db, "events"), (snap) => {
-      setEvents(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
+  /* -------------------------------
+      ✔ 시간표 실시간 구독
+  -------------------------------- */
+  useEffect(() => {
+    if (!userId) return;
 
-    return () => {
-      unsubTodos();
-      unsubTimetable();
-      unsubEvents();
-    };
-  }, []);
+    const unsub = onSnapshot(
+      collection(db, "users", userId, "timetable"),
+      (snap) => {
+        const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setTimetable(data);
+      }
+    );
 
-  // 🔥 달력 날짜 생성
+    return () => unsub();
+  }, [userId]);
+
+  /* -------------------------------
+      ✔ 캘린더 이벤트 구독
+  -------------------------------- */
+  useEffect(() => {
+    if (!userId) return;
+
+    const unsub = onSnapshot(
+      collection(db, "users", userId, "calendar", "events"),
+      (snap) => {
+        const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setEvents(data);
+      }
+    );
+
+    return () => unsub();
+  }, [userId]);
+
+  /* -------------------------------
+      ✔ 달력 날짜 생성
+  -------------------------------- */
   useEffect(() => {
     const startOfMonth = calendarDate.startOf("month");
     const endOfMonth = calendarDate.endOf("month");
-    const startDay = startOfMonth.day(); // 0(일) ~ 6(토)
+    const startDay = startOfMonth.day();
     const totalDays = endOfMonth.date();
 
-    const daysArr = [];
-    for (let i = 0; i < startDay; i++) daysArr.push(null);
-    for (let i = 1; i <= totalDays; i++) daysArr.push(i);
-    setDays(daysArr);
+    const arr = [];
+    for (let i = 0; i < startDay; i++) arr.push(null);
+    for (let i = 1; i <= totalDays; i++) arr.push(i);
+
+    setDays(arr);
   }, [calendarDate]);
 
-  // 미완료 ToDo만 필터
-  const incompleteTodos = todos.filter((todo) => !todo.completed);
+  const incompleteTodos = todayTodos.filter((t) => !t.completed);
 
   return (
     <div id="home-container">
-      {/* ✅ ToDo 섹션 */}
+      {/* 오늘의 할 일 */}
       <section id="todo-section">
-        <h2>ToDo</h2>
+        <h2>오늘의 할 일</h2>
 
         {incompleteTodos.length > 0 ? (
-          <div className="home-card" onClick={() => navigate("/TodoTab")}>
+          <div className="home-card" onClick={() => navigate("/todotab")}>
             {incompleteTodos.slice(0, 3).map((todo) => (
               <div key={todo.id} className="todo-item">
                 <span className="todo-dot"></span>
                 <span>{todo.title}</span>
               </div>
             ))}
+
+            {incompleteTodos.length > 3 && (
+              <div className="todo-more">외 {incompleteTodos.length - 3}개</div>
+            )}
           </div>
         ) : (
           <div className="todo-empty">
-            <p>현재 미완료된 할 일이 없습니다.</p>
+            <p>오늘의 할 일이 없습니다.</p>
             <button
-              onClick={() => navigate("/TodoTab")}
               className="todo-btn"
+              onClick={() => navigate("/todotab")}
             >
-              ToDo List 작성하기
+              오늘의 할 일 추가하기
             </button>
           </div>
         )}
       </section>
 
-      {/* ✅ 시간표 섹션 */}
+      {/* 시간표 */}
       <section id="timetable-section">
         <h2>나의 시간표</h2>
+
         {timetable.length > 0 ? (
           <div
             className="timetable-box"
-            onClick={() => navigate("/School")}
+            onClick={() => navigate("/school")}
           >
             <div className="timetable-grid">
-  {["Mon", "Tue", "Wed", "Thu", "Fri"].map((engDay) => {
-    const list = timetable
-      .filter((s) => s.day === engDay)
-      .slice(0, 2);
+              {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day) => {
+                const items = timetable
+                  .filter((t) => t.day === day)
+                  .slice(0, 2);
 
-    return (
-      <div key={engDay} className="timetable-cell">
-        {list.length === 0 ? (
-          <span className="timetable-empty">-</span>
-        ) : (
-          list.map((s) => (
-            <span
-              key={s.id}
-              className="timetable-item"
-              style={{ backgroundColor: s.color || "#f8b6b6" }}
-            >
-              {s.title}
-            </span>
-          ))
-        )}
-      </div>
-    );
-  })}
-</div>
-
+                return (
+                  <div className="timetable-cell" key={day}>
+                    {items.length === 0 ? (
+                      <span className="timetable-empty">-</span>
+                    ) : (
+                      items.map((i) => (
+                        <span
+                          key={i.id}
+                          className="timetable-item"
+                          style={{ backgroundColor: i.color || "#feb" }}
+                        >
+                          {i.title}
+                        </span>
+                      ))
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ) : (
           <div className="timetable-empty-box">
             <p>아직 등록된 시간표가 없습니다.</p>
             <button
-              onClick={() => navigate("/School")}
               className="timetable-btn"
+              onClick={() => navigate("/school")}
             >
               시간표 만들기
             </button>
@@ -138,70 +178,43 @@ export default function Home() {
         )}
       </section>
 
-      {/* ✅ 캘린더 미리보기 */}
+      {/* 캘린더 미리보기 */}
       <section id="calendar-preview">
         <h2 className="calendar-header">
           {calendarDate.format("YYYY년 M월")}
         </h2>
 
-        {/* 🔹 라우트는 /Calendar (대문자 C) */}
         <div
           className="calendar-box"
-          onClick={() => navigate("/Calendar")}
+          onClick={() => navigate("/calendar")}
         >
-          {/* 요일 헤더 */}
           <div className="calendar-grid calendar-header-row">
-            {["일", "월", "화", "수", "목", "금", "토"].map((day, i) => (
-              <div
-                key={i}
-                className={`calendar-day-header ${
-                  i === 0 ? "sunday" : ""
-                } ${i === 6 ? "saturday" : ""}`}
-              >
-                {day}
+            {["일", "월", "화", "수", "목", "금", "토"].map((d, i) => (
+              <div key={i} className="calendar-day-header">
+                {d}
               </div>
             ))}
           </div>
 
-          {/* 날짜 박스 (앞부분 2주만 미리보기) */}
           <div className="calendar-grid calendar-body">
             {days.slice(0, 14).map((day, i) => {
-              const dateStr =
-                day && calendarDate.date(day).format("YYYY-MM-DD");
+              if (!day) return <div key={i} className="calendar-day-cell"></div>;
 
-              const dayEvents = dateStr
-                ? events.filter((ev) => ev.date === dateStr)
-                : [];
-
-              const extraCount = dayEvents.length - 1;
+              const dateStr = calendarDate.date(day).format("YYYY-MM-DD");
+              const dayEvents = events.filter((ev) => ev.date === dateStr);
 
               return (
-                <div
-                  key={i}
-                  className={`calendar-day-cell ${
-                    i % 7 === 0
-                      ? "sunday"
-                      : i % 7 === 6
-                      ? "saturday"
-                      : ""
-                  }`}
-                >
-                  {day && (
-                    <>
-                      <span className="calendar-date">{day}</span>
+                <div key={i} className="calendar-day-cell">
+                  <span className="calendar-date">{day}</span>
 
-                      {dayEvents.length > 0 && (
-                        <div className="calendar-event">
-                          {dayEvents[0].title}
-                        </div>
-                      )}
+                  {dayEvents.length > 0 && (
+                    <div className="calendar-event">
+                      {dayEvents[0].title}
+                    </div>
+                  )}
 
-                      {extraCount > 0 && (
-                        <span className="calendar-more">
-                          +{extraCount}
-                        </span>
-                      )}
-                    </>
+                  {dayEvents.length > 1 && (
+                    <span className="calendar-more">+{dayEvents.length - 1}</span>
                   )}
                 </div>
               );

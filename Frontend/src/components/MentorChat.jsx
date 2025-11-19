@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "../styles/mentorchat.css";
-import { db } from "../services/firebase";
+import { db, auth } from "../services/firebase";
 import {
   collection,
   addDoc,
@@ -19,6 +19,9 @@ export default function MentorChat() {
   const { subjectId, weekId } = useParams();
   const location = useLocation();
   const chatIdParam = new URLSearchParams(location.search).get("chat");
+
+  const userId = auth.currentUser?.uid || "test-user"; // ⭐ user 기반 구조 반영
+
   const [subjectName, setSubjectName] = useState("");
   const [messages, setMessages] = useState([]);
   const [chatHistory, setChatHistory] = useState([]);
@@ -26,50 +29,66 @@ export default function MentorChat() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [activeChatId, setActiveChatId] = useState(chatIdParam || null);
+
   const chatEndRef = useRef(null);
   const navigate = useNavigate();
 
-  // ---------- NavBar 숨기기 ----------
+  /* -----------------------------------------
+     🔥 NavBar 숨기기
+  ------------------------------------------*/
   useEffect(() => {
-    const nav =
-      document.querySelector("#global-nav") ||
-      document.querySelector(".app-navbar");
-
+    const nav = document.querySelector("#global-nav");
     if (nav) nav.style.display = "none";
     return () => {
       if (nav) nav.style.display = "";
     };
   }, []);
 
-  // ---------- 과목 이름 ----------
+  /* -----------------------------------------
+     🔥 과목 이름 불러오기 (user 기반으로 수정)
+  ------------------------------------------*/
   useEffect(() => {
     if (!subjectId) return;
-    getDoc(doc(db, "subjects", subjectId)).then((snap) => {
+    getDoc(doc(db, "users", userId, "subjects", subjectId)).then((snap) => {
       if (snap.exists()) setSubjectName(snap.data().name || "과목");
     });
-  }, [subjectId]);
+  }, [subjectId, userId]);
 
-  // ---------- chatsCol ----------
+  /* -----------------------------------------
+     🔥 chats 컬렉션 경로
+     users/{uid}/subjects/{id}/weeks/{weekId}/chats
+  ------------------------------------------*/
   const chatsCol =
-    subjectId && weekId
-      ? collection(db, "subjects", subjectId, "weeks", weekId, "chats")
+    userId && subjectId && weekId
+      ? collection(
+          db,
+          "users",
+          userId,
+          "subjects",
+          subjectId,
+          "weeks",
+          weekId,
+          "chats"
+        )
       : null;
 
-  // ---------- 채팅 목록 ----------
+  /* -----------------------------------------
+     🔥 채팅 기록 불러오기
+  ------------------------------------------*/
   useEffect(() => {
     if (!chatsCol) return;
+
     const unsub = onSnapshot(chatsCol, (snap) => {
       const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-      // createdAt 정렬 안전 처리
       data.sort((a, b) => {
-        const aTime = a.createdAt?.seconds
+        const aT = a.createdAt?.seconds
           ? a.createdAt.seconds * 1000
           : a.createdAt || 0;
-        const bTime = b.createdAt?.seconds
+        const bT = b.createdAt?.seconds
           ? b.createdAt.seconds * 1000
           : b.createdAt || 0;
-        return bTime - aTime;
+        return bT - aT;
       });
 
       setChatHistory(data);
@@ -78,12 +97,16 @@ export default function MentorChat() {
     return () => unsub();
   }, [chatsCol]);
 
-  // ---------- 현재 채팅 메시지 ----------
+  /* -----------------------------------------
+     🔥 현재 채팅 메시지
+  ------------------------------------------*/
   useEffect(() => {
     if (!activeChatId || !chatsCol) return;
 
     const chatRef = doc(
       db,
+      "users",
+      userId,
       "subjects",
       subjectId,
       "weeks",
@@ -99,9 +122,11 @@ export default function MentorChat() {
     });
 
     return () => unsub();
-  }, [activeChatId, subjectId, weekId]);
+  }, [activeChatId, userId, subjectId, weekId]);
 
-  // ---------- 메시지 전송 ----------
+  /* -----------------------------------------
+     🔥 메시지 전송
+  ------------------------------------------*/
   const sendMessage = async () => {
     if (!input.trim()) return;
     if (!chatsCol) return alert("주차 정보가 없습니다!");
@@ -127,11 +152,12 @@ export default function MentorChat() {
       const newMsgs = [...updated, reply];
       setMessages(newMsgs);
 
-      // 저장 로직
       if (activeChatId) {
         await updateDoc(
           doc(
             db,
+            "users",
+            userId,
             "subjects",
             subjectId,
             "weeks",
@@ -157,7 +183,9 @@ export default function MentorChat() {
     }
   };
 
-  // ---------- 대화 저장 ----------
+  /* -----------------------------------------
+     🔥 대화 저장
+  ------------------------------------------*/
   const saveChat = async () => {
     if (messages.length === 0) return alert("저장할 대화가 없습니다!");
     if (!chatsCol) return alert("주차 정보가 없습니다!");
@@ -172,17 +200,31 @@ export default function MentorChat() {
       alert("새 대화로 저장되었습니다!");
     } else {
       await updateDoc(
-        doc(db, "subjects", subjectId, "weeks", weekId, "chats", activeChatId),
+        doc(
+          db,
+          "users",
+          userId,
+          "subjects",
+          subjectId,
+          "weeks",
+          weekId,
+          "chats",
+          activeChatId
+        ),
         { messages, updatedAt: serverTimestamp() }
       );
       alert("대화가 업데이트되었습니다!");
     }
   };
 
-  // ---------- 기존 대화 로드 ----------
+  /* -----------------------------------------
+     🔥 기존 대화 불러오기
+  ------------------------------------------*/
   const loadChat = async (chatId) => {
     const ref = doc(
       db,
+      "users",
+      userId,
       "subjects",
       subjectId,
       "weeks",
@@ -199,11 +241,24 @@ export default function MentorChat() {
     }
   };
 
-  // ---------- 삭제 ----------
+  /* -----------------------------------------
+     🔥 대화 삭제
+  ------------------------------------------*/
   const deleteChat = async (chatId) => {
     if (!window.confirm("삭제하시겠습니까?")) return;
+
     await deleteDoc(
-      doc(db, "subjects", subjectId, "weeks", weekId, "chats", chatId)
+      doc(
+        db,
+        "users",
+        userId,
+        "subjects",
+        subjectId,
+        "weeks",
+        weekId,
+        "chats",
+        chatId
+      )
     );
 
     if (activeChatId === chatId) {
@@ -212,25 +267,33 @@ export default function MentorChat() {
     }
   };
 
-  // ---------- 새 채팅 ----------
+  /* -----------------------------------------
+     🔥 새로운 대화 시작
+  ------------------------------------------*/
   const startNewChat = () => {
     setMessages([]);
     setActiveChatId(null);
     setShowHistory(false);
   };
 
-  // ---------- 외부 클릭 시 모달 닫기 ----------
+  /* -----------------------------------------
+     🔥 모달 외부 클릭 시 닫기
+  ------------------------------------------*/
   useEffect(() => {
     if (!showHistory) return;
+
     const handleClick = (e) => {
       const modal = document.querySelector(".chat-history-modal");
       if (modal && !modal.contains(e.target)) setShowHistory(false);
     };
+
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [showHistory]);
 
-  // ---------- 자동 스크롤 ----------
+  /* -----------------------------------------
+     🔥 자동 스크롤
+  ------------------------------------------*/
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -242,11 +305,9 @@ export default function MentorChat() {
         <button className="mentorchat-back-btn" onClick={() => navigate(-1)}>
           ←
         </button>
+
         <div className="mentorchat-subject-header">
-          <button
-            className="menu-btn"
-            onClick={() => setShowHistory((p) => !p)}
-          >
+          <button className="menu-btn" onClick={() => setShowHistory((p) => !p)}>
             ≡
           </button>
           <span className="subject-name">{subjectName}</span>
@@ -260,28 +321,24 @@ export default function MentorChat() {
       {showHistory && (
         <div className="chat-history-modal">
           <h4>채팅 기록</h4>
+
           {chatHistory.length === 0 ? (
             <p className="no-history">기록 없음</p>
           ) : (
             <div className="chat-history-list">
               {chatHistory.map((h) => (
                 <div key={h.id} className="history-item-wrap">
-                  <button
-                    className="history-item"
-                    onClick={() => loadChat(h.id)}
-                  >
+                  <button className="history-item" onClick={() => loadChat(h.id)}>
                     {h.title}
                   </button>
-                  <button
-                    className="delete-chat-btn"
-                    onClick={() => deleteChat(h.id)}
-                  >
+                  <button className="delete-chat-btn" onClick={() => deleteChat(h.id)}>
                     🗑️
                   </button>
                 </div>
               ))}
             </div>
           )}
+
           <button className="new-chat-btn" onClick={startNewChat}>
             새 채팅 시작
           </button>
@@ -291,14 +348,16 @@ export default function MentorChat() {
       {/* 메시지 */}
       <div className="chat-container">
         {messages.map((msg, i) => {
-          const isUser = msg.role === "user" || msg.sender === "user";
+          const isUser = msg.role === "user";
           const text = msg.content ?? msg.text ?? "";
+
           return (
             <div key={i} className={`chat-bubble ${isUser ? "user" : "ai"}`}>
               {text}
             </div>
           );
         })}
+
         <div ref={chatEndRef} />
       </div>
 

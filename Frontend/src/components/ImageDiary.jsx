@@ -1,12 +1,14 @@
-// src/components/ImageDiary.jsx - 완성 안정 버전
 import React, { useState, useEffect } from "react";
 import { quizAI } from "../services/api";
-import { db } from "../services/firebase";
+import { db, auth } from "../services/firebase";
 import { collection, onSnapshot, deleteDoc, doc } from "firebase/firestore";
 import { Trash2, Calendar, Filter, Search, X } from "lucide-react";
 import "../styles/ImageDiary.css";
 
 export default function ImageDiary() {
+  const user = auth.currentUser;
+  const userId = user?.uid || "test-user";
+
   const [emotion, setEmotion] = useState("평온 🌿");
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,19 +16,19 @@ export default function ImageDiary() {
   const [entries, setEntries] = useState([]);
   const [filteredEntries, setFilteredEntries] = useState([]);
 
-  // 필터 상태
   const [selectedMonth, setSelectedMonth] = useState("all");
   const [selectedEmotion, setSelectedEmotion] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
-  // 모달 상태
   const [modalImg, setModalImg] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  // 🔥 Firestore 실시간 구독
+  /* 🔥 Firestore 실시간 구독: users/{uid}/imageDiary */
   useEffect(() => {
-    const q = collection(db, "imageDiary");
+    if (!userId) return;
+
+    const q = collection(db, "users", userId, "imageDiary");
 
     const unsub = onSnapshot(q, (snap) => {
       const data = snap.docs.map((doc) => ({
@@ -34,18 +36,18 @@ export default function ImageDiary() {
         ...doc.data(),
       }));
 
-      // 이미지 없는 데이터 배제
       const filtered = data.filter((item) => item.imageUrl);
 
-      // 🔥 createdAt이 Timestamp/Date 모두 들어와도 정렬되도록 안정 처리
       const sorted = filtered.sort((a, b) => {
-        const aTime = a.createdAt?.seconds
+        const aT = a.createdAt?.seconds
           ? a.createdAt.seconds * 1000
           : a.createdAt || 0;
-        const bTime = b.createdAt?.seconds
+
+        const bT = b.createdAt?.seconds
           ? b.createdAt.seconds * 1000
           : b.createdAt || 0;
-        return bTime - aTime;
+
+        return bT - aT;
       });
 
       setEntries(sorted);
@@ -53,33 +55,29 @@ export default function ImageDiary() {
     });
 
     return () => unsub();
-  }, []);
+  }, [userId]);
 
-  // 🔥 필터링 로직
+  /* 🔥 필터링 */
   useEffect(() => {
     let result = [...entries];
 
-    // 월별 필터
     if (selectedMonth !== "all") {
       result = result.filter((entry) => {
-        const time = entry.createdAt?.seconds
+        const t = entry.createdAt?.seconds
           ? entry.createdAt.seconds * 1000
           : entry.createdAt;
 
-        if (!time) return false;
-        const date = new Date(time);
-        return date.getMonth() + 1 === parseInt(selectedMonth);
+        if (!t) return false;
+        return new Date(t).getMonth() + 1 === Number(selectedMonth);
       });
     }
 
-    // 감정 필터
     if (selectedEmotion !== "all") {
       result = result.filter((entry) =>
         entry.emotion?.includes(selectedEmotion)
       );
     }
 
-    // 검색어 필터
     if (searchQuery.trim()) {
       result = result.filter((entry) =>
         entry.diaryText?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -89,7 +87,7 @@ export default function ImageDiary() {
     setFilteredEntries(result);
   }, [entries, selectedMonth, selectedEmotion, searchQuery]);
 
-  // 🔥 AI 이미지 생성 요청
+  /* 🔥 AI 이미지 생성 */
   const handleCreate = async () => {
     if (!text.trim()) return alert("일기를 입력하세요!");
 
@@ -98,7 +96,7 @@ export default function ImageDiary() {
       await quizAI.post("/generate-image-diary", {
         emotion,
         diaryText: text,
-        userId: "test-user",
+        userId, // ⭐ 진짜 사용자 ID 전달
       });
 
       setText("");
@@ -110,36 +108,29 @@ export default function ImageDiary() {
     }
   };
 
-  // 🔥 개별 삭제
+  /* 🔥 개별 삭제 */
   const handleDelete = async (entryId) => {
     try {
-      await deleteDoc(doc(db, "imageDiary", entryId));
+      await deleteDoc(doc(db, "users", userId, "imageDiary", entryId));
       setDeleteConfirm(null);
     } catch (e) {
       console.error("삭제 실패:", e);
-      alert("삭제에 실패했습니다.");
+      alert("삭제 실패!");
     }
   };
 
-  // 🔥 월 목록 생성
+  /* 🔥 월 목록 생성 */
   const getAvailableMonths = () => {
     const months = new Set();
-
     entries.forEach((entry) => {
-      const time = entry.createdAt?.seconds
+      const t = entry.createdAt?.seconds
         ? entry.createdAt.seconds * 1000
         : entry.createdAt;
-
-      if (time) {
-        const date = new Date(time);
-        months.add(date.getMonth() + 1);
-      }
+      if (t) months.add(new Date(t).getMonth() + 1);
     });
-
-    return Array.from(months).sort((a, b) => b - a);
+    return [...months].sort((a, b) => b - a);
   };
 
-  // 🔥 필터 초기화
   const resetFilters = () => {
     setSelectedMonth("all");
     setSelectedEmotion("all");
@@ -160,7 +151,7 @@ export default function ImageDiary() {
         </button>
       </div>
 
-      {/* 필터 섹션 */}
+      {/* 필터 영역 */}
       {showFilters && (
         <div className="diary-filters">
           <div className="filter-row">
@@ -180,21 +171,21 @@ export default function ImageDiary() {
               )}
             </div>
 
-            {/* 월별 필터 */}
+            {/* 월 */}
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
               className="filter-select"
             >
               <option value="all">전체 월</option>
-              {getAvailableMonths().map((month) => (
-                <option key={month} value={month}>
-                  {month}월
+              {getAvailableMonths().map((m) => (
+                <option key={m} value={m}>
+                  {m}월
                 </option>
               ))}
             </select>
 
-            {/* 감정 필터 */}
+            {/* 감정 */}
             <select
               value={selectedEmotion}
               onChange={(e) => setSelectedEmotion(e.target.value)}
@@ -208,7 +199,6 @@ export default function ImageDiary() {
               <option value="설렘">설렘 💖</option>
             </select>
 
-            {/* 초기화 */}
             <button className="reset-filters-btn" onClick={resetFilters}>
               초기화
             </button>
@@ -225,7 +215,7 @@ export default function ImageDiary() {
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="오늘의 기분과 하루를 기록해보세요 🌸"
+          placeholder="오늘 하루를 기록해보세요 🌸"
         />
 
         <div className="diary-controls">
@@ -246,7 +236,7 @@ export default function ImageDiary() {
         </div>
       </div>
 
-      {/* Masonry 갤러리 */}
+      {/* 갤러리 */}
       {filteredEntries.length === 0 ? (
         <div className="diary-empty">
           <Calendar size={48} />
@@ -261,7 +251,6 @@ export default function ImageDiary() {
 
             return (
               <div key={entry.id} className="diary-card fade-in">
-                {/* 삭제 버튼 */}
                 <button
                   className="diary-delete-btn"
                   onClick={() => setDeleteConfirm(entry.id)}
@@ -269,7 +258,6 @@ export default function ImageDiary() {
                   <Trash2 size={16} />
                 </button>
 
-                {/* 이미지 */}
                 <img
                   src={entry.imageUrl}
                   alt="AI diary"
@@ -277,7 +265,6 @@ export default function ImageDiary() {
                   onClick={() => setModalImg(entry.imageUrl)}
                 />
 
-                {/* 정보 */}
                 <div className="diary-info">
                   <span className="emotion-tag">{entry.emotion}</span>
                   <p className="diary-text">{entry.diaryText}</p>
@@ -301,32 +288,23 @@ export default function ImageDiary() {
         </div>
       )}
 
-      {/* 이미지 확대 모달 */}
+      {/* 이미지 확대 */}
       {modalImg && (
         <div className="modal" onClick={() => setModalImg(null)}>
           <img src={modalImg} className="modal-img" alt="" />
         </div>
       )}
 
-      {/* 삭제 확인 모달 */}
+      {/* 삭제 모달 */}
       {deleteConfirm && (
-        <div
-          className="delete-modal-bg"
-          onClick={() => setDeleteConfirm(null)}
-        >
-          <div
-            className="delete-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="delete-modal-bg" onClick={() => setDeleteConfirm(null)}>
+          <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
             <h3>🗑️ 삭제 확인</h3>
-            <p>이 다이어리를 정말 삭제하시겠습니까?</p>
-            <p className="delete-warning">삭제된 기록은 복구할 수 없습니다.</p>
+            <p>정말 삭제하시겠습니까?</p>
+            <p className="delete-warning">삭제된 기록은 복구될 수 없습니다.</p>
 
             <div className="delete-modal-btns">
-              <button
-                className="cancel-btn"
-                onClick={() => setDeleteConfirm(null)}
-              >
+              <button className="cancel-btn" onClick={() => setDeleteConfirm(null)}>
                 취소
               </button>
               <button

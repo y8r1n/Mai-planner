@@ -1,8 +1,8 @@
-// src/components/HamburgerMenu.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../services/firebase";
+import { auth, db } from "../services/firebase";
 import { signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import {
   X,
   Home,
@@ -20,17 +20,35 @@ import "../styles/HamburgerMenu.css";
 
 export default function HamburgerMenu({ isOpen, onClose }) {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // Firebase Auth 기본 정보
+  const [profile, setProfile] = useState(null); // Firestore users/{uid}
 
-  // 사용자 정보 구독
+  // 🔥 1) Firebase Auth 구독
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
+
+      // Firestore 사용자 정보도 가져오기
+      if (currentUser) {
+        loadUserProfile(currentUser.uid);
+      }
     });
     return () => unsubscribe();
   }, []);
 
-  // 로그아웃 핸들러
+  // 🔥 2) Firestore 사용자 정보 로드
+  const loadUserProfile = async (uid) => {
+    try {
+      const snap = await getDoc(doc(db, "users", uid));
+      if (snap.exists()) {
+        setProfile(snap.data());
+      }
+    } catch (e) {
+      console.error("❌ 프로필 로드 실패:", e);
+    }
+  };
+
+  // 🔥 로그아웃
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -43,45 +61,53 @@ export default function HamburgerMenu({ isOpen, onClose }) {
     }
   };
 
-  // 메뉴 항목 클릭 핸들러
+  // 🔥 라우팅
   const handleNavigate = (path) => {
     navigate(path);
     onClose();
   };
 
-  // 메뉴가 열려있지 않으면 렌더링하지 않음
   if (!isOpen) return null;
+
+  // 🔥 Firestore 프로필 우선 적용
+  const displayName =
+    profile?.name || user?.displayName || "사용자";
+
+  const displayEmail =
+    profile?.email || user?.email || "";
+
+  const photoURL =
+    profile?.photoURL || user?.photoURL || null;
 
   return (
     <>
-      {/* 배경 오버레이 */}
       <div className="menu-overlay" onClick={onClose} />
 
-      {/* 메뉴 사이드바 */}
       <div className={`hamburger-menu ${isOpen ? "open" : ""}`}>
-        {/* 헤더 */}
+        {/* 닫기 버튼 */}
         <div className="menu-header">
           <button className="close-btn" onClick={onClose}>
             <X size={24} />
           </button>
         </div>
 
-        {/* 프로필 섹션 */}
+        {/* 프로필 */}
         <div className="menu-profile">
           {user ? (
             <>
               <div className="profile-avatar">
-                {user.photoURL ? (
-                  <img src={user.photoURL} alt={user.displayName} />
+                {photoURL ? (
+                  <img src={photoURL} alt={displayName} />
                 ) : (
                   <div className="avatar-placeholder">
-                    {user.displayName?.charAt(0) || "U"}
+                    {displayName.charAt(0)}
                   </div>
                 )}
               </div>
+
               <div className="profile-info">
-                <h3>{user.displayName || "사용자"}</h3>
-                <p>{user.email}</p>
+                <h3>{displayName}</h3>
+                <p>{displayEmail}</p>
               </div>
             </>
           ) : (
@@ -97,74 +123,67 @@ export default function HamburgerMenu({ isOpen, onClose }) {
           )}
         </div>
 
-        {/* 네비게이션 */}
+        {/* 네비 메뉴 */}
         <nav className="menu-nav">
           <div className="nav-section">
             <div className="nav-section-title">메뉴</div>
-            <button
-              className="nav-item"
-              onClick={() => handleNavigate("/")}
-            >
+
+            <button className="nav-item" onClick={() => handleNavigate("/")}>
               <Home size={20} />
               <span>HOME</span>
-              <ChevronRight size={18} className="nav-arrow" />
+              <ChevronRight size={18} />
             </button>
-            <button
-              className="nav-item"
-              onClick={() => handleNavigate("/withai")}
-            >
+
+            <button className="nav-item" onClick={() => handleNavigate("/withai")}>
               <Sparkles size={20} />
               <span>WITH AI</span>
-              <ChevronRight size={18} className="nav-arrow" />
+              <ChevronRight size={18} />
             </button>
-            <button
-              className="nav-item"
-              onClick={() => handleNavigate("/study")}
-            >
+
+            <button className="nav-item" onClick={() => handleNavigate("/study")}>
               <BookOpen size={20} />
               <span>SUBJECT</span>
-              <ChevronRight size={18} className="nav-arrow" />
+              <ChevronRight size={18} />
             </button>
-            <button
-              className="nav-item"
-              onClick={() => handleNavigate("/imagediary")}
-            >
+
+            <button className="nav-item" onClick={() => handleNavigate("/imagediary")}>
               <Image size={20} />
               <span>IMAGE DIARY</span>
-              <ChevronRight size={18} className="nav-arrow" />
+              <ChevronRight size={18} />
             </button>
-            <button
-              className="nav-item"
-              onClick={() => handleNavigate("/alarm")}
-            >
+
+            <button className="nav-item" onClick={() => handleNavigate("/alarm")}>
               <Bell size={20} />
               <span>알림</span>
-              <ChevronRight size={18} className="nav-arrow" />
+              <ChevronRight size={18} />
             </button>
           </div>
 
-          {/* 설정 섹션 */}
+          {/* 설정 */}
           <div className="nav-section">
             <div className="nav-section-title">설정</div>
+
             <button className="nav-item">
               <Settings size={20} />
               <span>AI 설정</span>
-              <ChevronRight size={18} className="nav-arrow" />
+              <ChevronRight size={18} />
             </button>
+
             <button className="nav-item">
               <Bell size={20} />
               <span>알림 설정</span>
-              <ChevronRight size={18} className="nav-arrow" />
+              <ChevronRight size={18} />
             </button>
+
             <button className="nav-item">
               <Moon size={20} />
               <span>방해금지 시간</span>
-              <ChevronRight size={18} className="nav-arrow" />
+              <ChevronRight size={18} />
             </button>
           </div>
         </nav>
 
-        {/* 로그아웃 버튼 */}
+        {/* 로그아웃 */}
         {user && (
           <div className="menu-footer">
             <button className="logout-btn" onClick={handleLogout}>
