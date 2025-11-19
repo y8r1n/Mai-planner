@@ -394,23 +394,33 @@ ${JSON.stringify(mapped, null, 2)}
   }
 });
 
+
 /* ========================================================================== */
-/* 🎨 이미지 다이어리 */
+/* 🎨 이미지 다이어리 (USER 기반 저장 버전) */
 /* ========================================================================== */
 app.post("/api/generate-image-diary", async (req, res) => {
-  const { emotion, diaryText, userId = "guest" } = req.body;
+  const { emotion, diaryText, userId } = req.body;
 
   try {
+    /* 🔥 userId 반드시 필요 */
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: "userId가 필요합니다.",
+      });
+    }
+
     const cleanEmotion = emotion.replace(/[^\p{Emoji}]/gu, "").trim();
 
+    /* 🔥 자연어 → 영어 프롬프트 변환 (OpenAI) */
     const promptText = await callOpenAI(
-      `Convert to English artistic image prompt:
+      `Convert to English prompt:
 Emotion: "${cleanEmotion}"
 Diary: "${diaryText}"
-Only English.`
+Only English description.`
     );
 
-    // Stable Diffusion 이미지 생성
+    /* 🔥 Stability Diffusion 이미지 생성 */
     const form = new FormData();
     form.append("prompt", promptText);
     form.append("aspect_ratio", "1:1");
@@ -431,7 +441,7 @@ Only English.`
     const buffer = Buffer.from(imgRes.data);
     const fileName = `imageDiary/${userId}/${Date.now()}.png`;
 
-    // Firebase Upload
+    /* Firebase Upload */
     const file = bucket.file(fileName);
     await file.save(buffer, { contentType: "image/png" });
 
@@ -440,22 +450,28 @@ Only English.`
       expires: "2030-01-01",
     });
 
-    // Firestore 기록
-  await adminDb.collection("imageDiary").add({
-  userId,
-  emotion: cleanEmotion,
-  diaryText,
-  imageUrl: url,
-  createdAt: admin.firestore.FieldValue.serverTimestamp(),
-});
-
+    /* 🔥 Firestore: 개인 이미지다이어리 저장 */
+    await adminDb
+      .collection("users")
+      .doc(userId)
+      .collection("imageDiary")
+      .add({
+        emotion: cleanEmotion,
+        diaryText,
+        imageUrl: url,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
     res.json({ success: true, imageUrl: url });
   } catch (e) {
     console.error("❌ 이미지 생성 오류:", e);
-    res.status(500).json({ success: false, error: e.message });
+    res.status(500).json({
+      success: false,
+      error: e.message,
+    });
   }
 });
+
 
 /* ========================================================================== */
 /* 🩺 Health Check */
