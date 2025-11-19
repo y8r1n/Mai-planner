@@ -8,7 +8,7 @@ import { quizAI } from "../services/api";
 export default function ReviewDetail() {
   const { subjectId, weekId, noteId } = useParams();
   
-  const userId = auth.currentUser?.uid || "test-user"; // ⭐ user 구조 반영
+  const userId = auth.currentUser?.uid || "test-user";
 
   const [note, setNote] = useState(null);
   const [flippedIndex, setFlippedIndex] = useState(null);
@@ -28,7 +28,7 @@ export default function ReviewDetail() {
     };
   }, []);
 
-  /* 🔹 오답노트 불러오기 (users/{uid}/subjects 기반) */
+  /* 🔹 오답노트 불러오기 */
   useEffect(() => {
     if (!subjectId || !weekId || !noteId) return;
 
@@ -106,7 +106,7 @@ export default function ReviewDetail() {
         explanation: expList[i]?.explanation || "해설이 없습니다.",
       }));
 
-      // Firebase 업데이트 (⭐ user 구조 적용)
+      // Firebase 업데이트
       await updateDoc(
         doc(
           db,
@@ -131,7 +131,7 @@ export default function ReviewDetail() {
       window.scrollTo({ top: 0, behavior: "smooth" });
 
     } catch (err) {
-      console.error("❌ 해설 생성 오류:", err);
+      console.error("⌛ 해설 생성 오류:", err);
       alert("서버 오류 발생!");
     } finally {
       setLoading(false);
@@ -146,7 +146,7 @@ export default function ReviewDetail() {
     navigate(`/QuizAI/${subjectId}/${weekId}`);
   };
 
-  if (!note) return <p className="loading">불러오는 중...</p>;
+  if (!note) return <div className="loading-state">불러오는 중...</div>;
 
   return (
     <div className="review-detail-page">
@@ -157,12 +157,12 @@ export default function ReviewDetail() {
         <h2 className="review-title">{note.quizTitle || "오답노트"}</h2>
       </header>
 
-      <div className="wrongnote-actions">
-        <button className="cta" disabled={loading} onClick={generateExplanations}>
-          {loading ? "해설 생성 중..." : "AI 해설 생성"}
+      <div className="review-actions">
+        <button className="btn-primary" disabled={loading} onClick={generateExplanations}>
+          {loading ? "해설 생성 중..." : "🤖 AI 해설 생성"}
         </button>
-        <button className="ghost" onClick={handleRetry}>
-          비슷한 문제 다시 풀기
+        <button className="btn-secondary" onClick={handleRetry}>
+          🔄 비슷한 문제 다시 풀기
         </button>
       </div>
 
@@ -187,25 +187,29 @@ export default function ReviewDetail() {
                       <p className="wrong-question">{item.question}</p>
                     </div>
                     <div className="wrong-content">
-                      <p>
+                      <p className="answer-row">
                         <strong>내 답:</strong>{" "}
-                        {item.myAnswer !== null
-                          ? String.fromCharCode(65 + item.myAnswer)
-                          : "-"}
+                        <span className="my-answer">
+                          {item.myAnswer !== null
+                            ? String.fromCharCode(65 + item.myAnswer)
+                            : "-"}
+                        </span>
                       </p>
-                      <p>
+                      <p className="answer-row">
                         <strong>정답:</strong>{" "}
-                        {String.fromCharCode(65 + item.correctAnswer)}
+                        <span className="correct-answer">
+                          {String.fromCharCode(65 + item.correctAnswer)}
+                        </span>
                       </p>
                     </div>
-                    <span className="hint">(탭하면 돌아갑니다)</span>
+                    <span className="hint">탭하면 뒤집힙니다</span>
                   </div>
 
                   {/* 뒷면 */}
                   <div className="flip-card-back">
-                    <h4>문제 해설</h4>
-                    <p>{item.explanation}</p>
-                    <span className="hint">(탭하면 돌아갑니다)</span>
+                    <h4 className="explanation-title">📖 문제 해설</h4>
+                    <p className="explanation-text">{item.explanation}</p>
+                    <span className="hint">탭하면 돌아갑니다</span>
                   </div>
 
                 </div>

@@ -20,7 +20,7 @@ export default function MentorChat() {
   const location = useLocation();
   const chatIdParam = new URLSearchParams(location.search).get("chat");
 
-  const userId = auth.currentUser?.uid || "test-user"; // ⭐ user 기반 구조 반영
+  const userId = auth.currentUser?.uid || "test-user";
 
   const [subjectName, setSubjectName] = useState("");
   const [messages, setMessages] = useState([]);
@@ -45,7 +45,7 @@ export default function MentorChat() {
   }, []);
 
   /* -----------------------------------------
-     🔥 과목 이름 불러오기 (user 기반으로 수정)
+     🔥 과목 이름 불러오기
   ------------------------------------------*/
   useEffect(() => {
     if (!subjectId) return;
@@ -56,7 +56,6 @@ export default function MentorChat() {
 
   /* -----------------------------------------
      🔥 chats 컬렉션 경로
-     users/{uid}/subjects/{id}/weeks/{weekId}/chats
   ------------------------------------------*/
   const chatsCol =
     userId && subjectId && weekId
@@ -306,9 +305,9 @@ export default function MentorChat() {
           ←
         </button>
 
-        <div className="mentorchat-subject-header">
+        <div className="mentorchat-top-bar">
           <button className="menu-btn" onClick={() => setShowHistory((p) => !p)}>
-            ≡
+            ☰
           </button>
           <span className="subject-name">{subjectName}</span>
           <button className="save-btn" onClick={saveChat}>
@@ -320,7 +319,7 @@ export default function MentorChat() {
       {/* 기록 모달 */}
       {showHistory && (
         <div className="chat-history-modal">
-          <h4>채팅 기록</h4>
+          <h4 className="modal-title">💬 채팅 기록</h4>
 
           {chatHistory.length === 0 ? (
             <p className="no-history">기록 없음</p>
@@ -340,13 +339,24 @@ export default function MentorChat() {
           )}
 
           <button className="new-chat-btn" onClick={startNewChat}>
-            새 채팅 시작
+            ➕ 새 채팅 시작
           </button>
         </div>
       )}
 
       {/* 메시지 */}
       <div className="chat-container">
+        {messages.length === 0 && (
+          <div className="chat-welcome">
+            <p className="welcome-emoji">🤖</p>
+            <p className="welcome-text">
+              안녕하세요! 학습 중 궁금한 내용을
+              <br />
+              자유롭게 질문해주세요.
+            </p>
+          </div>
+        )}
+
         {messages.map((msg, i) => {
           const isUser = msg.role === "user";
           const text = msg.content ?? msg.text ?? "";
@@ -365,13 +375,19 @@ export default function MentorChat() {
       <div className="chat-input-box">
         <input
           type="text"
+          className="chat-input"
           placeholder="여기를 눌러 입력하세요"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+          onKeyDown={(e) => e.key === "Enter" && !loading && sendMessage()}
+          disabled={loading}
         />
-        <button className="send-btn" onClick={sendMessage}>
-          {loading ? "..." : "↑"}
+        <button 
+          className="send-btn" 
+          onClick={sendMessage}
+          disabled={loading || !input.trim()}
+        >
+          {loading ? "⏳" : "➤"}
         </button>
       </div>
     </div>

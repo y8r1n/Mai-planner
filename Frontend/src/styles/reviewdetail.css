@@ -1,106 +1,151 @@
+/* ========================================
+   📝 REVIEW DETAIL (오답노트 상세) - Refactored
+======================================== */
+
 .review-detail-page {
   min-height: 100vh;
-  padding: 80px 20px 40px;
-  background: #fffdfd;
-  max-width: 480px;
+  padding: var(--space-2xl) var(--space-lg) var(--space-3xl);
+  background: var(--color-background);
+  max-width: var(--container-max-width);
   margin: 0 auto;
+  animation: fadeSlideUp 0.5s ease;
 }
 
-/* HEADER */
+/* ========================================
+   HEADER
+======================================== */
 .review-header {
   position: sticky;
   top: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 60px;
-  background: #fff;
-  z-index: 50;
+  padding: var(--space-xl) var(--space-lg);
+  background: var(--color-background-alt);
+  border-bottom: 2px solid var(--color-border-lighter);
+  z-index: var(--z-sticky);
+  margin: calc(-1 * var(--space-2xl)) calc(-1 * var(--space-lg)) var(--space-2xl);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  box-shadow: var(--shadow-md);
 }
 
 .review-back-btn {
   position: absolute;
-  left: 20px;
-  top: -20px;
-  border: none;
+  left: var(--space-lg);
   background: none;
-  color: #f09292;
-  font-size: 1.4rem;
+  border: none;
+  color: var(--color-primary);
+  font-size: 1.6rem;
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
-  font-weight: 600;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.review-back-btn:hover {
+  background: var(--color-surface-hover);
+  transform: scale(1.15);
 }
 
 .review-title {
-  font-size: 1.1rem;
-  color: #444;
-  font-weight: 600;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
   text-align: center;
-  position: sticky;
-  top: -10px;
 }
 
-/* ACTION BUTTONS */
-.wrongnote-actions {
+/* ========================================
+   ACTION BUTTONS
+======================================== */
+.review-actions {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin: 20px 0 10px;
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
+  flex-wrap: wrap;
 }
 
-.cta,
-.ghost {
+.btn-primary,
+.btn-secondary {
+  padding: var(--space-md) var(--space-xl);
   border: none;
-  border-radius: 20px;
-  padding: 10px 16px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: 0.2s;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  white-space: nowrap;
 }
 
-.cta {
-  background: #ff9c9c;
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   color: white;
 }
 
-.cta:disabled {
-  background: #ffd7d7;
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
-.ghost {
-  background: #fff;
-  color: #f09292;
-  border: 1.5px solid #f09292;
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-/* CONTAINER */
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 2px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  background: var(--color-primary-lighter);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   WRONG NOTE CONTAINER
+======================================== */
 .wrongnote-container {
   display: flex;
   flex-direction: column;
-  gap: 60px;
-  margin-top: 20px;
+  gap: var(--space-3xl);
+  margin-top: var(--space-xl);
 }
 
-/* 카드 */
+/* ========================================
+   FLIP CARD - 개선된 디자인
+======================================== */
 .flip-card {
-  perspective: 1000px;
+  perspective: 1200px;
   width: 100%;
-  min-height: 200px;
+  min-height: 240px;
   position: relative;
+  cursor: pointer;
 }
 
 .flip-card-inner {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 14px;
-  transition: transform 0.6s ease;
+  border-radius: var(--radius-xl);
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   transform-style: preserve-3d;
 }
 
 .flip-card.flipped .flip-card-inner {
   transform: rotateY(180deg);
-  z-index: 3;
 }
 
 /* 앞면/뒷면 공통 */
@@ -110,13 +155,19 @@
   top: 0;
   left: 0;
   width: 100%;
-  min-height: 200px;
+  min-height: 240px;
   backface-visibility: hidden;
-  border-radius: 14px;
-  box-shadow: 0 2px 5px rgba(255, 180, 180, 0.25);
-  background: #fff;
-  border: 1.5px solid #ffd4d4;
-  padding: 16px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  padding: var(--space-2xl);
+  transition: all var(--transition-base);
+}
+
+.flip-card:hover .flip-card-front,
+.flip-card:hover .flip-card-back {
+  box-shadow: var(--shadow-xl);
 }
 
 /* 앞면 */
@@ -125,75 +176,318 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  color: #333;
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-background) 100%);
 }
 
 /* 뒷면 */
 .flip-card-back {
-  background: #fffaf9;
-  color: #444;
+  background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-surface) 100%);
+  border-color: var(--color-primary-light);
   transform: rotateY(180deg);
-  z-index: 4;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.flip-card-back h4 {
-  color: #f09292;
-  font-weight: 700;
-  margin-bottom: 6px;
+/* ========================================
+   CARD CONTENT
+======================================== */
+.wrong-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 2px solid var(--color-border-lighter);
 }
 
-.flip-card-back p {
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: #555;
+.wrong-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: white;
+  font-weight: var(--font-weight-bold);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  font-size: var(--font-size-base);
+  box-shadow: var(--shadow-md);
+}
+
+.wrong-question {
+  flex: 1;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+}
+
+.wrong-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.answer-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  padding: var(--space-md);
+  background: var(--color-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-lighter);
+}
+
+.answer-row strong {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  min-width: 60px;
+}
+
+.my-answer {
+  color: var(--color-error);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-md);
+}
+
+.correct-answer {
+  color: var(--color-success);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-md);
 }
 
 .hint {
   display: block;
   text-align: center;
-  font-size: 0.8rem;
-  color: #aaa;
-  margin-top: 8px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-disabled);
+  font-style: italic;
+  margin-top: auto;
+  padding-top: var(--space-md);
+  opacity: 0.7;
 }
 
-/* 카드 내부 */
-.wrong-header {
+/* ========================================
+   BACK SIDE (해설)
+======================================== */
+.explanation-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin-bottom: var(--space-lg);
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 8px;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-md);
+  border-bottom: 2px solid var(--color-border);
 }
 
-.wrong-index {
-  display: inline-block;
-  background: #ffe6e6;
-  color: #f09292;
-  font-weight: 700;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  text-align: center;
-  line-height: 28px;
-  flex-shrink: 0;
-}
-
-.wrong-question {
-  font-weight: 600;
-  color: #333;
+.explanation-text {
   flex: 1;
-  font-size: 0.95rem;
-  line-height: 1.3;
+  font-size: var(--font-size-base);
+  line-height: 1.8;
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.7);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-lighter);
+  white-space: pre-wrap;
 }
 
-.wrong-content p {
-  color: #555;
-  font-size: 0.9rem;
-  margin: 4px 0;
-}
-
+/* ========================================
+   EMPTY STATE
+======================================== */
 .no-wrong-data {
   text-align: center;
-  color: #aaa;
-  font-size: 0.9rem;
-  margin-top: 40px;
+  padding: var(--space-3xl);
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-lg);
+  background: var(--color-background);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+  margin-top: var(--space-2xl);
+}
+
+.no-wrong-data::before {
+  content: '✅';
+  display: block;
+  font-size: 4rem;
+  margin-bottom: var(--space-lg);
+  opacity: 0.6;
+}
+
+/* ========================================
+   LOADING STATE
+======================================== */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-tertiary);
+  background: var(--color-background);
+}
+
+.loading-state::before {
+  content: '⏳';
+  display: block;
+  font-size: 3rem;
+  margin-right: var(--space-lg);
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+@media (max-width: 768px) {
+  .review-detail-page {
+    padding: var(--space-xl) var(--space-md) var(--space-2xl);
+  }
+
+  .review-header {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .review-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .review-actions {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .wrongnote-container {
+    gap: var(--space-2xl);
+  }
+
+  .flip-card-front,
+  .flip-card-back {
+    padding: var(--space-xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .review-header {
+    padding: var(--space-md);
+  }
+
+  .review-back-btn {
+    left: var(--space-md);
+    width: 40px;
+    height: 40px;
+    font-size: 1.4rem;
+  }
+
+  .review-title {
+    font-size: var(--font-size-md);
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: var(--space-sm) var(--space-lg);
+    font-size: var(--font-size-sm);
+  }
+
+  .flip-card {
+    min-height: 220px;
+  }
+
+  .flip-card-front,
+  .flip-card-back {
+    min-height: 220px;
+    padding: var(--space-lg);
+  }
+
+  .wrong-header {
+    gap: var(--space-md);
+  }
+
+  .wrong-index {
+    width: 36px;
+    height: 36px;
+    font-size: var(--font-size-sm);
+  }
+
+  .wrong-question {
+    font-size: var(--font-size-base);
+  }
+
+  .answer-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .answer-row strong {
+    min-width: auto;
+  }
+
+  .explanation-title {
+    font-size: var(--font-size-md);
+  }
+
+  .explanation-text {
+    font-size: var(--font-size-sm);
+    padding: var(--space-md);
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+.review-back-btn:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.flip-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* Keyboard navigation for flip cards */
+.flip-card:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* ========================================
+   ANIMATIONS
+======================================== */
+.flip-card {
+  animation: cardAppear 0.5s ease both;
+}
+
+.flip-card:nth-child(1) { animation-delay: 0.05s; }
+.flip-card:nth-child(2) { animation-delay: 0.1s; }
+.flip-card:nth-child(3) { animation-delay: 0.15s; }
+.flip-card:nth-child(4) { animation-delay: 0.2s; }
+.flip-card:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes cardAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

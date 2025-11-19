@@ -72,11 +72,13 @@ export default function App() {
         <Toast />
 
         <Routes>
-
+        {/* 로그인 필요 없는 페이지 */}
+        <Route path="/login" element={<Login />} />
+        
           <Route element={<Layout />}>
 
-            {/* 로그인 필요 없는 페이지 */}
-            <Route path="/login" element={<Login />} />
+            
+            
 
             {/* 기본 페이지 (보호 처리) */}
             <Route path="/" element={

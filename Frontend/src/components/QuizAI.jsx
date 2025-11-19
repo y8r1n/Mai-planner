@@ -16,7 +16,7 @@ export default function QuizAI() {
   const navigate = useNavigate();
   const { subjectId, weekId } = useParams();
 
-  const userId = auth.currentUser?.uid || "test-user"; // ⭐ user 구조 반영
+  const userId = auth.currentUser?.uid || "test-user";
 
   const [subjectName, setSubjectName] = useState("과목 이름");
   const [phase, setPhase] = useState("intro");
@@ -39,7 +39,7 @@ export default function QuizAI() {
     };
   }, []);
 
-  /* ------------------ 과목 이름 불러오기 (user 기반) ------------------ */
+  /* ------------------ 과목 이름 불러오기 ------------------ */
   useEffect(() => {
     if (!subjectId) return;
 
@@ -58,7 +58,7 @@ export default function QuizAI() {
     );
   }, [answers, questions]);
 
-  /* ------------------ 오답노트 생성 (user 기반) ------------------ */
+  /* ------------------ 오답노트 생성 ------------------ */
   const createWrongNote = async (wrongList) => {
     try {
       const notesRef = collection(
@@ -182,7 +182,7 @@ export default function QuizAI() {
       .filter((w) => w.myAnswer !== w.correctAnswer);
 
     try {
-      // ⭐ 퀴즈 저장 (user 기반)
+      // 퀴즈 저장
       await addDoc(
         collection(
           db,
@@ -218,15 +218,20 @@ export default function QuizAI() {
   if (phase === "intro") {
     return (
       <div className="quiz-page">
-        <button className="back" onClick={() => navigate(-1)}>
+        <button className="quiz-back-btn" onClick={() => navigate(-1)}>
           ←
         </button>
         <div className="intro-card">
-          <h2 className="subject">{subjectName}</h2>
-          <h3 className="set-title">01 연습문제</h3>
-          <p className="hint">AI가 문제를 생성합니다!</p>
-          <button className="cta" disabled={loading} onClick={startQuiz}>
-            {loading ? "문제 만드는 중..." : "시작"}
+          <div className="intro-icon">📝</div>
+          <h2 className="intro-subject">{subjectName}</h2>
+          <h3 className="intro-title">AI 연습문제</h3>
+          <p className="intro-hint">AI가 맞춤 문제를 생성합니다!</p>
+          <button 
+            className="quiz-start-btn" 
+            disabled={loading} 
+            onClick={startQuiz}
+          >
+            {loading ? "문제 만드는 중..." : "시작하기"}
           </button>
         </div>
       </div>
@@ -237,45 +242,52 @@ export default function QuizAI() {
     const q = questions[idx];
     return (
       <div className="quiz-page">
-        <button className="back" onClick={() => navigate(-1)}>
+        <button className="quiz-back-btn" onClick={() => navigate(-1)}>
           ←
         </button>
 
         <div className="quiz-topbar">
-          <button className="ghost" onClick={prev} disabled={idx === 0}>
-            이전
+          <button 
+            className="quiz-nav-btn" 
+            onClick={prev} 
+            disabled={idx === 0}
+          >
+            ← 이전
           </button>
-          <div className="set-badge">01 연습 문제</div>
+          <div className="quiz-badge">연습 문제</div>
           <button
-            className="ghost"
+            className="quiz-nav-btn"
             onClick={idx === questions.length - 1 ? finish : next}
           >
-            {idx === questions.length - 1 ? "끝" : "다음"}
+            {idx === questions.length - 1 ? "완료" : "다음 →"}
           </button>
         </div>
 
-        <div className="dots">
+        <div className="quiz-progress">
           {questions.map((_, i) => (
-            <span key={i} className={`dot ${i === idx ? "active" : ""}`} />
+            <span key={i} className={`progress-dot ${i === idx ? "active" : ""} ${answers[i] !== null ? "answered" : ""}`} />
           ))}
         </div>
 
-        <div className="question-wrap">
-          <p className="qtext">
-            {idx + 1}. {q.question}
-          </p>
-          {q.options.map((opt, i) => {
-            const isSel = answers[idx] === i;
-            return (
-              <button
-                key={i}
-                className={`opt ${isSel ? "selected" : ""}`}
-                onClick={() => choose(i)}
-              >
-                {String.fromCharCode(65 + i)}. {opt}
-              </button>
-            );
-          })}
+        <div className="question-card">
+          <p className="question-number">문제 {idx + 1}</p>
+          <p className="question-text">{q.question}</p>
+          
+          <div className="options-list">
+            {q.options.map((opt, i) => {
+              const isSel = answers[idx] === i;
+              return (
+                <button
+                  key={i}
+                  className={`option-btn ${isSel ? "selected" : ""}`}
+                  onClick={() => choose(i)}
+                >
+                  <span className="option-label">{String.fromCharCode(65 + i)}</span>
+                  <span className="option-text">{opt}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     );
@@ -285,53 +297,57 @@ export default function QuizAI() {
     return (
       <div className="quiz-page">
         <button
-          className="review-back-btn"
+          className="quiz-back-btn"
           onClick={() => navigate(`/Subject/${subjectId}?tab=복습`)}
         >
           ←
         </button>
 
-        <div className="result-title">01 연습 문제</div>
+        <div className="result-card">
+          <div className="result-icon">
+            {score === questions.length ? "🎉" : score >= questions.length / 2 ? "👍" : "💪"}
+          </div>
+          <h2 className="result-title">연습 문제 완료!</h2>
+          <p className="result-score">
+            <span className="score-number">{score}</span> / {questions.length}
+          </p>
+        </div>
 
-        <div className="score-table">
-          <div className="row header">
-            <div className="cell">문항</div>
+        <div className="result-table">
+          <div className="result-row header">
+            <div className="result-cell">문항</div>
             {questions.map((_, i) => (
-              <div key={i} className="cell">
-                {String(i + 1).padStart(2, "0")}
+              <div key={i} className="result-cell">
+                {i + 1}
               </div>
             ))}
           </div>
 
-          <div className="row">
-            <div className="cell">나의 답</div>
+          <div className="result-row">
+            <div className="result-cell">나의 답</div>
             {answers.map((a, i) => (
-              <div key={i} className="cell">
+              <div key={i} className="result-cell">
                 {a === null ? "-" : String.fromCharCode(65 + a)}
               </div>
             ))}
           </div>
 
-          <div className="row">
-            <div className="cell">정답</div>
+          <div className="result-row">
+            <div className="result-cell">정답</div>
             {questions.map((q, i) => (
               <div
                 key={i}
-                className={`cell ${answers[i] === q.answer ? "ok" : "bad"}`}
+                className={`result-cell ${answers[i] === q.answer ? "correct" : "wrong"}`}
               >
-                {answers[i] === q.answer ? "●" : "✕"}
+                {answers[i] === q.answer ? "○" : "✕"}
               </div>
             ))}
           </div>
         </div>
 
-        <p className="score-note">
-          점수: {score} / {questions.length}
-        </p>
-
         <div className="result-actions">
           <button
-            className="cta"
+            className="result-btn primary"
             disabled={loading || !noteId}
             onClick={async () => {
               await quizAI.post("/generate-explanations", {
@@ -345,7 +361,7 @@ export default function QuizAI() {
               navigate(`/ReviewDetail/${subjectId}/${weekId}/${noteId}`);
             }}
           >
-            {loading ? "해설 생성 중..." : "오답 풀이 해설 보기"}
+            {loading ? "해설 생성 중..." : "📖 오답 풀이 해설 보기"}
           </button>
         </div>
       </div>

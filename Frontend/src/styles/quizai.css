@@ -1,284 +1,612 @@
-/* =====================================
-   🎀 QuizAI 스타일 (WithAI 톤 맞춤)
-   ===================================== */
+/* ========================================
+   📝 QUIZ AI - Refactored
+======================================== */
 
 .quiz-page {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 16px 18px 60px;
-  color: #5a4a49;
-  background-color: #fafafa;
   min-height: 100vh;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-lg) var(--space-3xl);
+  background: var(--color-background);
+  animation: fadeSlideUp 0.5s ease;
 }
 
-/* 뒤로가기 버튼 */
-.back {
+/* ========================================
+   BACK BUTTON
+======================================== */
+.quiz-back-btn {
   border: none;
   background: none;
-  color: #f7adc0;
-  font-size: 22px;
+  color: var(--color-primary);
+  font-size: 1.6rem;
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
-  margin-top: 32px;
-  margin-bottom: 10px;
-  transition: transform 0.2s ease;
-}
-.back:hover {
-  transform: translateX(-3px);
+  margin-bottom: var(--space-xl);
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
 }
 
-/* ================== 인트로 카드 ================== */
+.quiz-back-btn:hover {
+  background: var(--color-surface-hover);
+  transform: scale(1.15);
+}
+
+/* ========================================
+   INTRO CARD
+======================================== */
 .intro-card {
-  border: 2px solid #f8cdd5;
-  background: #fffdfd;
-  border-radius: 20px;
-  padding: 56px 16px;
+  border: 2px solid var(--color-border);
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-background) 100%);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-3xl) var(--space-2xl);
   text-align: center;
-  margin-top: 120px;
-  box-shadow: 0 4px 10px rgba(247, 173, 192, 0.1);
-  transition: transform 0.3s ease;
-}
-.intro-card:hover {
-  transform: translateY(-4px);
-}
-.intro-card .subject {
-  font-weight: 700;
-  font-size: 1.4rem;
-  margin-bottom: 8px;
-  color: #5c4b49;
-}
-.intro-card .set-title {
-  color: #7b6764;
-  margin-bottom: 12px;
-}
-.intro-card .hint {
-  color: #b4a2a0;
-  margin: 28px 0;
+  margin-top: 15vh;
+  box-shadow: var(--shadow-xl);
+  transition: all var(--transition-base);
+  animation: cardFloat 3s ease-in-out infinite;
 }
 
-/* ================== 버튼 ================== */
-.cta {
-  background: #ffe7ed;
-  border: 1px solid #f7b8c5;
-  padding: 10px 24px;
-  border-radius: 999px;
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.intro-icon {
+  font-size: 5rem;
+  margin-bottom: var(--space-xl);
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.intro-subject {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-md);
+  color: var(--color-text-primary);
+}
+
+.intro-title {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-lg);
+}
+
+.intro-hint {
+  color: var(--color-text-tertiary);
+  margin: var(--space-2xl) 0;
+  font-size: var(--font-size-base);
+}
+
+.quiz-start-btn {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: white;
+  border: none;
+  padding: var(--space-lg) var(--space-3xl);
+  border-radius: var(--radius-full);
   cursor: pointer;
-  font-weight: 600;
-  color: #5a4a49;
-  transition: all 0.25s ease;
-}
-.cta:hover {
-  background: #f7adc0;
-  color: #fff;
-  border-color: #f499ae;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-md);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-lg);
+  margin-top: var(--space-xl);
 }
 
-.ghost {
-  background: #fff;
-  border: 1px solid #f7b8c5;
-  padding: 8px 14px;
-  border-radius: 999px;
-  color: #7a6763;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-.ghost:hover {
-  background: #fff5f8;
-  color: #f07c98;
+.quiz-start-btn:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: var(--shadow-xl);
 }
 
-/* ================== 퀴즈 상단바 ================== */
+.quiz-start-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   QUIZ TOPBAR
+======================================== */
 .quiz-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 12px 0 16px;
-  padding: 0 4px;
-}
-.set-badge {
-  background: #fff3f6;
-  border: 1px solid #f6c5ce;
-  border-radius: 999px;
-  padding: 6px 18px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #7b6764;
+  margin-bottom: var(--space-2xl);
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
-/* ================== 점 (진행 표시) ================== */
-.dots {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin: 36px 0 32px;
-}
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #f8d4dc;
-  transition: background 0.3s ease;
-}
-.dot.active {
-  background: #f48ba5;
-}
-
-/* ================== 문제 카드 ================== */
-.question-wrap {
-  margin-top: 12px;
-}
-.qtext {
-  margin-bottom: 16px;
-  line-height: 1.5;
-  font-weight: 600;
-}
-.opt {
-  width: 100%;
-  text-align: left;
-  border: 1px solid #f6cfd4;
-  background: #fff;
-  padding: 12px 14px;
-  border-radius: 12px;
-  margin-bottom: 12px;
+.quiz-nav-btn {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  color: var(--color-text-primary);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  color: #5a4a49;
-  transition: all 0.25s ease;
-}
-.opt:hover {
-  background: #fff5f8;
-  border-color: #f6a8b6;
-}
-.opt.selected {
-  background: #fff3f7;
-  border-color: #f38ea7;
-  box-shadow: 0 0 6px rgba(243, 142, 167, 0.3);
+  transition: all var(--transition-base);
 }
 
-/* ================== 결과 화면 ================== */
-.result-title {
-  border: 1px solid #f4cfd3;
-  border-radius: 999px;
-  padding: 10px 18px;
-  text-align: center;
-  background: #fffafc;
-  margin: 50px 0 40px;
-  font-weight: 600;
-  color: #5a4a49;
+.quiz-nav-btn:hover:not(:disabled) {
+  background: var(--color-primary-lighter);
+  border-color: var(--color-primary);
+  transform: scale(1.05);
 }
 
-.score-table {
-  border: 2px solid #f4cfd3;
-  border-radius: 16px;
-  margin: 40px 0 50px;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 3px 8px rgba(255, 160, 175, 0.08);
-}
-.row {
-  display: grid;
-  grid-template-columns: 100px repeat(auto-fit, minmax(40px, 1fr));
-}
-.row .cell {
-  border-top: 1px solid #f9d9dc;
-  padding: 10px;
-  text-align: center;
-  font-size: 14px;
-}
-.row.header .cell {
-  background: #fff5f8;
-  font-weight: 600;
-  border-top: none;
-  color: #7b6764;
-}
-.cell.ok {
-  color: #17a574;
-  font-weight: 700;
-}
-.cell.bad {
-  color: #f05c82;
-  font-weight: 700;
-}
-.score-note {
-  text-align: center;
-  color: #7e6763;
-  margin: 20px 0 30px;
-  font-weight: 500;
+.quiz-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-.result-actions {
+.quiz-badge {
+  background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-border-lighter) 100%);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: var(--space-sm) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-dark);
+}
+
+/* ========================================
+   QUIZ PROGRESS
+======================================== */
+.quiz-progress {
   display: flex;
+  gap: var(--space-md);
   justify-content: center;
-  gap: 10px;
-  margin-top: 40px;
+  margin-bottom: var(--space-3xl);
+  padding: var(--space-lg);
 }
 
-/* ================== 해설 화면 ================== */
-.explain-title {
-  margin: 8px 0 14px;
-  text-align: center;
-  color: #5a4a49;
-  font-weight: 600;
-}
-.explain-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.ex-card {
-  border: 1px solid #f6cfd4;
-  border-radius: 14px;
-  padding: 14px 16px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(255, 180, 190, 0.05);
-}
-.ex-qhead {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 6px;
-}
-.tag {
-  font-size: 11px;
-  padding: 4px 8px;
-  border-radius: 999px;
-  border: 1px solid #f6cfd4;
-  font-weight: 600;
-}
-.tag.ok {
-  background: #e6fff2;
-  border-color: #a8e8ca;
-  color: #17a574;
-}
-.tag.bad {
-  background: #fff1f4;
-  border-color: #f7b1c2;
-  color: #e34972;
-}
-.ex-qidx {
-  color: #b9a5a2;
-  font-size: 12px;
-}
-.ex-q,
-.ex-a,
-.ex-my,
-.ex-exp {
-  margin: 6px 0;
-  color: #5a4a49;
+.progress-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-border-lighter);
+  border: 2px solid var(--color-border);
+  transition: all var(--transition-base);
 }
 
-/* ================== 애니메이션 (부드러운 등장) ================== */
-.intro-card,
-.ex-card,
-.result-title,
-.opt {
-  animation: fadeIn 0.4s ease both;
+.progress-dot.answered {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
 }
-@keyframes fadeIn {
-  0% {
+
+.progress-dot.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary-dark);
+  transform: scale(1.5);
+  box-shadow: 0 0 10px rgba(240, 146, 146, 0.5);
+}
+
+/* ========================================
+   QUESTION CARD
+======================================== */
+.question-card {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-2xl);
+  box-shadow: var(--shadow-lg);
+  animation: questionAppear 0.5s ease;
+}
+
+@keyframes questionAppear {
+  from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(20px);
   }
-  100% {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.question-number {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  margin-bottom: var(--space-md);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.question-text {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  line-height: 1.7;
+  margin-bottom: var(--space-2xl);
+  padding-bottom: var(--space-xl);
+  border-bottom: 2px solid var(--color-border-lighter);
+}
+
+/* ========================================
+   OPTIONS LIST
+======================================== */
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.option-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  text-align: left;
+  border: 2px solid var(--color-border-lighter);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  padding: var(--space-lg) var(--space-xl);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.option-btn:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border);
+  transform: translateX(6px);
+  box-shadow: var(--shadow-md);
+}
+
+.option-btn.selected {
+  background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-surface-hover) 100%);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(240, 146, 146, 0.2), var(--shadow-md);
+  transform: translateX(6px);
+}
+
+.option-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-border-lighter);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-base);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.option-btn.selected .option-label {
+  background: var(--color-primary);
+  color: white;
+  transform: scale(1.1);
+}
+
+.option-text {
+  flex: 1;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  font-weight: var(--font-weight-medium);
+}
+
+/* ========================================
+   RESULT CARD
+======================================== */
+.result-card {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-xl);
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-background) 100%);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  margin-bottom: var(--space-3xl);
+  box-shadow: var(--shadow-xl);
+  animation: resultAppear 0.6s ease;
+}
+
+@keyframes resultAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.result-icon {
+  font-size: 5rem;
+  margin-bottom: var(--space-xl);
+  animation: iconCelebrate 0.8s ease;
+}
+
+@keyframes iconCelebrate {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.2) rotate(-10deg); }
+  75% { transform: scale(1.2) rotate(10deg); }
+}
+
+.result-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xl);
+}
+
+.result-score {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.score-number {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+/* ========================================
+   RESULT TABLE
+======================================== */
+.result-table {
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  margin-bottom: var(--space-3xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.result-row {
+  display: grid;
+  grid-template-columns: 100px repeat(auto-fit, minmax(50px, 1fr));
+  border-bottom: 1px solid var(--color-border-lighter);
+}
+
+.result-row:last-child {
+  border-bottom: none;
+}
+
+.result-row.header {
+  background: linear-gradient(135deg, var(--color-primary-lighter) 0%, var(--color-border-lighter) 100%);
+}
+
+.result-row.header .result-cell {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-dark);
+}
+
+.result-cell {
+  padding: var(--space-lg);
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  border-right: 1px solid var(--color-border-lighter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.result-cell:last-child {
+  border-right: none;
+}
+
+.result-cell.correct {
+  color: var(--color-success);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-md);
+}
+
+.result-cell.wrong {
+  color: var(--color-error);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-md);
+}
+
+/* ========================================
+   RESULT ACTIONS
+======================================== */
+.result-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.result-btn {
+  padding: var(--space-lg) var(--space-2xl);
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.result-btn.primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: white;
+}
+
+.result-btn.primary:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-xl);
+}
+
+.result-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+@media (max-width: 768px) {
+  .quiz-page {
+    padding: var(--space-lg) var(--space-md) var(--space-2xl);
+  }
+
+  .intro-card {
+    margin-top: 10vh;
+    padding: var(--space-2xl) var(--space-xl);
+  }
+
+  .intro-icon {
+    font-size: 4rem;
+  }
+
+  .intro-subject {
+    font-size: var(--font-size-xl);
+  }
+
+  .intro-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .result-table {
+    overflow-x: auto;
+  }
+
+  .result-row {
+    grid-template-columns: 80px repeat(auto-fit, minmax(40px, 1fr));
+  }
+
+  .result-cell {
+    padding: var(--space-md);
+    font-size: var(--font-size-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .quiz-back-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.4rem;
+  }
+
+  .intro-card {
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  .intro-subject {
+    font-size: var(--font-size-lg);
+  }
+
+  .intro-title {
+    font-size: var(--font-size-md);
+  }
+
+  .quiz-start-btn {
+    padding: var(--space-md) var(--space-2xl);
+    font-size: var(--font-size-base);
+  }
+
+  .quiz-topbar {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .quiz-nav-btn {
+    padding: var(--space-xs) var(--space-md);
+    font-size: var(--font-size-xs);
+  }
+
+  .quiz-badge {
+    order: -1;
+    width: 100%;
+    text-align: center;
+  }
+
+  .quiz-progress {
+    gap: var(--space-sm);
+    padding: var(--space-md);
+  }
+
+  .progress-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .question-card {
+    padding: var(--space-xl);
+  }
+
+  .question-text {
+    font-size: var(--font-size-md);
+  }
+
+  .options-list {
+    gap: var(--space-md);
+  }
+
+  .option-btn {
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .option-label {
+    width: 32px;
+    height: 32px;
+    font-size: var(--font-size-sm);
+  }
+
+  .option-text {
+    font-size: var(--font-size-sm);
+  }
+
+  .result-card {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  .result-icon {
+    font-size: 4rem;
+  }
+
+  .result-title {
+    font-size: var(--font-size-xl);
+  }
+
+  .result-score {
+    font-size: var(--font-size-lg);
+  }
+
+  .score-number {
+    font-size: var(--font-size-xl);
+  }
+
+  .result-btn {
+    width: 100%;
+    justify-content: center;
+    padding: var(--space-md) var(--space-xl);
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+.quiz-back-btn:focus-visible,
+.quiz-start-btn:focus-visible,
+.quiz-nav-btn:focus-visible,
+.option-btn:focus-visible,
+.result-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
 }

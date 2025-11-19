@@ -252,6 +252,15 @@ export default function Subject() {
     }
   };
 
+  // 드래그 앤 드롭
+  const handleDrop = (e) => {
+    e.preventDefault();
+    if (uploading || !selectedWeek) return;
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileUpload(file);
+  };
+
+  // 파일 선택 토글
   const toggleSelect = (fid) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -260,12 +269,19 @@ export default function Subject() {
     });
   };
 
+  // 선택 삭제
   const deleteSelected = async () => {
-    if (!window.confirm("선택한 파일을 삭제할까요?")) return;
+    if (selectedIds.size === 0) return;
 
-    const targets = uploadedFiles.filter((f) => selectedIds.has(f.id));
-    for (const f of targets) {
-      if (f.path) await deleteObject(ref(storage, f.path));
+    for (const fid of selectedIds) {
+      const item = uploadedFiles.find((f) => f.id === fid);
+      if (!item?.path) continue;
+
+      try {
+        await deleteObject(ref(storage, item.path));
+      } catch (e) {
+        console.error("스토리지 삭제 실패:", e);
+      }
 
       await deleteDoc(
         doc(
@@ -274,7 +290,7 @@ export default function Subject() {
           "weeks",
           selectedWeek.id,
           "files",
-          f.id
+          fid
         )
       );
     }
@@ -283,63 +299,44 @@ export default function Subject() {
   };
 
   /* ============================
-     🤖 Mentor AI 요약
+     🤖 AI 요약
   ============================= */
-  const generateAISummary = async (week) => {
-    if (!week?.id) return;
+  const [summaryLoading, setSummaryLoading] = useState(false);
 
-    await updateDoc(
-      doc(db, ...subjectPath, "weeks", week.id),
-      {
-        aiSummary: "AI가 개념 요약을 준비 중입니다..."
-      }
-    );
+  const requestSummary = async () => {
+    if (!selectedWeek?.summary?.trim()) {
+      alert("요약할 내용이 없습니다!");
+      return;
+    }
+
+    setSummaryLoading(true);
 
     try {
-      const res = await mentorAI.post("/generate-summary", {
-        subjectName: subject.name,
-        weekTitle: week.weekTitle,
-        userNotes: week.summary || week.memo || "",
+      const res = await mentorAI.post("/summary", {
+        content: selectedWeek.summary,
       });
 
-      if (res.data?.success) {
-        await updateDoc(
-          doc(db, ...subjectPath, "weeks", week.id),
-          { aiSummary: res.data.summary }
-        );
-      } else {
-        await updateDoc(
-          doc(db, ...subjectPath, "weeks", week.id),
-          { aiSummary: "요약 실패. 다시 시도해주세요." }
-        );
-      }
-    } catch (err) {
-      console.error(err);
+      await updateDoc(
+        doc(db, ...subjectPath, "weeks", selectedWeek.id),
+        { aiSummary: res.data.result }
+      );
+    } catch (e) {
+      console.error("AI 요약 실패:", e);
+      alert("AI 요약 실패!");
+    } finally {
+      setSummaryLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (activeTab !== "MENTOR AI" || !selectedWeek) return;
-
-    const summary = selectedWeek.aiSummary?.trim();
-    const needGenerate =
-      !summary ||
-      summary.includes("준비 중") ||
-      summary.includes("실패") ||
-      summary.includes("오류");
-
-    if (needGenerate) generateAISummary(selectedWeek);
-  }, [activeTab, selectedWeek]);
-
   /* ============================
-     🤖 Mentor Chat 최근 대화
+     💬 Mentor Chat 미리보기
   ============================= */
   const [recentChats, setRecentChats] = useState([]);
 
   useEffect(() => {
     if (!selectedWeek?.id) return;
 
-    const chatRef = collection(
+    const chatsRef = collection(
       db,
       ...subjectPath,
       "weeks",
@@ -347,17 +344,24 @@ export default function Subject() {
       "chats"
     );
 
-    const unsub = onSnapshot(chatRef, (snap) => {
+    const unsub = onSnapshot(chatsRef, (snap) => {
       const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      list.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-      setRecentChats(list);
+      list.sort((a, b) => {
+        const aT = a.createdAt?.seconds || 0;
+        const bT = b.createdAt?.seconds || 0;
+        return bT - aT;
+      });
+      setRecentChats(list.slice(0, 3));
     });
 
     return () => unsub();
   }, [selectedWeek?.id]);
 
+  // 새 채팅 생성
   const createNewChat = async () => {
-    const chatRef = collection(
+    if (!selectedWeek) return;
+
+    const chatsCol = collection(
       db,
       ...subjectPath,
       "weeks",
@@ -365,154 +369,161 @@ export default function Subject() {
       "chats"
     );
 
-    const existing = await getDocs(chatRef);
-    const nextIndex = existing.size + 1;
+    const snap = await getDocs(chatsCol);
+    const nextIndex = snap.size + 1;
 
-    const refDoc = await addDoc(chatRef, {
+    const ref = await addDoc(chatsCol, {
       title: `${String(nextIndex).padStart(2, "0")}번 대화`,
       messages: [],
       createdAt: serverTimestamp(),
     });
 
-    return refDoc.id;
+    return ref.id;
   };
 
   /* ============================
-     🔁 복습 (퀴즈 + 오답노트)
+     📝 퀴즈 & 오답노트
   ============================= */
   const [quizList, setQuizList] = useState([]);
   const [wrongNotes, setWrongNotes] = useState([]);
 
+  // 퀴즈 구독
   useEffect(() => {
     if (!selectedWeek?.id) return;
 
-    (async () => {
-      const quizSnap = await getDocs(
-        collection(
-          db,
-          ...subjectPath,
-          "weeks",
-          selectedWeek.id,
-          "quizzes"
-        )
-      );
+    const qRef = collection(
+      db,
+      ...subjectPath,
+      "weeks",
+      selectedWeek.id,
+      "quizzes"
+    );
 
-      const noteSnap = await getDocs(
-        collection(
-          db,
-          ...subjectPath,
-          "weeks",
-          selectedWeek.id,
-          "notes"
-        )
-      );
+    const unsub = onSnapshot(qRef, (snap) => {
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setQuizList(list);
+    });
 
-      const quizData = quizSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      const noteData = noteSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
-      quizData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-      noteData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-
-      const indexedNotes = noteData.map((note, idx) => ({
-        ...note,
-        displayTitle:
-          `${String(idx + 1).padStart(2, "0")} ` +
-          (note.quizTitle?.replace(/^(\d+\s)?/, "") || "오답노트"),
-      }));
-
-      setQuizList(quizData);
-      setWrongNotes(indexedNotes);
-    })();
+    return () => unsub();
   }, [selectedWeek?.id]);
 
-  /* ============================
-     🎨 렌더링
-  ============================= */
+  // 오답노트 구독
+  useEffect(() => {
+    if (!selectedWeek?.id) return;
+
+    const noteRef = collection(
+      db,
+      ...subjectPath,
+      "weeks",
+      selectedWeek.id,
+      "notes"
+    );
+
+    const unsub = onSnapshot(noteRef, (snap) => {
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      list.sort((a, b) => {
+        const aT = a.createdAt?.seconds || 0;
+        const bT = b.createdAt?.seconds || 0;
+        return bT - aT;
+      });
+
+      const withTitle = list.map((n) => ({
+        ...n,
+        displayTitle: n.quizTitle || `오답노트 ${n.id.slice(0, 4)}`,
+      }));
+
+      setWrongNotes(withTitle);
+    });
+
+    return () => unsub();
+  }, [selectedWeek?.id]);
+
   return (
     <div className="subject-page">
-      <div className="subject-container">
-        <header className="subject-header">
-          <button className="back-btn" onClick={() => navigate(-1)}>←</button>
-          <h2 className="subject-title">{subject.name || "과목 이름"}</h2>
-        </header>
+      {/* 헤더 */}
+      <div className="subject-header">
+        <button className="back-btn" onClick={() => navigate("/study")}>
+          ←
+        </button>
+        <h2 className="subject-title">{subject.name}</h2>
+      </div>
 
-        {/* 탭 */}
-        <nav ref={tabsRef} className="subject-tabs">
-          {["학습", "MENTOR AI", "복습"].map((tab) => (
-            <button
-              key={tab}
-              className={`tab-item ${activeTab === tab ? "active" : ""}`}
-              onClick={() => setActiveTab(tab)}
+      {/* 탭 */}
+      <div className="subject-tabs" ref={tabsRef}>
+        {["학습", "MENTOR AI", "복습"].map((tab) => (
+          <button
+            key={tab}
+            className={`tab-item ${activeTab === tab ? "active" : ""}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab}
+          </button>
+        ))}
+        <div
+          className="tab-underline"
+          style={{ left: underline.left, width: underline.width }}
+        />
+      </div>
+
+      {/* 콘텐츠 영역 */}
+      <div className="content-area">
+        {/* 주차 리스트 */}
+        <div className="week-list">
+          <h4>주차 선택</h4>
+
+          {weeks.map((w) => (
+            <div
+              key={w.id}
+              className={`week-item ${
+                selectedWeek?.id === w.id ? "active" : ""
+              }`}
+              onClick={() => setSelectedWeek(w)}
             >
-              {tab}
-            </button>
-          ))}
-          <span
-            className="tab-underline"
-            style={{ width: underline.width, left: underline.left }}
-          />
-        </nav>
-
-        <hr className="subject-line" />
-
-        <div className="content-area">
-          {/* 왼쪽 주차 리스트 */}
-          <div className="week-list">
-            <h4>주차</h4>
-
-            {weeks.map((w) => (
-              <div
-                key={w.id}
-                className={`week-item ${selectedWeek?.id === w.id ? "active" : ""}`}
+              {w.weekTitle}
+              <button
+                className="delete-week"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (window.confirm("주차 전체 삭제하시겠습니까?")) {
+                    deleteWeekCompletely(userId, id, w.id);
+                  }
+                }}
               >
-                <span onClick={() => setSelectedWeek(w)}>
-                  {w.weekTitle}
-                </span>
+                🗑️
+              </button>
+            </div>
+          ))}
 
-                <button
-                  className="delete-week"
-                  onClick={() => {
-                    if (window.confirm(`${w.weekTitle} 삭제?`)) {
-                      deleteWeekCompletely(userId, id, w.id);
-                    }
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
+          <button className="add-week-btn" onClick={addWeek}>
+            ＋ 주차 추가
+          </button>
+        </div>
 
-            <button className="add-week-btn" onClick={addWeek}>
-              ＋ 주차 생성
-            </button>
-          </div>
-
-          {/* 오른쪽 컨텐츠 */}
-          {selectedWeek && (
-            <div className="week-content">
-              {/* ❤️ 학습 탭 */}
+        {/* 주차별 콘텐츠 */}
+        <div className="week-content">
+          {!selectedWeek ? (
+            <div className="no-week-selected">
+              <p>주차를 선택하거나 추가해주세요</p>
+            </div>
+          ) : (
+            <div className="week-content-inner">
+              {/* 📚 학습 탭 */}
               {activeTab === "학습" && (
                 <>
-                  <h4>파일 업로드</h4>
+                  <h4>강의 교안 등록</h4>
 
-                  {/* 파일 업로드 영역 */}
                   {uploadedFiles.length === 0 ? (
                     <div
-                      className={`content-box upload-box ${uploading ? "disabled" : ""}`}
-                      onClick={() =>
-                        !uploading &&
-                        document.getElementById("fileInput").click()
-                      }
-                      onDrop={async (e) => {
-                        e.preventDefault();
-                        if (uploading) return;
-                        const f = e.dataTransfer.files?.[0];
-                        if (f) await handleFileUpload(f);
-                      }}
+                      className="file-dropzone"
                       onDragOver={(e) => e.preventDefault()}
+                      onDrop={handleDrop}
+                      onClick={() => {
+                        if (!uploading && selectedWeek)
+                          document.getElementById("fileInput").click();
+                      }}
                     >
                       {uploading ? (
-                        <div className="upload-progress-wrapper">
+                        <div className="upload-progress-container">
                           <div className="upload-progress-bar">
                             <div
                               className="upload-progress-fill"
@@ -520,27 +531,34 @@ export default function Subject() {
                             />
                           </div>
                           <span className="upload-progress-text">
-                            업로드 중... {uploadProgress}%
+                            업로드 중... {Math.round(uploadProgress)}%
                           </span>
                         </div>
                       ) : (
-                        <p className="file-placeholder">
-                          📂 파일 업로드 (클릭 또는 드래그)
-                        </p>
+                        <>
+                          <span className="dropzone-icon">📎</span>
+                          <p className="dropzone-text">
+                            📂 파일 업로드 (클릭 또는 드래그)
+                          </p>
+                        </>
                       )}
                     </div>
                   ) : (
-                    <div className="content-box file-list-box">
+                    <div className="file-list-box">
                       {uploadedFiles.map((f) => (
                         <div key={f.id} className="file-row">
                           <input
                             type="checkbox"
+                            className="file-checkbox"
                             checked={selectedIds.has(f.id)}
                             onChange={() => toggleSelect(f.id)}
                           />
                           <span className="file-name">{f.name}</span>
 
-                          <button onClick={() => window.open(f.url, "_blank")}>
+                          <button
+                            className="file-preview-btn"
+                            onClick={() => window.open(f.url, "_blank")}
+                          >
                             미리보기
                           </button>
                         </div>
@@ -548,6 +566,7 @@ export default function Subject() {
 
                       <div className="file-list-footer">
                         <button
+                          className="file-add-btn"
                           onClick={() =>
                             document.getElementById("fileInput").click()
                           }
@@ -556,7 +575,7 @@ export default function Subject() {
                         </button>
 
                         <button
-                          className="danger"
+                          className="file-delete-btn"
                           onClick={deleteSelected}
                           disabled={selectedIds.size === 0}
                         >
@@ -608,7 +627,7 @@ export default function Subject() {
               {activeTab === "MENTOR AI" && (
                 <>
                   <h4>AI 요약</h4>
-                  <div className="content-box ai-summary-box">
+                  <div className="ai-summary-box">
                     {selectedWeek.aiSummary ? (
                       <div
                         className="ai-text"
@@ -617,7 +636,16 @@ export default function Subject() {
                         }}
                       />
                     ) : (
-                      <p className="ai-placeholder">AI가 요약을 준비 중...</p>
+                      <div className="ai-empty-state">
+                        <p className="ai-placeholder">AI가 요약을 준비 중...</p>
+                        <button
+                          className="ai-summary-btn"
+                          onClick={requestSummary}
+                          disabled={summaryLoading}
+                        >
+                          {summaryLoading ? "요약 생성 중..." : "AI 요약 생성"}
+                        </button>
+                      </div>
                     )}
                   </div>
 
@@ -662,7 +690,7 @@ export default function Subject() {
                       );
                     }}
                   >
-                    채팅 시작!
+                    💬 채팅 시작!
                   </button>
 
                   <h4>학습 메모</h4>
@@ -684,37 +712,35 @@ export default function Subject() {
                 <>
                   <h4>AI 연습문제</h4>
 
-                  <div className="ai-quiz-box">
-                    <div className="quiz-list-wrapper">
-                      {quizList.length === 0 ? (
-                        <p className="no-quiz">아직 생성된 문제가 없습니다.</p>
-                      ) : (
-                        <div className="quiz-list">
-                          {quizList.map((quiz, idx) => (
-                            <button
-                              key={quiz.id}
-                              className="quiz-item"
-                              onClick={() =>
-                                navigate(
-                                  `/ReviewDetail/${id}/${selectedWeek.id}/${quiz.id}`
-                                )
-                              }
-                            >
-                              {String(idx + 1).padStart(2, "0")}번 문제
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                  <div className="quiz-list-wrapper">
+                    {quizList.length === 0 ? (
+                      <p className="no-quiz">아직 생성된 문제가 없습니다.</p>
+                    ) : (
+                      <div className="quiz-list">
+                        {quizList.map((quiz, idx) => (
+                          <button
+                            key={quiz.id}
+                            className="quiz-item"
+                            onClick={() =>
+                              navigate(
+                                `/ReviewDetail/${id}/${selectedWeek.id}/${quiz.id}`
+                              )
+                            }
+                          >
+                            {String(idx + 1).padStart(2, "0")}번 문제
+                          </button>
+                        ))}
+                      </div>
+                    )}
 
-                      <button
-                        className="quiz-add-btn"
-                        onClick={() =>
-                          navigate(`/QuizAI/${id}/${selectedWeek.id}`)
-                        }
-                      >
-                        ＋ 문제 풀기
-                      </button>
-                    </div>
+                    <button
+                      className="quiz-add-btn"
+                      onClick={() =>
+                        navigate(`/QuizAI/${id}/${selectedWeek.id}`)
+                      }
+                    >
+                      ＋ 문제 풀기
+                    </button>
                   </div>
 
                   <h4>오답노트</h4>

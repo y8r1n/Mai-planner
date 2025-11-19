@@ -194,12 +194,15 @@ export default function Study() {
 
         {/* 모달 */}
         {showModal && (
-          <div className="study-modal-bg">
+          <div className="study-modal-backdrop">
             <div className="study-modal">
-              <h4>{selectedSubject ? "과목 수정" : "기간 선택"}</h4>
+              <h4 className="study-modal-title">
+                {selectedSubject ? "과목 수정" : "과목 추가"}
+              </h4>
 
               <div className="study-modal-row">
                 <select
+                  className="study-select"
                   value={newSubject.year}
                   onChange={(e) =>
                     setNewSubject({ ...newSubject, year: e.target.value })
@@ -209,9 +212,10 @@ export default function Study() {
                     <option key={y}>{y}</option>
                   ))}
                 </select>
-                <span>년도</span>
+                <span className="study-label">년도</span>
 
                 <select
+                  className="study-select"
                   value={newSubject.semester}
                   onChange={(e) =>
                     setNewSubject({ ...newSubject, semester: e.target.value })
@@ -220,12 +224,13 @@ export default function Study() {
                   <option value="1">1</option>
                   <option value="2">2</option>
                 </select>
-                <span>학기</span>
+                <span className="study-label">학기</span>
               </div>
 
-              <label>과목명</label>
+              <label className="study-input-label">과목명</label>
               <input
                 type="text"
+                className="study-input"
                 placeholder="과목명을 입력하세요"
                 value={newSubject.name}
                 onChange={(e) =>
@@ -234,8 +239,14 @@ export default function Study() {
               />
 
               <div className="study-modal-btns">
-                <button onClick={() => setShowModal(false)}>취소</button>
+                <button 
+                  className="study-cancel-btn"
+                  onClick={() => setShowModal(false)}
+                >
+                  취소
+                </button>
                 <button
+                  className="study-confirm-btn"
                   onClick={selectedSubject ? updateSubjectFn : addSubject}
                 >
                   {selectedSubject ? "수정" : "확인"}

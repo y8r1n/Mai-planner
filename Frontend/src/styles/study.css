@@ -1,125 +1,436 @@
-/* ===== 전체 페이지 ===== */
+/* ========================================
+   📚 STUDY (과목 관리) - Refactored
+======================================== */
+
 .study-page {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  background: linear-gradient(180deg, #fffdfd 0%, #f8f8f8 100%);
-  padding: 100px 0;
+  align-items: flex-start;
+  background: var(--color-background);
+  padding: calc(var(--navbar-height) + var(--space-2xl)) var(--space-lg) var(--space-3xl);
 }
 
-/* ===== 중앙 콘텐츠 컨테이너 ===== */
+/* ========================================
+   CONTAINER
+======================================== */
 .study-container {
   width: 100%;
-  max-width: 500px; 
-  background: #fff;
-  border-radius: 24px;
-  box-shadow: 0 4px 20px rgba(243, 186, 186, 0.15);
-  padding: 60px 50px 80px;
-  animation: study-fadeIn 0.8s ease;
+  max-width: var(--container-max-width);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-2xl) var(--space-xl);
+  animation: fadeSlideUp 0.5s ease;
 }
 
-/* ===== 상단 헤더 ===== */
+/* ========================================
+   HEADER
+======================================== */
 .study-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-lg);
 }
 
 .study-page-title {
-  font-weight: 600;
-  color: #444;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
 }
 
-/* ===== 추가 버튼 ===== */
+/* Add Button */
 .study-add-btn {
-  border: 3px solid #f3baba;
-  background: none;
-  color: #f09292;
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
-  font-weight: bold;
-  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--color-border-lighter);
+  color: var(--color-primary);
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
 }
 
 .study-add-btn:hover {
-  background: #fff0f0;
+  background: var(--color-primary-lighter);
   transform: rotate(90deg) scale(1.1);
+  box-shadow: var(--shadow-md);
 }
 
-/* ===== 구분선 ===== */
+/* ========================================
+   DIVIDER
+======================================== */
 .study-divider {
   border: none;
-  border-bottom: 3px solid #f3baba;
-  margin-bottom: 30px;
-  opacity: 0.9;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--color-border) 50%,
+    transparent 100%
+  );
+  margin-bottom: var(--space-xl);
+  opacity: 0.8;
 }
 
-/* ===== 학기 및 과목 ===== */
+/* ========================================
+   EMPTY STATE
+======================================== */
+.study-empty-box {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-xl);
+  background: var(--color-background);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-base);
+  line-height: 1.8;
+  margin-top: var(--space-xl);
+}
+
+.study-empty-box::before {
+  content: '📚';
+  display: block;
+  font-size: 3rem;
+  margin-bottom: var(--space-lg);
+  opacity: 0.6;
+}
+
+/* ========================================
+   SEMESTER BLOCK
+======================================== */
+.study-semester-block {
+  margin-bottom: var(--space-2xl);
+  animation: fadeSlideUp 0.4s ease;
+}
+
+.study-semester-block:nth-child(1) { animation-delay: 0.05s; }
+.study-semester-block:nth-child(2) { animation-delay: 0.1s; }
+.study-semester-block:nth-child(3) { animation-delay: 0.15s; }
+
 .study-semester-title {
-  color: #f09292;
-  font-weight: 600;
-  font-size: 1rem;
-  margin-bottom: 12px;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  margin-bottom: var(--space-lg);
+  padding-left: var(--space-sm);
+  border-left: 4px solid var(--color-primary);
+}
+
+/* ========================================
+   SUBJECT ITEMS (Swipe for Actions)
+======================================== */
+.study-subject-item-wrapper {
+  position: relative;
+  margin-bottom: var(--space-md);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
 }
 
 .study-subject-item {
   width: 100%;
-  border: 1px solid #f3baba;
-  border-radius: 12px;
-  padding: 12px 16px;
-  background: white;
-  font-size: 0.95rem;
-  color: #444;
-  margin-bottom: 10px;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg) var(--space-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  text-align: left;
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 8px rgba(243, 186, 186, 0.1);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  z-index: var(--z-base);
 }
 
 .study-subject-item:hover {
-  background: #fff8f8;
-  transform: scale(1.02);
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary-light);
+  transform: translateX(4px);
+  box-shadow: var(--shadow-md);
 }
 
-/* ===== 페이드 인 ===== */
-@keyframes study-fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Edit/Delete Buttons (Swipe Reveal) */
+.study-edit-delete-btns {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+  padding-right: var(--space-md);
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all var(--transition-base);
+  z-index: 0;
 }
 
-/* ===== 반응형 ===== */
+.study-subject-item-wrapper.show-actions .study-edit-delete-btns {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.study-subject-item-wrapper.show-actions .study-subject-item {
+  transform: translateX(-120px);
+}
+
+.study-edit-btn,
+.study-delete-btn {
+  padding: var(--space-sm) var(--space-lg);
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.study-edit-btn {
+  background: var(--color-border-lighter);
+  color: var(--color-primary);
+}
+
+.study-edit-btn:hover {
+  background: var(--color-primary-lighter);
+}
+
+.study-delete-btn {
+  background: var(--color-error);
+  color: white;
+}
+
+.study-delete-btn:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+}
+
+/* ========================================
+   MODAL
+======================================== */
+.study-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal-backdrop);
+  animation: fadeIn 0.2s ease;
+}
+
+.study-modal {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl) var(--space-xl);
+  width: 90%;
+  max-width: 380px;
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.3s ease;
+}
+
+.study-modal-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+/* Modal Row (Year/Semester) */
+.study-modal-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.study-select {
+  padding: var(--space-sm) var(--space-lg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.study-select:focus {
+  border-color: var(--color-primary);
+  background: var(--color-background-alt);
+}
+
+.study-label {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Input */
+.study-input-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.study-input {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  outline: none;
+  transition: all var(--transition-fast);
+  margin-bottom: var(--space-xl);
+}
+
+.study-input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-background-alt);
+  box-shadow: 0 0 0 3px rgba(240, 146, 146, 0.1);
+}
+
+.study-input::placeholder {
+  color: var(--color-text-disabled);
+}
+
+/* Modal Buttons */
+.study-modal-btns {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.study-cancel-btn,
+.study-confirm-btn {
+  padding: var(--space-md) var(--space-2xl);
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.study-cancel-btn {
+  background: var(--color-border-lighter);
+  color: var(--color-text-secondary);
+}
+
+.study-cancel-btn:hover {
+  background: var(--color-border);
+}
+
+.study-confirm-btn {
+  background: var(--color-primary);
+  color: white;
+}
+
+.study-confirm-btn:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
 @media (max-width: 768px) {
+  .study-page {
+    padding: calc(var(--navbar-height) + var(--space-xl)) var(--space-md) var(--space-2xl);
+  }
+
   .study-container {
-    max-width: 95%;
-    padding: 40px 25px;
-    border-radius: 20px;
+    padding: var(--space-xl) var(--space-lg);
   }
 
   .study-page-title {
-    font-size: 1rem;
+    font-size: var(--font-size-lg);
   }
 
   .study-add-btn {
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .study-container {
+    padding: var(--space-lg) var(--space-md);
+    border-radius: var(--radius-lg);
+  }
+
+  .study-page-title {
+    font-size: var(--font-size-md);
+  }
+
+  .study-add-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+  }
+
+  .study-semester-title {
+    font-size: var(--font-size-base);
   }
 
   .study-subject-item {
-    font-size: 0.9rem;
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--font-size-sm);
   }
+
+  .study-modal {
+    width: 95%;
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  .study-modal-row {
+    flex-wrap: wrap;
+  }
+
+  .study-edit-delete-btns {
+    gap: var(--space-xs);
+  }
+
+  .study-edit-btn,
+  .study-delete-btn {
+    padding: var(--space-xs) var(--space-md);
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+.study-add-btn:focus-visible,
+.study-subject-item:focus-visible,
+.study-edit-btn:focus-visible,
+.study-delete-btn:focus-visible,
+.study-cancel-btn:focus-visible,
+.study-confirm-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
