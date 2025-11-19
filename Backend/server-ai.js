@@ -426,84 +426,77 @@ app.post("/api/mentor-ai/summary", async (req, res) => {
 });
 
 /* ========================================================================== */
-/* 🧩 Quiz 생성 */
+/* 📘 Mentor Summary - generate-summary (프론트 경로 맞춤) */
+/* ========================================================================== */
+app.post("/api/mentor-ai/generate-summary", async (req, res) => {
+  const { subjectName, weekTitle } = req.body;
+
+  const prompt = `"${subjectName}" / "${weekTitle}" 요약해줘 (3문단 이하)`;
+
+  try {
+    const summary = await callOpenAI(prompt);
+    res.json({ success: true, summary });
+  } catch (e) {
+    console.error("❌ 요약 오류:", e);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+
+/* ========================================================================== */
+/* 🧩 Quiz 생성 — 안정화 버전 */
 /* ========================================================================== */
 app.post("/api/generate-quiz", async (req, res) => {
   const { subjectName, count = 5 } = req.body;
 
   const prompt = `
-"${subjectName}" 과목의 객관식 ${count}문제를 JSON 배열로 생성해줘.
-형식:
-[
- { "question": "...", "options": [".."], "answer": 0 }
-]
-`;
+  "${subjectName}" 과목의 객관식 ${count}문제를 JSON 배열 ONLY 로 생성해줘.
+  형식:
+  [
+    {
+      "question": "...",
+      "options": ["..."],
+      "answer": 0
+    }
+  ]
+  반드시 JSON 배열만 출력해야 함.
+  `;
 
   try {
-    const result = await callOpenAI(prompt);
-    const json = safeJsonParse(result);
+    const raw = await callOpenAI(prompt);
 
-    res.json({ success: true, questions: json });
+    // JSON 부분만 추출
+    const first = raw.indexOf("[");
+    const last = raw.lastIndexOf("]") + 1;
+
+    if (first === -1 || last === -1) {
+      throw new Error("JSON 배열을 찾을 수 없음");
+    }
+
+    const jsonText = raw.slice(first, last);
+
+    let questions = JSON.parse(jsonText);
+
+    if (!Array.isArray(questions)) {
+      throw new Error("퀴즈 형식 오류");
+    }
+
+    res.json({ success: true, questions });
   } catch (e) {
     console.error("❌ quiz 오류:", e);
     res.status(500).json({ success: false, error: e.message });
   }
 });
 
-/* ========================================================================== */
-/* 📖 Quiz 해설 */
-/* ========================================================================== */
-app.post("/api/generate-explanations", async (req, res) => {
-  const { questions = [], userAnswers = [] } = req.body;
-
-  if (questions.length === 0) {
-    return res.status(400).json({ success: false, error: "문제가 없습니다." });
-  }
-
-  const mapped = questions.map((q, i) => ({
-    number: i + 1,
-    question: q.question,
-    correct: String.fromCharCode(65 + (q.correctAnswer ?? q.answer ?? 0)),
-    mine:
-      userAnswers[i] !== null && userAnswers[i] !== undefined
-        ? String.fromCharCode(65 + userAnswers[i])
-        : "-",
-  }));
-
-  const prompt = `
-아래 문제들에 대해 번호별 해설을 작성해줘.
-반드시 JSON 배열 ONLY:
-[
- {"explanation":"..."},
-]
-문제 목록:
-${JSON.stringify(mapped, null, 2)}
-`;
-
-  try {
-    const result = await callOpenAI(prompt);
-
-    const first = result.indexOf("[");
-    const last = result.lastIndexOf("]") + 1;
-
-    const json = JSON.parse(result.slice(first, last));
-
-    res.json({ success: true, explanations: json });
-  } catch (e) {
-    console.error("❌ 해설 오류:", e);
-    res.status(500).json({ success: false, error: e.message });
-  }
-});
 
 
 /* ========================================================================== */
-/* 🎨 이미지 다이어리 (USER 기반 저장 버전) */
+/* 🎨 이미지 다이어리 (USER 기반 저장 버전) — 최신 안정화 버전 */
 /* ========================================================================== */
 app.post("/api/generate-image-diary", async (req, res) => {
   const { emotion, diaryText, userId } = req.body;
 
   try {
-    /* 🔥 userId 반드시 필요 */
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -513,22 +506,22 @@ app.post("/api/generate-image-diary", async (req, res) => {
 
     const cleanEmotion = emotion.replace(/[^\p{Emoji}]/gu, "").trim();
 
-    /* 🔥 자연어 → 영어 프롬프트 변환 (OpenAI) */
+    // 영어로 변환
     const promptText = await callOpenAI(
       `Convert to English prompt:
-Emotion: "${cleanEmotion}"
-Diary: "${diaryText}"
-Only English description.`
+      Emotion: "${cleanEmotion}"
+      Diary: "${diaryText}"
+      Only English description.`
     );
 
-    /* 🔥 Stability Diffusion 이미지 생성 */
+    // Stability 새로운 엔드포인트
     const form = new FormData();
     form.append("prompt", promptText);
     form.append("aspect_ratio", "1:1");
     form.append("output_format", "png");
 
     const imgRes = await axios.post(
-      "https://api.stability.ai/v2beta/stable-image/generate/core",
+      "https://api.stability.ai/v2beta/stable-image/generate/ultra",
       form,
       {
         headers: {
@@ -542,7 +535,7 @@ Only English description.`
     const buffer = Buffer.from(imgRes.data);
     const fileName = `imageDiary/${userId}/${Date.now()}.png`;
 
-    /* Firebase Upload */
+    // Firebase Storage Upload
     const file = bucket.file(fileName);
     await file.save(buffer, { contentType: "image/png" });
 
@@ -551,7 +544,6 @@ Only English description.`
       expires: "2030-01-01",
     });
 
-    /* 🔥 Firestore: 개인 이미지다이어리 저장 */
     await adminDb
       .collection("users")
       .doc(userId)
@@ -565,13 +557,14 @@ Only English description.`
 
     res.json({ success: true, imageUrl: url });
   } catch (e) {
-    console.error("❌ 이미지 생성 오류:", e);
+    console.error("❌ 이미지 생성 오류:", e?.response?.data || e);
     res.status(500).json({
       success: false,
       error: e.message,
     });
   }
 });
+
 
 
 /* ========================================================================== */
