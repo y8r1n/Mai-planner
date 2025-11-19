@@ -63,22 +63,22 @@ export default function Home() {
     return () => unsub();
   }, [userId]);
 
-  /* -------------------------------
-      ✔ 캘린더 이벤트 구독
-  -------------------------------- */
-  useEffect(() => {
-    if (!userId) return;
+ /* -------------------------------
+    ✔ 캘린더 이벤트 구독 (수정됨)
+-------------------------------- */
+useEffect(() => {
+  if (!userId) return;
 
-    const unsub = onSnapshot(
-      collection(db, "users", userId, "calendar", "events"),
-      (snap) => {
-        const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        setEvents(data);
-      }
-    );
+  const unsub = onSnapshot(
+    collection(db, "users", userId, "calendarEvents"), // ⬅️ 여기만 바꿈
+    (snap) => {
+      const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setEvents(data);
+    }
+  );
 
-    return () => unsub();
-  }, [userId]);
+  return () => unsub();
+}, [userId]);
 
   /* -------------------------------
       ✔ 달력 날짜 생성

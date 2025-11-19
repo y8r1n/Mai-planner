@@ -27,12 +27,12 @@ export default function Calendar() {
   const userId = auth.currentUser?.uid;
 
   /* ----------------------------------------
-      🔥 Firestore 일정 실시간 구독
+      🔥 Firestore 일정 실시간 구독 (수정됨)
   ----------------------------------------- */
   useEffect(() => {
     if (!userId) return;
 
-    const colRef = collection(db, "users", userId, "calendar", "events");
+    const colRef = collection(db, "users", userId, "calendarEvents");
 
     const unsub = onSnapshot(colRef, (snap) => {
       const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -70,13 +70,13 @@ export default function Calendar() {
     : [];
 
   /* ----------------------------------------
-      🔥 일정 추가
+      🔥 일정 추가 (수정됨)
   ----------------------------------------- */
   const handleAddEvent = async (e) => {
     e.preventDefault();
     if (!newEventText.trim()) return;
 
-    const colRef = collection(db, "users", userId, "calendar", "events");
+    const colRef = collection(db, "users", userId, "calendarEvents");
 
     await addDoc(colRef, {
       title: newEventText.trim(),
@@ -88,10 +88,10 @@ export default function Calendar() {
   };
 
   /* ----------------------------------------
-      🔥 일정 수정
+      🔥 일정 수정 (수정됨)
   ----------------------------------------- */
   const handleUpdateEvent = async (id) => {
-    const ref = doc(db, "users", userId, "calendar", "events", id);
+    const ref = doc(db, "users", userId, "calendarEvents", id);
 
     await updateDoc(ref, { title: newEventText.trim() });
 
@@ -100,10 +100,10 @@ export default function Calendar() {
   };
 
   /* ----------------------------------------
-      🔥 일정 삭제
+      🔥 일정 삭제 (수정됨)
   ----------------------------------------- */
   const handleDeleteEvent = async (id) => {
-    const ref = doc(db, "users", userId, "calendar", "events", id);
+    const ref = doc(db, "users", userId, "calendarEvents", id);
 
     await deleteDoc(ref);
 

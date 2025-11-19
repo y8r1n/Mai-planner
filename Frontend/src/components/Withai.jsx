@@ -448,115 +448,137 @@ export default function Withai() {
         </div>
       )}
 
-      {/* 타임라인 */}
-      <div className="withai-timeline">
-        {combinedTimeline.length === 0 ? (
-          <div className="withai-empty">
-            <p>아직 일정이 없어요.</p>
-            <p>AI 버튼 또는 [+ 일정 추가]를 사용해보세요.</p>
-          </div>
-        ) : (
-          combinedTimeline.map((task) => {
-            const status = (() => {
-              const start = dayjs(`${selectedDate} ${safeTime(task.time)}`);
-              const end = dayjs(`${selectedDate} ${safeTime(task.end)}`);
+     {/* 타임라인 */}
+<div className="withai-timeline">
 
-              if (!currentTime.isSame(dayjs(selectedDate), "day")) {
-                return "future";
-              }
-              if (currentTime.isBefore(start)) return "future";
-              if (currentTime.isAfter(end)) return "completed";
-              return "current";
-            })();
+  {/* (1) 기상 */}
+  <div className="withai-item">
+    <button className="withai-circle current" disabled />
+    <div className="withai-content">
+      <h4>{startTask.title}</h4>
+      <div className="withai-time">{safeTime(startTask.time)}</div>
+    </div>
+  </div>
 
-            const circleClass = [
-              "withai-circle",
-              status === "completed" ? "completed" : "",
-              status === "current" ? "current" : "",
-              status === "future" ? "future" : "",
-            ]
-              .filter(Boolean)
-              .join(" ");
+  {/* (2) 일정 리스트 */}
+  {combinedTimeline.length === 0 ? (
+    <div className="withai-empty">
+      <p>등록된 일정이 없습니다.</p>
+      <p>AI 버튼 또는 [+ 일정 추가]를 사용해보세요.</p>
+    </div>
+  ) : (
+    combinedTimeline.map((task) => {
+      const status = (() => {
+        const start = dayjs(`${selectedDate} ${safeTime(task.time)}`);
+        const end = dayjs(`${selectedDate} ${safeTime(task.end)}`);
 
-            const gapAfter = suggestions.find((s) => s.after === task.id);
+        if (!currentTime.isSame(dayjs(selectedDate), "day")) {
+          return "future";
+        }
+        if (currentTime.isBefore(start)) return "future";
+        if (currentTime.isAfter(end)) return "completed";
+        return "current";
+      })();
 
-            return (
-              <React.Fragment key={task.id}>
-                <div className="withai-item">
-                  <button
-                    className={circleClass}
-                    onClick={() => {
-                      if (!task.fromTimetable && !task.fromEvent) {
-                        setIsEditing(true);
-                        setEditId(task.id);
-                        setNewTask({
-                          title: task.title,
-                          time: safeTime(task.time),
-                          end: safeTime(task.end),
-                        });
-                        setShowTaskModal(true);
-                      }
-                    }}
-                    disabled={task.fromTimetable || task.fromEvent}
-                  />
+      const circleClass = [
+        "withai-circle",
+        status === "completed" ? "completed" : "",
+        status === "current" ? "current" : "",
+        status === "future" ? "future" : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
 
-                  <div className="withai-content">
-                    <h4>{task.title}</h4>
-                    <div className="withai-time">
-                      {safeTime(task.time)} ~ {safeTime(task.end)}
-                    </div>
+      const gapAfter = suggestions.find((s) => s.after === task.id);
 
-                    <div style={{ marginTop: 4, fontSize: 12 }}>
-                      {task.fromTimetable && (
-                        <span className="tag timetable">시간표</span>
-                      )}
-                      {task.fromEvent && (
-                        <span className="tag event">캘린더</span>
-                      )}
-                    </div>
+      return (
+        <React.Fragment key={task.id}>
+          <div className="withai-item">
+            <button
+              className={circleClass}
+              onClick={() => {
+                if (!task.fromTimetable && !task.fromEvent) {
+                  setIsEditing(true);
+                  setEditId(task.id);
+                  setNewTask({
+                    title: task.title,
+                    time: safeTime(task.time),
+                    end: safeTime(task.end),
+                  });
+                  setShowTaskModal(true);
+                }
+              }}
+              disabled={task.fromTimetable || task.fromEvent}
+            />
 
-                    {!task.fromTimetable && !task.fromEvent && (
-                      <div className="withai-editbtns">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsEditing(true);
-                            setEditId(task.id);
-                            setNewTask({
-                              title: task.title,
-                              time: safeTime(task.time),
-                              end: safeTime(task.end),
-                            });
-                            setShowTaskModal(true);
-                          }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => deleteTask(task.id)}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
+            <div className="withai-content">
+              <h4>{task.title}</h4>
+              <div className="withai-time">
+                {safeTime(task.time)} ~ {safeTime(task.end)}
+              </div>
 
-                {gapAfter && (
-                  <div
-                    className="gap-suggestion"
-                    style={{
-                      marginLeft: 52,
-                      marginBottom: 16,
-                      fontSize: 12,
-                      color: "#888",
-                    }}
-                  >
-                    {gapAfter.text}
-                  </div>
+              <div style={{ marginTop: 4, fontSize: 12 }}>
+                {task.fromTimetable && (
+                  <span className="tag timetable">시간표</span>
                 )}
-              </React.Fragment>
-            );
-          })
-        )}
-      </div>
+                {task.fromEvent && (
+                  <span className="tag event">캘린더</span>
+                )}
+              </div>
+
+              {!task.fromTimetable && !task.fromEvent && (
+                <div className="withai-editbtns">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditing(true);
+                      setEditId(task.id);
+                      setNewTask({
+                        title: task.title,
+                        time: safeTime(task.time),
+                        end: safeTime(task.end),
+                      });
+                      setShowTaskModal(true);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => deleteTask(task.id)}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {gapAfter && (
+            <div
+              className="gap-suggestion"
+              style={{
+                marginLeft: 52,
+                marginBottom: 16,
+                fontSize: 12,
+                color: "#888",
+              }}
+            >
+              {gapAfter.text}
+            </div>
+          )}
+        </React.Fragment>
+      );
+    })
+  )}
+
+  {/* (3) 하루 마무리 */}
+  <div className="withai-item">
+    <button className="withai-circle future" disabled />
+    <div className="withai-content">
+      <h4>{endTask.title}</h4>
+      <div className="withai-time">{safeTime(endTask.time)}</div>
+    </div>
+  </div>
+
+</div>
+
 
       {/* 일정 추가/수정 모달 */}
       {showTaskModal && (
