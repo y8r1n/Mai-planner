@@ -125,9 +125,8 @@ function safeJsonParse(text) {
   }
 }
 
-
 /* ========================================================================== */
-/* 🤖 WITH AI — AI 일정 자동 생성 (USER 기반 저장 버전) */
+/* 🤖 WITH AI — AI 일정 자동 생성 (calendarEvents 기반) */
 /* ========================================================================== */
 app.post("/api/with-ai/generate", async (req, res) => {
   try {
@@ -152,7 +151,7 @@ app.post("/api/with-ai/generate", async (req, res) => {
       userId,
     });
 
-    /* 🔥 userId 반드시 필요 */
+    /* 🔥 userId 필요 */
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -160,7 +159,6 @@ app.post("/api/with-ai/generate", async (req, res) => {
       });
     }
 
-    /* 🔥 필수값 체크 */
     if (!selectedDate || !startTime || !endTime) {
       return res.status(400).json({
         success: false,
@@ -168,7 +166,9 @@ app.post("/api/with-ai/generate", async (req, res) => {
       });
     }
 
-    /* 프롬프트 구성 */
+    /* ----------------------------
+        프롬프트 구성
+    ----------------------------- */
     const todosText =
       todos.length > 0
         ? todos
@@ -209,7 +209,7 @@ ${timetableText}
 ${eventsText}
 
 --- 요청사항 ---
-최적화된 하루 일정을 JSON ONLY로 출력해줘.
+최적의 하루 일정을 JSON ONLY 로 출력해줘.
 
 형식:
 {
@@ -225,20 +225,22 @@ ${eventsText}
   "summary": "한 줄 요약"
 }
 
-⚠ MUST: JSON만 출력해.
+⚠ MUST: JSON만 출력해야 함.
     `;
 
-    /* 🔥 OpenAI 호출 */
+    /* ----------------------------
+        OpenAI 호출
+    ----------------------------- */
     console.log("🤖 OpenAI 호출 중...");
     const raw = await callOpenAI(prompt, "gpt-4o", false);
 
     const clean = raw.replace(/```json|```/g, "").trim();
-    let aiJson;
 
+    let aiJson;
     try {
       aiJson = JSON.parse(clean);
     } catch (e) {
-      console.log("❌ AI JSON 파싱 실패:", clean);
+      console.log("❌ JSON 파싱 실패:", clean);
       return res.status(500).json({
         success: false,
         error: "AI JSON 파싱 실패",
@@ -247,14 +249,15 @@ ${eventsText}
 
     const schedule = aiJson.schedule || [];
 
-    /* 🔥 DB 저장 (개인 calendar 컬렉션) */
-    const calendarRef = adminDb
-      .collection("users")
-      .doc(userId)
-      .collection("calendar");
+    /* ==========================================================================
+        🔥 저장 위치: calendarEvents (전역 루트 컬렉션)
+        => 프론트가 읽는 컬렉션과 동일하게 맞춤
+    ========================================================================== */
+    const calendarRef = adminDb.collection("calendarEvents");
 
     const saveTasks = schedule.map((item) =>
       calendarRef.add({
+        userId,
         title: item.task,
         time: item.time,
         end: item.end || "",
@@ -268,23 +271,24 @@ ${eventsText}
 
     await Promise.all(saveTasks);
 
-    console.log(`✅ ${saveTasks.length}개 AI 일정 저장 완료`);
+    console.log(`✅ ${saveTasks.length}개 AI 일정 저장 완료 (calendarEvents)`);
 
-    res.json({
+    return res.json({
       success: true,
       schedule,
       summary: aiJson.summary || "",
       totalTasks: saveTasks.length,
     });
   } catch (error) {
-    console.error("❌ WITH AI 오류:", error);
-    res.status(500).json({
+    console.error("❌ WITH AI 생성 오류:", error);
+    return res.status(500).json({
       success: false,
       error: "AI 일정 생성 실패",
       details: error.message,
     });
   }
 });
+
 
 
 
