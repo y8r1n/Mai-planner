@@ -126,62 +126,54 @@ function safeJsonParse(text) {
 }
 
 /* ========================================================================== */
-/* 🤖 WITH AI — 추천 문구 생성 (프론트의 withai recommend용) */
+/* 🤖 WITH AI — 추천 문구 생성 */
 /* ========================================================================== */
 app.post("/api/with-ai/recommend", async (req, res) => {
   try {
-    const { userId, day, subject, mood = "", todos = [] } = req.body;
+    const { userId, day, subject, mood, todos = [] } = req.body;
 
-    if (!userId)
+    if (!userId) {
       return res.status(400).json({
         success: false,
         error: "userId가 필요합니다.",
       });
-
-    const todoText =
-      todos.length > 0
-        ? todos.map((t, i) => `${i + 1}. ${t.title}`).join("\n")
-        : "없음";
+    }
 
     const prompt = `
-🗓 날짜: ${day}
-📌 주제: ${subject}
-🙂 기분: ${mood}
+    날짜: ${day}
+    주제: ${subject}
+    기분: ${mood}
+    할일: ${todos.map((t) => t.title).join(", ") || "없음"}
 
-오늘의 할 일:
-${todoText}
-
-위 정보를 바탕으로,
-"오늘 하루를 잘 보낼 수 있도록 3가지 추천 활동"을 JSON 배열 ONLY로 출력해줘.
-
-형식:
-[
-  { "title": "추천 이름", "description": "설명" },
-  ...
-]
+    아래 형식의 JSON 배열만 반환하세요:
+    [
+      { "title": "추천 제목", "description": "설명" },
+      { "title": "추천 제목", "description": "설명" }
+    ]
     `;
 
-    const result = await callOpenAI(prompt, "gpt-4o-mini", true);
-    const json = safeJsonParse(result);
+    const raw = await callOpenAI(prompt, "gpt-4o-mini", true);
 
-    // Firestore 저장 (옵션)
-    await adminDb
-      .collection("withAI_recommendations")
-      .add({
-        userId,
-        day,
-        subject,
-        mood,
-        recommendations: json,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
+    let list = [];
 
-    res.json({ success: true, recommendations: json });
-  } catch (e) {
-    console.error("❌ recommend 오류:", e);
-    res.json({
+    try {
+      list = JSON.parse(raw);
+    } catch {
+      list = safeJsonParse(raw);
+    }
+
+    // 배열 형태 아니면 강제 변환
+    if (!Array.isArray(list)) list = [];
+
+    return res.json({
+      success: true,
+      recommendations: list,
+    });
+  } catch (error) {
+    console.error("❌ recommend 오류:", error);
+    return res.status(500).json({
       success: false,
-      recommendations: [],
+      error: "AI 추천 생성 실패",
     });
   }
 });
