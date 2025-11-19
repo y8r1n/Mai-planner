@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { quizAI } from "../services/api";
+import { drawAI, quizAI } from "../services/api";
 import { db, auth } from "../services/firebase";
 import { collection, onSnapshot, deleteDoc, doc } from "firebase/firestore";
 import { Trash2, Calendar, Filter, Search, X } from "lucide-react";
@@ -93,7 +93,7 @@ export default function ImageDiary() {
 
     setLoading(true);
     try {
-      await quizAI.post("/generate-image-diary", {
+      await drawAI.post("/generate-image-diary", {
         emotion,
         diaryText: text,
         userId, // ⭐ 진짜 사용자 ID 전달
