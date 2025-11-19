@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { drawAI, quizAI } from "../services/api";
+import { drawAI } from "../services/api";
 import { db, auth } from "../services/firebase";
 import { collection, onSnapshot, deleteDoc, doc } from "firebase/firestore";
 import { Trash2, Calendar, Filter, Search, X } from "lucide-react";
