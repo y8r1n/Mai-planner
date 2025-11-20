@@ -37,6 +37,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "https://mai-planner.vercel.app",
+  "https://mai-planner-22r94993l-y8r1ns-projects.vercel.app", // ← 추가!
 ];
 
 app.use(
@@ -45,6 +46,7 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.log("❌ Blocked by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
@@ -100,7 +102,7 @@ async function callOpenAI(prompt, model = "gpt-4o-mini", jsonMode = false) {
           Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
           "Content-Type": "application/json",
         },
-        timeout: 10000, // 10초 타임아웃 추가 (서버 멈춤 방지)
+        timeout: 30000, // 타임아웃 추가 (서버 멈춤 방지)
       }
     );
 
