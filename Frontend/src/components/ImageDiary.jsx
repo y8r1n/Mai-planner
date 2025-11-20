@@ -41,11 +41,11 @@ export default function ImageDiary() {
       const sorted = filtered.sort((a, b) => {
         const aT = a.createdAt?.seconds
           ? a.createdAt.seconds * 1000
-          : a.createdAt || 0;
+          : a.createdAt || Date.now();
 
         const bT = b.createdAt?.seconds
           ? b.createdAt.seconds * 1000
-          : b.createdAt || 0;
+          : b.createdAt || Date.now();
 
         return bT - aT;
       });

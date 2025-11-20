@@ -130,6 +130,7 @@ function safeJsonParse(text) {
 /* ========================================================================== */
 /* 🤖 WITH AI — 추천 문구 생성 */
 /* ========================================================================== */
+
 app.post("/api/with-ai/recommend", async (req, res) => {
   try {
     const { userId, day, subject, mood, todos = [] } = req.body;
@@ -149,7 +150,6 @@ app.post("/api/with-ai/recommend", async (req, res) => {
 
     아래 형식의 JSON 배열만 반환하세요:
     [
-      { "title": "추천 제목", "description": "설명" },
       { "title": "추천 제목", "description": "설명" }
     ]
     `;
@@ -157,15 +157,25 @@ app.post("/api/with-ai/recommend", async (req, res) => {
     const raw = await callOpenAI(prompt, "gpt-4o-mini", true);
 
     let list = [];
-
     try {
       list = JSON.parse(raw);
     } catch {
       list = safeJsonParse(raw);
     }
 
-    // 배열 형태 아니면 강제 변환
-    if (!Array.isArray(list)) list = [];
+    // ⭐ 중요 → 빈 배열이면 fallback 생성
+    if (!Array.isArray(list) || list.length === 0) {
+      list = [
+        {
+          title: "여유로운 하루 시작",
+          description: "오늘은 가볍게 커피 한잔하며 일정을 천천히 시작해보세요 ☕"
+        },
+        {
+          title: "마음 편한 하루",
+          description: "작은 루틴부터 차근차근. 오늘도 충분히 잘 해낼 수 있어요 🌿"
+        }
+      ];
+    }
 
     return res.json({
       success: true,
@@ -555,7 +565,7 @@ app.post("/api/generate-image-diary", async (req, res) => {
       });
     }
 
-    const cleanEmotion = emotion.replace(/[^\p{Emoji}]/gu, "").trim();
+    const cleanEmotion = emotion;  
 
     // 영어로 변환
     const promptText = await callOpenAI(
