@@ -106,6 +106,9 @@ export default function ReviewDetail() {
         explanation: expList[i]?.explanation || "해설이 없습니다.",
       }));
 
+      console.log("🔥 서버에서 받은 해설:", expList);
+      console.log("🔥 Firestore에 저장될 오답:", updated);
+
       // Firebase 업데이트
       await updateDoc(
         doc(
