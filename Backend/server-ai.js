@@ -490,6 +490,55 @@ app.post("/api/generate-quiz", async (req, res) => {
   }
 });
 
+/* ========================================================================== */
+/* 📖 QUIZ 해설 생성 */
+/* ========================================================================== */
+app.post("/api/generate-explanations", async (req, res) => {
+  const { subjectName, questions = [], userAnswers = [] } = req.body;
+
+  if (!questions.length) {
+    return res.status(400).json({ success: false, error: "문제가 없습니다." });
+  }
+
+  const questionList = questions
+    .map((q, i) => {
+      const my = userAnswers[i] ?? null;
+      return `${i + 1}. ${q.question} (정답: ${String.fromCharCode(
+        65 + q.correctAnswer
+      )}, 내 답: ${my !== null ? String.fromCharCode(65 + my) : "-"})`;
+    })
+    .join("\n");
+
+  const prompt = `
+너는 반드시 JSON 배열만 반환해야 한다.
+
+[
+  {"explanation": "해설 내용"}
+]
+
+오답 목록:
+${questionList}
+
+JSON만 출력!
+`;
+
+  try {
+    let result = await callOpenAI(prompt, "gpt-4o-mini");
+
+    // 혹시 모델이 앞뒤에 쓸데없는 텍스트를 붙이면 JSON 부분만 잘라내기
+    const jsonStart = result.indexOf("[");
+    const jsonEnd = result.lastIndexOf("]") + 1;
+    result = result.slice(jsonStart, jsonEnd);
+
+    const json = JSON.parse(result);
+
+    res.json({ success: true, explanations: json });
+  } catch (e) {
+    console.error("❌ generate-explanations 오류:", e.response?.data || e.message);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 
 
 /* ========================================================================== */
