@@ -1,0 +1,107 @@
+/* ========================================
+   📱 SUBJECT HEADER (공통 서브 헤더)
+======================================== */
+
+.subject-header {
+  position: sticky;
+  top: 60px;  /* global-nav 높이만큼 밀기 */
+  display: grid;
+  grid-template-columns: 60px 1fr 60px;
+  align-items: center;
+  padding: var(--space-lg) var(--space-xl);
+  background: var(--color-background-alt);
+  border-bottom: 2px solid var(--color-border-lighter);
+  z-index: var(--z-sticky);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.subject-back-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--color-primary);
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.subject-back-btn:hover {
+  background: var(--color-primary-lighter);
+  border-color: var(--color-primary);
+  transform: scale(1.1);
+  box-shadow: var(--shadow-md);
+}
+
+.subject-header-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  text-align: center;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subject-header-spacer {
+  width: 44px;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 768px) {
+  .subject-header {
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .subject-header-title {
+    font-size: var(--font-size-lg);
+
+  }
+
+  .subject-back-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .subject-header {
+    padding: var(--space-md);
+    grid-template-columns: 50px 1fr 50px;
+  }
+
+  .subject-header-title {
+    font-size: var(--font-size-md);
+  }
+
+  .subject-back-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.3rem;
+  }
+
+  .subject-header-spacer {
+    width: 36px;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+.subject-back-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}

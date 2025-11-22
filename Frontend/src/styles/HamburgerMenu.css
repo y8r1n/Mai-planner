@@ -351,4 +351,111 @@
 ======================================== */
 @media (prefers-color-scheme: dark) {
   /* 다크 모드 스타일을 여기에 추가할 수 있습니다 */
+}/* ========================================
+   🌙 HAMBURGER MENU - 다크모드
+======================================== */
+
+[data-theme="dark"] .menu-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="dark"] .hamburger-menu {
+  background: #1e1e1e;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .menu-header {
+  border-bottom-color: #333;
+}
+
+[data-theme="dark"] .close-btn {
+  color: #808080;
+}
+
+[data-theme="dark"] .close-btn:hover {
+  background: #252525;
+  color: #888;
+}
+
+[data-theme="dark"] .menu-profile {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  border-bottom-color: #333;
+}
+
+[data-theme="dark"] .profile-avatar {
+  border-color: #555;
+}
+
+[data-theme="dark"] .avatar-placeholder {
+  background: linear-gradient(135deg, #666 0%, #555 100%);
+}
+
+[data-theme="dark"] .profile-info h3 {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .profile-info p {
+  color: #808080;
+}
+
+[data-theme="dark"] .profile-login svg {
+  color: #505050;
+}
+
+[data-theme="dark"] .login-btn {
+  background: linear-gradient(135deg, #666 0%, #555 100%);
+}
+
+[data-theme="dark"] .login-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .nav-section-title {
+  color: #505050;
+}
+
+[data-theme="dark"] .nav-item {
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .nav-item::before {
+  background: #888;
+}
+
+[data-theme="dark"] .nav-item:hover {
+  background: #252525;
+  color: #888;
+}
+
+[data-theme="dark"] .nav-arrow {
+  color: #505050;
+}
+
+[data-theme="dark"] .nav-item:hover .nav-arrow {
+  color: #888;
+}
+
+[data-theme="dark"] .menu-footer {
+  border-top-color: #333;
+}
+
+[data-theme="dark"] .logout-btn {
+  background: #2a2a2a;
+  color: #d88888;
+}
+
+[data-theme="dark"] .logout-btn:hover {
+  background: rgba(216, 136, 136, 0.15);
+}
+
+[data-theme="dark"] .hamburger-menu::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+[data-theme="dark"] .hamburger-menu::-webkit-scrollbar-thumb {
+  background: #404040;
+}
+
+[data-theme="dark"] .hamburger-menu::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

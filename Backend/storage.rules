@@ -1,12 +1,18 @@
 rules_version = '2';
 
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
+    
+    // 🎨 이미지 다이어리 - 공개 읽기 허용
+    match /imageDiary/{userId}/{allPaths=**} {
+      allow read: if true;  // 누구나 이미지 볼 수 있음 (공개 URL)
+      allow write: if request.auth != null && request.auth.uid == userId;  // 본인만 업로드 가능
+    }
+    
+    // 📂 기타 모든 파일 - 인증된 사용자만
     match /{allPaths=**} {
-      allow read, write: if false;
+      allow read: if request.auth != null;   // 로그인한 사용자만 읽기
+      allow write: if request.auth != null;  // 로그인한 사용자만 쓰기
     }
   }
 }

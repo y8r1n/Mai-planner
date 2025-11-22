@@ -163,19 +163,25 @@ export default function HamburgerMenu({ isOpen, onClose }) {
           <div className="nav-section">
             <div className="nav-section-title">설정</div>
 
-            <button className="nav-item">
+            <button className="nav-item" onClick={() => handleNavigate("/settings")}>
+              <Settings size={20} />
+              <span>전체 설정</span>
+              <ChevronRight size={18} />
+            </button>
+
+            <button className="nav-item" onClick={() => handleNavigate("/settings/ai")}>
               <Settings size={20} />
               <span>AI 설정</span>
               <ChevronRight size={18} />
             </button>
 
-            <button className="nav-item">
+            <button className="nav-item" onClick={() => handleNavigate("/settings/notifications")}>
               <Bell size={20} />
               <span>알림 설정</span>
               <ChevronRight size={18} />
             </button>
 
-            <button className="nav-item">
+            <button className="nav-item" onClick={() => handleNavigate("/settings/dnd")}>
               <Moon size={20} />
               <span>방해금지 시간</span>
               <ChevronRight size={18} />

@@ -96,25 +96,19 @@ export default function School() {
   /* ------------------------------
      ✔ 시간표 좌표 계산
   -------------------------------- */
-  const topPx = (t) => {
-    const [h, m] = t.split(":").map(Number);
-    const base = h - 9;
-    return base * 64 + (m / 60) * 64;
-  };
-
-  const heightPx = (start, end) => {
-    const [sh, sm] = start.split(":");
-    const [eh, em] = end.split(":");
-    const diff = (eh + em / 60) - (sh + sm / 60);
-    return diff * 64;
-  };
+   const topPx = (t) => (parseInt(t.split(":")[0], 10) - 9) * 64;
+  const heightPx = (s, e) =>
+    (parseInt(e.split(":")[0], 10) - parseInt(s.split(":")[0], 10)) * 64 || 48;
 
   const maxHour =
-    subjects.length > 0
-      ? Math.max(...subjects.map((s) => Number(s.end.split(":")[0]))) + 1
-      : 16;
+  subjects.length > 0
+    ? Math.max(
+        18,
+        Math.max(...subjects.map((s) => parseInt(s.end.split(":")[0], 10))) + 1
+      )
+    : 18;
 
-  const timeSlots = Array.from({ length: maxHour - 9 }, (_, i) => `${i + 9}:00`);
+  const timeSlots = Array.from({ length: maxHour - 9 }, (_, i) => `${9 + i}:00`);
 
   return (
     <div id="school-page">

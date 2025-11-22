@@ -1,54 +1,53 @@
-//  server-ai.js
 /* ========================================================================== */
 /* 📦 Imports */
 /* ========================================================================== */
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import axios from "axios";
 import fs from "fs";
-import detect from "detect-port";
 import FormData from "form-data";
 import admin from "firebase-admin";
+import { extraPdfText } from "./extrapdfText.js";
 
 /* ========================================================================== */
 /* 🔐 Load Firebase Admin Secret */
 /* ========================================================================== */
+const isRender = process.env.RENDER === "true";
 
-// 🔥 Render Secret Files 경로
-const serviceAccountPath = "/etc/secrets/serviceAccountKey.json";
+const serviceAccountPath = isRender
+  ? "/etc/secrets/serviceAccountKey.json"
+  : "./serviceAccountKey.json";
 
 if (!fs.existsSync(serviceAccountPath)) {
-  console.error("❌ serviceAccountKey.json 파일이 존재하지 않습니다!");
+  console.error("❌ serviceAccountKey.json 파일 없음:", serviceAccountPath);
   process.exit(1);
 }
 
-const serviceAccount = JSON.parse(
-  fs.readFileSync(serviceAccountPath, "utf8")
-);
-
+const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
 
 /* ========================================================================== */
 /* 🚀 Express Init */
 /* ========================================================================== */
 const app = express();
 
-// CORS 설정 (안정화)
 const allowedOrigins = [
   "http://localhost:5173",
   "https://mai-planner.vercel.app",
-  "https://mai-planner-22r94993l-y8r1ns-projects.vercel.app", // ← 추가!
+  "https://mai-planner.onrender.com",
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log("❌ Blocked by CORS:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      )
+        return callback(null, true);
+      return callback(new Error("Blocked by CORS: " + origin));
     },
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -56,13 +55,17 @@ app.use(
   })
 );
 
-// 🔥 Express5 / path-to-regexp 호환되는 OPTIONS 패턴
-app.options(/.*/, cors());
+// Preflight allow-all
+app.options(/.*/, (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  return res.sendStatus(200);
+});
 
-// 🔥 JSON Body 파서
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
-
 
 /* ========================================================================== */
 /* 🔥 Firebase Admin Init */
@@ -76,7 +79,6 @@ if (!admin.apps.length) {
 
 const adminDb = admin.firestore();
 const bucket = admin.storage().bucket();
-
 
 /* ========================================================================== */
 /* 🧠 공통 OpenAI Request Handler (안정화 버전) */
@@ -112,6 +114,7 @@ async function callOpenAI(prompt, model = "gpt-4o-mini", jsonMode = false) {
     throw new Error("OpenAI 요청 실패 (callOpenAI)");
   }
 }
+
 
 
 /* ========================================================================== */
@@ -423,14 +426,22 @@ app.post("/api/mentor-chat/message", async (req, res) => {
 /* 📘 Mentor Summary */
 /* ========================================================================== */
 app.post("/api/mentor-ai/summary", async (req, res) => {
-  const { subjectName, weekTitle } = req.body;
+  const { content } = req.body;  // ✅ 프론트가 실제로 보내는 필드
 
-  const prompt = `"${subjectName}" / "${weekTitle}" 요약해줘 (3문단 이하)`;
+  if (!content || !content.trim()) {
+    return res.status(400).json({ 
+      success: false, 
+      error: "요약할 내용이 없습니다." 
+    });
+  }
+
+  const prompt = `다음 내용을 3문단 이하로 요약해줘:\n\n${content}`;
 
   try {
-    const summary = await callOpenAI(prompt);
-
-    res.json({ success: true, summary });
+    const result = await callOpenAI(prompt);
+    
+    // ✅ 프론트가 기대하는 응답 형식: res.data.result
+    res.json({ success: true, result });
   } catch (e) {
     console.error("❌ 요약 오류:", e);
     res.status(500).json({ success: false, error: e.message });
@@ -456,170 +467,64 @@ app.post("/api/mentor-ai/generate-summary", async (req, res) => {
 
 
 /* ========================================================================== */
-/* 🧩 Quiz 생성 — 안정화 버전 */
+/* 🧠 Quiz 생성 + 해설 포함 (file + summary + notes 기반) */
 /* ========================================================================== */
-app.post("/api/generate-quiz", async (req, res) => {
-  const { subjectName, count = 5 } = req.body;
 
-  const prompt = `
-  "${subjectName}" 과목의 객관식 ${count}문제를 JSON 배열 ONLY 로 생성해줘.
-  형식:
-  [
-    {
-      "question": "...",
-      "options": ["..."],
-      "answer": 0
-    }
-  ]
-  반드시 JSON 배열만 출력해야 함.
-  `;
+app.post("/api/quiz/generate", async (req, res) => {
+  const { pdfUrls = [], summary = "", notes = "", count = 5 } = req.body;
 
-  try {
-    const raw = await callOpenAI(prompt);
+  console.log("📡 QUIZ REQUEST:", { pdfUrls });
 
-    // JSON 부분만 추출
-    const first = raw.indexOf("[");
-    const last = raw.lastIndexOf("]") + 1;
-
-    if (first === -1 || last === -1) {
-      throw new Error("JSON 배열을 찾을 수 없음");
-    }
-
-    const jsonText = raw.slice(first, last);
-
-    let questions = JSON.parse(jsonText);
-
-    if (!Array.isArray(questions)) {
-      throw new Error("퀴즈 형식 오류");
-    }
-
-    res.json({ success: true, questions });
-  } catch (e) {
-    console.error("❌ quiz 오류:", e);
-    res.status(500).json({ success: false, error: e.message });
-  }
-});
-
-/* ========================================================================== */
-/* 📖 QUIZ 해설 생성 */
-/* ========================================================================== */
-app.post("/api/generate-explanations", async (req, res) => {
-  const { subjectName, questions = [], userAnswers = [] } = req.body;
-
-  if (!questions.length) {
-    return res.status(400).json({ success: false, error: "문제가 없습니다." });
+  let fileText = "";
+  for (const url of pdfUrls) {
+    fileText += "\n\n" + (await extraPdfText(url));
   }
 
-  const questionList = questions
-    .map((q, i) => {
-      const my = userAnswers[i] ?? null;
-      return `${i + 1}. ${q.question} (정답: ${String.fromCharCode(
-        65 + q.correctAnswer
-      )}, 내 답: ${my !== null ? String.fromCharCode(65 + my) : "-"})`;
-    })
-    .join("\n");
+  console.log("📄 총 텍스트 길이:", fileText.length);
 
+  // 🔥 최소 데이터 검증
+  if (!fileText.trim() && !summary.trim() && !notes.trim()) {
+    return res.status(400).json({
+      success: false,
+      error: "학습 데이터가 없습니다.",
+    });
+  }
+
+  // ==========================
+  // 🎯 문제 생성 프롬프트 구성
+  // ==========================
   const prompt = `
-너는 반드시 JSON 배열만 반환해야 한다.
+다음 내용을 기반으로 ${count}개의 객관식 문제와 정답, 해설을 생성해줘.
 
+반드시 JSON 배열형태로 다음 구조로만 출력:
 [
-  {"explanation": "해설 내용"}
+ { "question": "...", "options": ["보기1","보기2","보기3","보기4"], "answer": "보기1", "explanation": "왜 이 답인지 상세히" }
 ]
 
-오답 목록:
-${questionList}
+📌 교안 내용:
+${fileText.substring(0, 7000)}
 
-JSON만 출력!
+📌 요약:
+${summary}
+
+📌 메모:
+${notes}
 `;
 
   try {
-    let result = await callOpenAI(prompt, "gpt-4o-mini");
+    const raw = await callOpenAI(prompt, "gpt-4o", true);
+    const quiz = safeJsonParse(raw);
 
-    // 혹시 모델이 앞뒤에 쓸데없는 텍스트를 붙이면 JSON 부분만 잘라내기
-    const jsonStart = result.indexOf("[");
-    const jsonEnd = result.lastIndexOf("]") + 1;
-    result = result.slice(jsonStart, jsonEnd);
+    console.log("🎉 생성된 quiz:", quiz);
 
-    const json = JSON.parse(result);
-
-    res.json({ success: true, explanations: json });
-  } catch (e) {
-    console.error("❌ generate-explanations 오류:", e.response?.data || e.message);
-    res.status(500).json({ success: false, error: e.message });
-  }
-});
-
-
-
-/* ========================================================================== */
-/* 🎨 이미지 다이어리 (USER 기반 저장 버전) — 최신 안정화 버전 */
-/* ========================================================================== */
-app.post("/api/generate-image-diary", async (req, res) => {
-  const { emotion, diaryText, userId } = req.body;
-
-  try {
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        error: "userId가 필요합니다.",
-      });
-    }
-
-    const cleanEmotion = emotion;  
-
-    // 영어로 변환
-    const promptText = await callOpenAI(
-      `Convert to English prompt:
-      Emotion: "${cleanEmotion}"
-      Diary: "${diaryText}"
-      Only English description.`
-    );
-
-    // Stability 새로운 엔드포인트
-    const form = new FormData();
-    form.append("prompt", promptText);
-    form.append("aspect_ratio", "1:1");
-    form.append("output_format", "png");
-
-    const imgRes = await axios.post(
-      "https://api.stability.ai/v2beta/stable-image/generate/ultra",
-      form,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.STABILITY_KEY}`,
-          ...form.getHeaders(),
-        },
-        responseType: "arraybuffer",
-      }
-    );
-
-    const buffer = Buffer.from(imgRes.data);
-    const fileName = `imageDiary/${userId}/${Date.now()}.png`;
-
-    // Firebase Storage Upload
-    const file = bucket.file(fileName);
-    await file.save(buffer, { contentType: "image/png" });
-
-    const [url] = await file.getSignedUrl({
-      action: "read",
-      expires: "2030-01-01",
+    return res.json({
+      success: true,
+      quiz
     });
 
-    await adminDb
-      .collection("users")
-      .doc(userId)
-      .collection("imageDiary")
-      .add({
-        emotion: cleanEmotion,
-        diaryText,
-        imageUrl: url,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-
-    res.json({ success: true, imageUrl: url });
   } catch (e) {
-    console.error("❌ 이미지 생성 오류:", e?.response?.data || e);
-    res.status(500).json({
+    console.error("❌ quiz 생성 오류:", e);
+    return res.status(500).json({
       success: false,
       error: e.message,
     });
@@ -627,25 +532,296 @@ app.post("/api/generate-image-diary", async (req, res) => {
 });
 
 
-
 /* ========================================================================== */
-/* 🩺 Health Check */
+/* 🎨 이미지 생성 API - JSON 응답 처리 버전 */
+/* Backend/server-ai.js의 /api/generate-image-diary 교체 */
+/* ========================================================================== */
+
+app.post("/api/generate-image-diary", async (req, res) => {
+  const { emotion, diaryText, userId } = req.body;
+
+  console.log("🎨 이미지 생성 시작:", { emotion, diaryText: diaryText.substring(0, 50), userId });
+
+  if (!process.env.OPENAI_API_KEY || !process.env.STABILITY_KEY) {
+    return res.status(500).json({ success: false, error: "API 키 누락" });
+  }
+
+  try {
+    if (!userId) {
+      return res.status(400).json({ success: false, error: "userId 필요" });
+    }
+
+    const cleanEmotion = emotion;
+
+    // 영어 프롬프트 생성
+    const promptText = await callOpenAI(
+      `Create a detailed, vivid image description in English:
+      
+      Emotion: "${cleanEmotion}"
+      Diary: "${diaryText}"
+      
+      Requirements:
+      - Describe a beautiful, artistic scene
+      - Include setting, colors, lighting, mood, atmosphere
+      - Make it visually rich and detailed
+      - 2-3 sentences minimum
+      - Only return the description, no quotes
+      
+      Example: "A serene park bathed in golden afternoon sunlight, with lush green trees swaying gently. A person walks peacefully along a winding path, surrounded by colorful flowers and singing birds."`
+    );
+
+    console.log("🌐 영어 프롬프트 생성 완료:", promptText.substring(0, 100));
+
+    // Stability AI 요청
+    const form = new FormData();
+    form.append("prompt", promptText);
+    form.append("aspect_ratio", "1:1");
+    form.append("output_format", "png");
+
+    console.log("📡 Stability AI 요청 시작 (core 모델)...");
+
+    const imgRes = await axios.post(
+      "https://api.stability.ai/v2beta/stable-image/generate/core",
+      form,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.STABILITY_KEY}`,
+          Accept: "image/*, application/json",  // ⭐ Accept 헤더 추가
+          ...form.getHeaders(),
+        },
+        responseType: "arraybuffer",
+        timeout: 60000,
+      }
+    );
+
+    console.log("✅ Stability AI 응답 받음");
+    console.log("  - Content-Type:", imgRes.headers['content-type']);
+    console.log("  - 데이터 크기:", imgRes.data.byteLength);
+
+    let buffer;
+
+    // ⭐⭐⭐ Content-Type에 따라 처리 분기 ⭐⭐⭐
+    const contentType = imgRes.headers['content-type'];
+
+    if (contentType.includes('application/json')) {
+      // JSON 응답 (Base64 인코딩된 이미지)
+      console.log("📦 JSON 응답 처리 중...");
+      
+      const jsonData = JSON.parse(imgRes.data.toString('utf-8'));
+      console.log("  - JSON 키:", Object.keys(jsonData));
+
+      if (jsonData.image) {
+        // Base64 디코드
+        buffer = Buffer.from(jsonData.image, 'base64');
+        console.log("  - Base64 디코드 완료, 크기:", buffer.length);
+      } else if (jsonData.artifacts && jsonData.artifacts[0]) {
+        // artifacts 배열에서 추출
+        buffer = Buffer.from(jsonData.artifacts[0].base64, 'base64');
+        console.log("  - artifacts에서 추출 완료, 크기:", buffer.length);
+      } else {
+        throw new Error("JSON에서 이미지 데이터를 찾을 수 없습니다");
+      }
+    } else {
+      // 직접 이미지 데이터
+      console.log("📦 직접 이미지 데이터 처리 중...");
+      buffer = Buffer.from(imgRes.data, 'binary');
+    }
+
+    console.log("📦 Buffer 생성 완료");
+    console.log("  - Buffer 길이:", buffer.length);
+    console.log("  - Buffer 시작 바이트:", buffer.slice(0, 8).toString('hex'));
+
+    // PNG 시그니처 확인 (89 50 4E 47)
+    const isPNG = buffer[0] === 0x89 && 
+                  buffer[1] === 0x50 && 
+                  buffer[2] === 0x4E && 
+                  buffer[3] === 0x47;
+
+    console.log("  - PNG 시그니처 확인:", isPNG ? "✅" : "❌");
+
+    if (!isPNG) {
+      console.error("❌ PNG 시그니처 불일치!");
+      console.error("  - 실제:", buffer.slice(0, 4).toString('hex'));
+      throw new Error("Invalid PNG signature");
+    }
+
+    if (buffer.length === 0) {
+      throw new Error("Empty image buffer");
+    }
+
+    const timestamp = Date.now();
+    const fileName = `imageDiary/${userId}/${timestamp}.png`;
+
+    console.log("📁 저장 경로:", fileName);
+
+    // Firebase Storage 업로드
+    const file = bucket.file(fileName);
+    await file.save(buffer, {
+      contentType: "image/png",
+      metadata: {
+        cacheControl: "public, max-age=31536000",
+      }
+    });
+
+    console.log("☁️ Firebase Storage 업로드 완료:", fileName);
+
+    // 업로드 검증
+    const [uploadedMetadata] = await file.getMetadata();
+    console.log("✅ 업로드 검증:");
+    console.log("  - 크기:", uploadedMetadata.size);
+    console.log("  - Content-Type:", uploadedMetadata.contentType);
+
+    // 공개 URL 생성
+    const directUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+    
+    const [signedUrl] = await file.getSignedUrl({
+      action: "read",
+      expires: "2030-01-01",
+    });
+
+    console.log("🔗 URL 생성 완료");
+
+    // Firestore에 저장
+    await adminDb
+      .collection("users")
+      .doc(userId)
+      .collection("imageDiary")
+      .add({
+        emotion: cleanEmotion,
+        diaryText,
+        imageUrl: directUrl,
+        signedUrl: signedUrl,
+        storagePath: fileName,
+        filename: `${timestamp}.png`,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+    console.log("🎉 이미지 생성 완료!");
+
+    res.json({
+      success: true,
+      imageUrl: directUrl,
+      filename: `${timestamp}.png`,
+      storagePath: fileName
+    });
+
+  } catch (e) {
+    console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.error("❌ 이미지 생성 오류!");
+    console.error("  - 메시지:", e.message);
+    console.error("  - 스택:", e.stack);
+    
+    if (e?.response?.data) {
+      try {
+        const errorText = Buffer.isBuffer(e.response.data) 
+          ? e.response.data.toString('utf-8')
+          : e.response.data;
+        console.error("  - API 응답:", errorText);
+      } catch {}
+    }
+    console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+
+    res.status(500).json({
+      success: false,
+      error: e.message || "이미지 생성 실패"
+    });
+  }
+});
+/* ========================================================================== */
+/* 🖼️ 이미지 프록시 - 최종 수정 버전 */
+/* Backend/server-ai.js의 /api/image 프록시를 이것으로 교체 */
+/* ========================================================================== */
+
+// OPTIONS 요청 처리
+app.options("/api/image/:userId/:filename", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.status(204).send();
+});
+
+app.get("/api/image/:userId/:filename", async (req, res) => {
+  const { userId, filename } = req.params;
+  
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  console.log("🖼️ 이미지 프록시 요청");
+  console.log("  - userId:", userId);
+  console.log("  - filename:", filename);
+  
+  try {
+    const filePath = `imageDiary/${userId}/${filename}`;
+    console.log("  - filePath:", filePath);
+    
+    const file = bucket.file(filePath);
+    
+    // 파일 존재 확인
+    const [exists] = await file.exists();
+    if (!exists) {
+      console.error("❌ 파일 없음:", filePath);
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      return res.status(404).json({ error: "Image not found" });
+    }
+    
+    console.log("✅ 파일 존재 확인");
+    
+    // 파일 메타데이터
+    const [metadata] = await file.getMetadata();
+    console.log("  - contentType:", metadata.contentType);
+    console.log("  - size:", metadata.size);
+    
+    // 파일 다운로드
+    console.log("📥 파일 다운로드 시작...");
+    const [buffer] = await file.download();
+    console.log("  - 다운로드 크기:", buffer.length, "bytes");
+    
+    if (buffer.length === 0) {
+      console.error("❌ 빈 버퍼!");
+      return res.status(500).send("Empty buffer");
+    }
+    
+    // ⭐⭐⭐ 헤더 설정 (순서 중요!) ⭐⭐⭐
+    res.writeHead(200, {
+      'Content-Type': 'image/png',
+      'Content-Length': buffer.length,
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET',
+      'Cache-Control': 'public, max-age=31536000',
+      'X-Content-Type-Options': 'nosniff'
+    });
+    
+    // Buffer 전송
+    res.end(buffer, 'binary');
+    
+    console.log("✅ 이미지 전송 완료!");
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    
+  } catch (e) {
+    console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.error("❌ 이미지 프록시 오류:");
+    console.error("  - 에러:", e.message);
+    console.error("  - 스택:", e.stack);
+    console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    
+    if (!res.headersSent) {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.status(500).send("Internal server error");
+    }
+  }
+});
+/* ========================================================================== */
+/* 🩺 Health */
 /* ========================================================================== */
 app.get("/", (req, res) => {
   res.json({ status: "OK", message: "Mai-planner backend running" });
 });
-
 app.get("/api/health", (req, res) => {
-  res.status(200).json({ ok: true });
+  res.json({ ok: true });
 });
 
-
 /* ========================================================================== */
-/* 🚀 Start Server */
+/* 🚀 Start */
 /* ========================================================================== */
-
 const port = process.env.PORT || 4003;
-
 app.listen(port, "0.0.0.0", () => {
-  console.log(`🚀 서버 실행됨 (Render) → 포트: ${port}`);
+  console.log(`🚀 서버 실행됨 → 포트 ${port}`);
 });

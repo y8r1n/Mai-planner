@@ -1,235 +1,366 @@
-#📚 Mai-Planner — AI 기반 학습 플래너 웹앱
+<div align="center">
+<img width="120" src=""> <br/> <h1>📘 Mai Better Life — MAI Planner</h1> <p><b>AI 기반 일정 · 학습 · 감정 기록 · 라이프스타일 관리 플랫폼</b></p> <p>WithAI 일정 추천 · MentorChat · 주차별 학습 관리 · 이미지 일기 · 시간 패턴 분석</p> <br/> </div>
 
-대학생의 학습 루틴을 돕기 위해 기획된 AI 학습 플래너
-일정 추천, 요약, 챗봇, 이미지 기반 다이어리, 시간표 관리 등
-학습과 감정 기록을 동시에 지원하는 AI Productivity Web App입니다.
+<br/> <h3>✨ 프로젝트 한눈에 보기<h3/>
 
-🔗 배포 URL: https://mai-planner.vercel.app/
-🔗 백엔드 API URL:https://mai-planner.onrender.com
+일상을 더 똑똑하게, 더 나답게.<br/>
+<br/>
+AI를 활용해 “공부 · 일정 · 감정 · 시각화 · 루틴”을
+<br/>
+<br/>한 곳에서 관리하도록 설계한 All-in-One Life Planner.
 
-#👩🏻‍💻 제작 목적 (Project Goal)
-실제 대학생 학습 상황에 유용한 AI 학습 도구(MVP) 개발
-공모전 출품 → 기능성 + 실사용성 + 확장성을 중심으로 설계
-UI/UX 흐름, 데이터 구조, AI 자동화 기능 강조
+<br/> 
 
-#22Z team 
-김재이: 아이디어 구상, 프론트엔드 개발, 테스팅, 문서 작성
-이예린: 백엔드, 프론트엔드 개발, UI/UX 디자인(Figma), 배포 작업
+## 📸 Preview 
 
-#✨ 주요 기능 (Key Features)
-🔥 AI 기반 기능
+<br/>
 
-AI 일정 추천 — 하루의 기분·과목 기반으로 일정 3가지 자동 추천
+## 📄 Documentation
 
-AI 멘토 챗봇 — 과목별 대화형 학습 도움
+<details>
+<summary><b> 📕All-in-One 문서 폴더 (전체 자료 모음)</b></summary>
+<br>
 
-AI 학습 요약 — 주차별 학습 내용을 AI가 3문단으로 요약
+보완자료 + 기술문서 + 시연자료 + Figma + 이미지 + 제출물  
+모든 산출물을 하나로 통합한 전체 폴더입니다.
 
-AI 객관식 퀴즈 생성 — 과목 기반 문제 자동 생성
+🔗 **전체 문서(ALL Docs)**  
+https://drive.google.com/drive/folders/12k4O1Cgb8CNY689bGvlXK6s9ERUfigss?usp=drive_link
 
-AI 퀴즈 해설 — 틀린 문제에 대해 JSON 기반 해설 생성
+</details>
 
-AI 이미지 다이어리 — 감정 + 일기 → 이미지 생성 후 Firebase Storage 저장
+<br/>
 
-📅 학습 관리 기능
+## <h3>🧩 1. 프로젝트 개요 (Overview)</h3>
 
-시간표 기능 — 요일·시간 기반 블록형 UI, 수정·삭제·모달 UI
+Mai Planner는 대학생의 실제 학습 상황을 기반으로 설계된
+AI 기반 개인 일정/학습 관리 플랫폼입니다.
 
-주차별 관리 — 주차 생성, 콘텐츠 추가, 파일 업로드
+사용자는 다음과 같은 기능을 사용할 수 있습니다:
 
-알림(Notification) — 과목별 알림 저장 및 표시
+하루 목표에 맞춘 AI 일정 추천
 
-전체 UI 아이패드 4:3 기준 디자인 적용
+주차별 학습 정리 + AI 요약/설명
 
-#🏛 기술 스택 (Tech Stack)
+감정 기반 이미지 일기 생성
 
-**Frontend**
+시간/루틴 패턴 분석
+
+사용자 커리어 관리(확장 예정)
+
+## <h3>🎯 1-2. 제작 목적 (Project Goal)</h3>
+
+대학생 학습 환경에 필요한 AI 기반 학습 도구(MVP) 제작
+
+공모전 제출을 위한 기능성 + 실사용성 + UX 중심 구조 설계
+
+AI의 자동화 기능을 적극 활용한 사용자 경험 개선
+
+## <h3>🎛️ 2. 핵심 기능 (Features) </h3>
+🔹 1) WithAI — 일정 추천
+
+날짜 / 과목 / 기분 입력 → AI가 현실적인 활동 3개 추천
+
+Firestore에 자동 저장해 히스토리 관리
+
+🔹 2) MentorChat — 주차별 학습 챗봇
+
+수업 내용을 입력하면 요약/설명/문답 지원
+
+GPT-4o 기반 실시간 대화
+
+Firestore 실시간 반영(onSnapshot)
+
+주차별 AI 피드백 기록
+
+🔹 3) MentorAI — 핵심 요약
+
+복잡한 텍스트를 핵심으로 자동 요약
+
+어려운 개념을 쉬운 언어로 재설명
+
+🔹 4) Image Diary — 감정 기반 이미지 일기
+
+“오늘의 기분 + 메시지” → Stability + OpenAI로 이미지 생성
+
+Firebase Storage에 자동 업로드 후 URL 저장
+
+감성 기반 하루 기록
+
+🔹 5) SUBJECT — 주차별 학습 관리
+
+과목 → 주차 생성 → 이미지/메모 업로드
+
+Firebase Storage 저장
+
+주차 전체 삭제(deleteWeekCompletely)
+
+연습문제집 & 해설 제공 플로우
+
+🔹 6) Visualization — 시간 패턴 분석
+
+하루/주간 시간 사용 패턴 시각화
+
+공부/휴식/루틴 분포 파악에 도움
+
+개인화 추천 기능으로 확장 예정
+
+🔹 7) Career — 자격증/목표 관리 (확장 예정)
+
+자격증 일정 및 루틴 관리
+
+목표 달성률 기반 추천 기능 계획
+
+##  <h3>🏗️ 3. 기술 스택 (Tech Stack)</h3>
+
+>Frontend
+
 React 19
+
 Vite 5
+
+TailwindCSS
+
 React Router
-TailwindCSS 4
+
 Lucide Icons
 
-**Backend**
+Framer Motion
+
+Firebase Auth
+
+Axios
+
+>Backend
+
 Node.js (Express)
+
 Firebase Admin SDK
-Firebase Firestore (Client + Admin)
-Stability.ai API
-OpenAI GPT-4o-mini
-Deploy
 
-#배포
-Frontend → Vercel
-Backend → Render (Web Service)
-Storage → Firebase Storage
+Firestore(Admin + Client)
 
-#📸 스크린샷 (Screenshots)
+Stability AI API
 
-#🛠 프로젝트 구조 (Project Structure)
-ai-planner/
-├─ Frontend/
-│  ├─ components/
-│  ├─ contexts/
-│  ├─ services/
-│  └─ styles/
-├─ Backend/
-│  ├─ firebase.json/
-│  ├─ server-ai.js/
-│  ├─ firebaserc/
-│  └─ package.json/
-├─ public/
-├─ vercel.json
-└─ README.md
+GPT-4o / GPT-4o-mini
 
-#🚀 실행 방법 (How to Run)
-▶ 1. 📦 프론트엔드 실행 (Vite)
+Database / Storage
+
+Firestore
+
+Firebase Storage
+
+>DevOps
+
+Frontend: Vercel
+
+Backend: Render
+
+CDN: Firebase Storage
+
+## <h3>📂 4. 디렉토리 구조 (Project Structure)</h3>
+
+````
+mai-planner/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Home/
+│   │   │   ├── WithAI/
+│   │   │   ├── Subject/
+│   │   │   ├── MentorChat/
+│   │   │   ├── ImageDiary/
+│   │   │   └── Common/
+│   │   ├── contexts/
+│   │   ├── services/
+│   │   ├── hooks/
+│   │   ├── styles/
+│   │   └── App.jsx
+│   ├── public/
+│   └── vite.config.js
+│
+└── backend/
+    ├── routes/
+    │   ├── with-ai.js
+    │   ├── mentor-ai.js
+    │   ├── mentor-chat.js
+    │   └── diary.js
+    ├── config/
+    │   └── firebase.js
+    ├── services/
+    │   ├── openai.js
+    │   └── stability.js
+    ├── server.js
+    └── package.json
+````
+
+
+## <h3>🚀 5. 실행 방법 (How to Run)</h3>
+
+## Frontend
+
+
+```
 npm install
 npm run dev
 
-혹은 
-
-npm run build 
-npm run dev 
-
-로컬 주소:
-http://localhost:4173
-
-#▶ 2. 🔥 백엔드(Node.js Express) 실행
-
-.env 준비:
-OPENAI_API_KEY=...
-STABILITY_KEY=...
-FIREBASE_API_KEY=...
-FIREBASE_AUTH_DOMAIN=...
-FIREBASE_PROJECT_ID=...
-FIREBASE_STORAGE_BUCKET=...
-FIREBASE_MSG_ID=...
-FIREBASE_APP_ID=...
-**Admin key는 Render Secret에 업로드**
+http://localhost:5173
+```
 
 
-설치 및 실행:
+
+## Backend
+
+.env 필요:
+
+
+```
+OPENAI_API_KEY=
+STABILITY_KEY=
+FIREBASE_API_KEY=
+FIREBASE_AUTH_DOMAIN=
+FIREBASE_PROJECT_ID=
+FIREBASE_STORAGE_BUCKET=
+FIREBASE_MSG_ID=
+FIREBASE_APP_ID=
+```
+
+
+관리자 키는 Render Secret 사용
+
+```
 npm install
-node server-api.js
+node server.js
+```
 
-로컬 주소
-http://localhost:4003
 
-#🌐 배포 방법 (Deploy Guide)
-🔵 Frontend (Vercel)
-1) Vercel → New Project
-2) GitHub Repo 연결
-3) Framework: Vite
-4) Build Command: vite build
-5) Output: dist
-6) Environment Variables 입력
-7) Deploy
+## <h3>🌐 6. 배포 (Deployment)</h3>
 
-🟣 Backend (Render)
-1) Render → New → Web Service
-2) Build Command: npm install
-3) Start Command: node server-api.js
-4) Environment Variables 입력
-5) Auto Deploy 활성화
-6) Keep Alive 필요 없음 (무료 플랜은 sleep 모드)
 
-#🔒 보안 정책 (Security)
-serviceAccountKey.json → GitHub에 절대 업로드 ❌
-모든 API KEY는 .env 또는 Render Secret에서 관리
-서버는 CORS 정책으로 Vercel URL만 허용
+## Frontend – Vercel
 
+Framework: Vite
 
-📸 스크린샷 (Screenshots)
+Build: vite build
 
-> Home Tab 
-사용자의 일정을 등록시 볼 수 있는 화면 
+Output: dist
 
+Env 등록
 
-<img width="1481" height="1403" alt="스크린샷 2025-11-18 141032" src="https://github.com/user-attachments/assets/2fcc7cc1-cc57-4e83-8b07-73edc0dda131" />
+Deploy
 
+## Backend – Render
 
-*-Todo list
+Build: npm install
 
+Start: node server.js
 
-<img width="1755" height="1398" alt="스크린샷 2025-11-18 141201" src="https://github.com/user-attachments/assets/6af6896c-ef80-4673-a077-a068d0aef83d" />
+Env 등록
 
-*-timetable 
+Auto Deploy on
 
+Sleep Mode OK
+<br/>
 
+## <h3>🔒 7. 보안 정책 (Security)</h3>
 
-<img width="1835" height="1368" alt="스크린샷 2025-11-18 141220" src="https://github.com/user-attachments/assets/08a9ea66-ff21-44ac-a9b7-a39698f64e46" />
-<img width="1509" height="1363" alt="스크린샷 2025-11-18 141225" src="https://github.com/user-attachments/assets/8bca3182-e082-4191-85fa-9b049c7a820d" />
+serviceAccountKey.json → 절대 GitHub에 업로드 금지
 
+모든 KEY는 .env 또는 Render Secret
 
+CORS = Vercel URL만 허용
 
-*-calender
+## <h1>🤝 8. Team 22Z </h1>
+👥 Team Members
 
+### 👩🏻‍💻 김재이 (Frontend Developer / Product Planner)
+Github: https://github.com/jkimj
 
+Email: jkimj2004@naver.com
 
-<img width="1462" height="1365" alt="스크린샷 2025-11-18 141236" src="https://github.com/user-attachments/assets/2ef299d3-be31-464a-8da7-8f4a194e401c" />
-<img width="1489" height="1360" alt="스크린샷 2025-11-18 141243" src="https://github.com/user-attachments/assets/6114bac6-6099-494b-bef4-ad254b1fe8df" />
+<details>
+<summary> <b> Roles & Contributions </b> </summary>
 
+Frontend Development
 
+React UI 구성 (Login page, Alarm page)
 
+Lucide icon 전체 페이지 스타일링 및 개선 
 
+사용자 플로우 테스트 및 UI 디테일 조정
 
+AI 서버 디테일 수정, 연동 작업 
 
+모바일·PC 반응형 적용
 
+Product Planning
 
+프로젝트 전체 아이디어 및 기능 기획
 
+서비스 구조도, 스토리보드 작성
 
-> With AI
-상단의 ✨ 버튼 누를 시 AI 추천 타임라인 일정 생성
+User Scenario 제작 및 기능 검증
 
+Documentation & QA
 
+기술 문서/기획 문서 제작
 
-<img width="1486" height="1360" alt="스크린샷 2025-11-18 141253" src="https://github.com/user-attachments/assets/67fba359-6f50-4ae8-9d6e-a2e67a77b83d" />
-<img width="2099" height="1351" alt="스크린샷 2025-11-18 160842" src="https://github.com/user-attachments/assets/44eb36de-debe-45dc-b55c-172dd4f08e23" />
-<img width="2160" height="1348" alt="스크린샷 2025-11-18 160902" src="https://github.com/user-attachments/assets/1c54f15c-28dc-4625-8c91-bb745144fb09" />
-<img width="2132" height="1330" alt="스크린샷 2025-11-18 160853" src="https://github.com/user-attachments/assets/84ed776b-4577-436b-984e-156d51fcdb4e" />
+테스트 케이스 작성 및 품질 검증
 
+제출 자료 정리
 
+</details>
 
 
+### 👩🏻‍💻 이예린 (Full-Stack Developer / AI Integration)
+Github: https://github.com/y8r1n
 
+Email: yesrin14@gmail.com
 
+<details>
+<summary> <b> Roles & Contributions </b></summary>
 
-> Subject
-채팅봇과 연습문제집&해설 제공, 본인이 등록한 과목으로 복습 가능
+Backend Development
 
+Node.js + Express 기반 서버 구축
 
+Firebase Admin SDK 연동
 
-<img width="1360" height="1370" alt="스크린샷 2025-11-18 141308" src="https://github.com/user-attachments/assets/bcdd9e03-36d5-406c-8e25-69b4db933ff4" />
-<img width="570" height="1356" alt="스크린샷 2025-11-18 141646" src="https://github.com/user-attachments/assets/784d4ca1-a5b2-4e7b-9b76-9fc73554decc" />
-<img width="578" height="1349" alt="스크린샷 2025-11-18 141407" src="https://github.com/user-attachments/assets/8727243f-477c-4e69-803d-5464f8e284e9" />
-<img width="573" height="1353" alt="스크린샷 2025-11-18 141333" src="https://github.com/user-attachments/assets/7f98f311-2729-4725-b3e0-01a8d65c5493" />
-<img width="570" height="1363" alt="스크린샷 2025-11-18 141321" src="https://github.com/user-attachments/assets/b3301e0b-6f31-460a-a9a3-3266f9d2e37d" />
+AI API(OpenAI, Stability) 통합
 
+서버 라우트(with-ai, mentor-ai, diary 등) 설계 및 구현
 
-*-연습문제집 플로우 
+데이터 모델링(Firestore 구조 설계)
 
-<img width="1100" height="1340" alt="스크린샷 2025-11-18 162153" src="https://github.com/user-attachments/assets/4eac0825-2ac3-4116-8da6-49b859088a76" />
-<img width="1087" height="1347" alt="스크린샷 2025-11-18 162204" src="https://github.com/user-attachments/assets/60cd1acd-46f5-4d71-a5e2-dbc53556cec2" />
-<img width="1091" height="1317" alt="스크린샷 2025-11-18 162213" src="https://github.com/user-attachments/assets/1f156cf3-036a-4fa8-b2eb-13bba83b1f0e" />
-<img width="1100" height="1332" alt="스크린샷 2025-11-18 162237" src="https://github.com/user-attachments/assets/58b1f4d7-53ee-4409-b50d-95194825d68c" />
+Frontend Development
 
+React 기반 UI 컴포넌트 구축
 
+TailwindCSS 스타일링 및 UX 개선
 
+MentorChat / WithAI / Subject / ImageDiary 주요 기능 구현
 
+실시간 데이터 연동(onSnapshot)
 
+AI & System Integration
 
+GPT-4o/4o-mini 모델 활용 자동 요약·추천 서비스 구축
 
+이미지 생성 파이프라인 설계
 
-> ImageDiary
-오늘의 기분과 간단한 메시지로 이미지 일기 생성
+Core Feature AI-Flow 개발 (MentorAI, WithAI 로직 등)
 
-<img width="2547" height="1363" alt="스크린샷 2025-11-18 141657" src="https://github.com/user-attachments/assets/93ee3020-4a07-4ee1-917b-241c9e411ddb" />
+Deployment
 
+Vercel(Frontend) / Render(Backend) 배포
 
+.env / 시크릿 관리 및 보안 구성
 
+CORS 안정성 설정 및 최적화
 
+UI/UX & Product Design
 
+Figma 기반 전체 화면 설계
 
-
+</details>
 
 

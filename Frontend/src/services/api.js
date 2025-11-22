@@ -28,7 +28,7 @@ export const mentorChat = axios.create({
 
 // 🧩 퀴즈 생성 + 해설
 export const quizAI = axios.create({
-  baseURL: `${BASE_URL}/api`,
+  baseURL: `${BASE_URL}`,
 });
 
 // 🎨 이미지 생성

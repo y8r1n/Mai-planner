@@ -81,7 +81,7 @@ export default function Alarm() {
         {/* 헤더 */}
         <div className="alarm-header">
           <h1 className="alarm-title">
-            <Bell size={32} strokeWidth={2.5} />
+            <Bell size={30} strokeWidth={2.5} />
             알림
           </h1>
 

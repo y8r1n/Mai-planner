@@ -1,4 +1,4 @@
-// src/components/Withai.jsx
+// src/components/WithAI.jsx
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
@@ -20,7 +20,7 @@ import {
 import { db, auth } from "../services/firebase";
 import { withAI } from "../services/api";
 
-import { Sparkles, AlertCircle } from "lucide-react";
+import { Sparkles, AlertCircle, ListTodo, Calendar as CalendarIcon } from "lucide-react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 dayjs.locale("ko");
@@ -64,10 +64,11 @@ export default function Withai() {
   /* ----------------------------
       STATE
   ----------------------------- */
-  const [timeline, setTimeline] = useState([]);      // 순수 타임라인 일정
-  const [todos, setTodos] = useState([]);
+  const [timeline, setTimeline] = useState([]);
+  const [dailyTodos, setDailyTodos] = useState([]);
+  const [generalTodos, setGeneralTodos] = useState([]);
   const [timetable, setTimetable] = useState([]);
-  const [events, setEvents] = useState([]);          // fromEvent 등 외부/AI 일정
+  const [events, setEvents] = useState([]);
 
   const [suggestions, setSuggestions] = useState([]);
   const [aiPlan, setAiPlan] = useState(null);
@@ -84,7 +85,7 @@ export default function Withai() {
     title: "",
     time: "",
     end: "",
-    category: "",        // preset key 또는 "custom" 또는 ""
+    category: "",
     customCategory: "",
   });
   const [isEditing, setIsEditing] = useState(false);
@@ -92,6 +93,8 @@ export default function Withai() {
 
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  const [showTodoModal, setShowTodoModal] = useState(false);
 
   const [startTask, setStartTask] = useState({ title: "기상", time: "07:00" });
   const [endTask, setEndTask] = useState({
@@ -141,21 +144,38 @@ export default function Withai() {
   }, []);
 
   /* ----------------------------
-      Todos 구독
+      Daily Todos 구독
   ----------------------------- */
   useEffect(() => {
-    const qTodos = query(
+    const qDailyTodos = query(
       collection(db, "users", userId, "todos", selectedDate, "tasks"),
       orderBy("createdAt", "desc")
     );
 
-    const unsub = onSnapshot(qTodos, (snap) => {
+    const unsub = onSnapshot(qDailyTodos, (snap) => {
       const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setTodos(data.filter((t) => !t.completed));
+      setDailyTodos(data.filter((t) => !t.completed));
     });
 
     return () => unsub();
   }, [selectedDate, userId]);
+
+  /* ----------------------------
+      General Todos 구독
+  ----------------------------- */
+  useEffect(() => {
+    const qGeneralTodos = query(
+      collection(db, "users", userId, "todos", "general", "tasks"),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsub = onSnapshot(qGeneralTodos, (snap) => {
+      const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setGeneralTodos(data.filter((t) => !t.completed));
+    });
+
+    return () => unsub();
+  }, [userId]);
 
   /* ----------------------------
       Timetable 구독
@@ -186,12 +206,10 @@ export default function Withai() {
     const unsub = onSnapshot(q, (snap) => {
       const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-      // 순수 타임라인 (직접 + AI 일정) : fromTimetable/fromEvent 없는 애들
       const pureTimeline = data.filter(
         (e) => !e.fromTimetable && !e.fromEvent
       );
 
-      // 외부/연동/AI 전용 이벤트 (fromEvent === true 등)
       const externalEvents = data.filter((e) => e.fromEvent);
 
       setTimeline(pureTimeline);
@@ -205,10 +223,8 @@ export default function Withai() {
       Combined Timeline
   ----------------------------- */
   const combinedTimeline = useMemo(() => {
-    // 1) 순수 타임라인 복사
     const base = timeline.map((t) => ({ ...t }));
 
-    // 2) 주간 시간표
     timetable.forEach((t) =>
       base.push({
         id: `tt-${t.id}`,
@@ -219,7 +235,6 @@ export default function Withai() {
       })
     );
 
-    // 3) 외부/AI 이벤트 (fromEvent)
     events.forEach((e) =>
       base.push({
         ...e,
@@ -271,12 +286,11 @@ export default function Withai() {
   }, [combinedTimeline, selectedDate, startTask, endTask]);
 
   /* ----------------------------
-      일정 저장 / 수정 (+중복 방지 & 카테고리)
+      일정 저장 / 수정
   ----------------------------- */
   const saveTask = async () => {
     if (!newTask.title.trim()) return;
 
-    // 카테고리 해석
     const preset = CATEGORY_PRESETS.find(
       (c) => c.key === newTask.category
     );
@@ -313,10 +327,8 @@ export default function Withai() {
 
     try {
       if (isEditing && editId) {
-        // 수정
         await updateDoc(fsDoc(db, "calendarEvents", editId), data);
       } else {
-        // 추가 - 중복 방지 (같은 날짜 + 같은 시간 + 같은 제목)
         const dupQ = query(
           collection(db, "calendarEvents"),
           where("userId", "==", userId),
@@ -362,6 +374,22 @@ export default function Withai() {
   };
 
   /* ----------------------------
+      TODO → 일정 추가 함수
+  ----------------------------- */
+  const addTodoToSchedule = async (todo, suggestedTime = "") => {
+    setNewTask({
+      title: todo.title,
+      time: suggestedTime || "",
+      end: "",
+      category: "",
+      customCategory: "",
+    });
+    setIsEditing(false);
+    setShowTodoModal(false);
+    setShowTaskModal(true);
+  };
+
+  /* ----------------------------
       AI 추천 문구 fetch
   ----------------------------- */
   useEffect(() => {
@@ -372,18 +400,19 @@ export default function Withai() {
       aiFetching.current = true;
 
       try {
+        const allTodos = [...dailyTodos, ...generalTodos];
+        
         const res = await withAI.post("/recommend", {
           userId,
           day: selectedDate,
           subject: "오늘 일정",
           mood: "보통",
-          todos,
+          todos: allTodos,
         });
 
-        if (res.data?.success) {
-          const plan = res.data.recommendations
-            .map((r) => `🌸 ${r.title}\n${r.description}`)
-            .join("\n\n");
+        if (res.data?.success && res.data.recommendations?.length > 0) {
+          const first = res.data.recommendations[0];
+          const plan = `${first.title}\n${first.description}`;
           setAiPlan(plan);
         } else setAiPlan("오늘은 가볍게 보내보세요 ☕");
       } catch (e) {
@@ -397,7 +426,7 @@ export default function Withai() {
     };
 
     fetchPlan();
-  }, [selectedDate, userId, todos]);
+  }, [selectedDate, userId, dailyTodos, generalTodos]);
 
   /* ----------------------------
       AI 일정 생성
@@ -417,12 +446,14 @@ export default function Withai() {
       const oldDocs = await getDocs(qOld);
       await Promise.all(oldDocs.docs.map((d) => deleteDoc(d.ref)));
 
+      const allTodos = [...dailyTodos, ...generalTodos];
+
       await withAI.post("/generate", {
         userId,
         selectedDate,
         startTime: startTask.time,
         endTime: endTask.time,
-        todos,
+        todos: allTodos,
         timetable,
         events,
       });
@@ -455,15 +486,14 @@ export default function Withai() {
 
       {/* TOP BAR */}
       <div className="withai-topbar">
-        {/* AI 설정 */}
         <button
           className="withai-playbtn"
           onClick={() => setShowSettingsModal(true)}
+          title="AI 일정 생성"
         >
           <Sparkles size={22} />
         </button>
 
-        {/* 날짜 */}
         <button
           className="withai-date"
           onClick={() => setShowDropdown((p) => !p)}
@@ -471,7 +501,15 @@ export default function Withai() {
           {dayjs(selectedDate).format("M월 D일 (ddd)")}
         </button>
 
-        {/* 일정추가 */}
+        <button
+          className="withai-addbtn"
+          onClick={() => setShowTodoModal(true)}
+          title="TODO에서 일정 추가"
+          style={{ marginRight: '8px' }}
+        >
+          <ListTodo size={16} /> TODO
+        </button>
+
         <button
           className="withai-addbtn"
           onClick={() => {
@@ -489,7 +527,6 @@ export default function Withai() {
           + 일정 추가
         </button>
 
-        {/* 날짜 드롭다운 */}
         <div className={`withai-dropdown ${showDropdown ? "open" : ""}`}>
           {dateList.map((d) => (
             <p
@@ -505,7 +542,6 @@ export default function Withai() {
         </div>
       </div>
 
-      {/* ERROR */}
       {error && (
         <div className="withai-error-message">
           <AlertCircle size={16} />
@@ -513,17 +549,24 @@ export default function Withai() {
         </div>
       )}
 
-      {/* AI 추천 카드 */}
       {aiPlan && (
         <div className="withai-aiplan-card">
-          <h3>오늘의 AI 추천</h3>
+          <div className="aiplan-header">
+            <h3>오늘의 AI 추천</h3>
+            <button
+              className="aiplan-delete-btn"
+              onClick={() => setAiPlan(null)}
+              title="삭제"
+            >
+              ✕
+            </button>
+          </div>
           <p>{aiPlan}</p>
         </div>
       )}
 
       {/* TIMELINE */}
       <div className="withai-timeline">
-        {/* =============== 기상 =============== */}
         {(() => {
           const start = dayjs(`${selectedDate} ${safeTime(startTask.time)}`);
 
@@ -546,7 +589,6 @@ export default function Withai() {
           );
         })()}
 
-        {/* =============== 일정 리스트 =============== */}
         {combinedTimeline.length === 0 ? (
           <div className="withai-empty">
             <p>등록된 일정이 없습니다.</p>
@@ -554,7 +596,6 @@ export default function Withai() {
           </div>
         ) : (
           combinedTimeline.map((task) => {
-            // 시간 상태 계산
             const status = (() => {
               const s = dayjs(`${selectedDate} ${safeTime(task.time)}`);
               const e = dayjs(`${selectedDate} ${safeTime(task.end)}`);
@@ -567,16 +608,12 @@ export default function Withai() {
             })();
 
             const cls = ["withai-circle", status].join(" ");
-
-            // 갭 메시지
             const gap = suggestions.find((s) => s.after === task.id);
-
             const editable = !task.fromTimetable && !task.fromEvent;
 
             return (
               <React.Fragment key={task.id}>
                 <div className="withai-item">
-                  {/* 동그라미 */}
                   <button
                     className={cls}
                     disabled={!editable}
@@ -610,14 +647,12 @@ export default function Withai() {
                     }}
                   />
 
-                  {/* 내용 */}
                   <div className="withai-content">
                     <h4>{task.title}</h4>
                     <div className="withai-time">
                       {safeTime(task.time)} ~ {safeTime(task.end)}
                     </div>
 
-                    {/* 태그/카테고리 영역 */}
                     <div style={{ marginTop: 4, fontSize: 12 }}>
                       {task.fromTimetable && (
                         <span className="tag timetable">시간표</span>
@@ -635,7 +670,6 @@ export default function Withai() {
                       )}
                     </div>
 
-                    {/* ✏️ 수정 / 🗑 삭제 버튼 — 호버시 나타남 */}
                     {editable && (
                       <div className="withai-editbtns">
                         <button
@@ -676,7 +710,6 @@ export default function Withai() {
                   </div>
                 </div>
 
-                {/* 갭 메시지 */}
                 {gap && (
                   <div
                     className="gap-suggestion"
@@ -695,7 +728,6 @@ export default function Withai() {
           })
         )}
 
-        {/* =============== 하루 마무리 =============== */}
         {(() => {
           const end = dayjs(`${selectedDate} ${safeTime(endTask.time)}`);
 
@@ -719,7 +751,138 @@ export default function Withai() {
         })()}
       </div>
 
-      {/* =============== 일정 추가/수정 모달 =============== */}
+      {/* TODO 선택 모달 */}
+      {showTodoModal && (
+        <div
+          className="withai-task-modal"
+          onClick={() => setShowTodoModal(false)}
+        >
+          <div
+            className="withai-task-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxHeight: '70vh', overflowY: 'auto' }}
+          >
+            <div className="withai-task-header">
+              <h3>📝 TODO에서 일정 추가</h3>
+              <button
+                className="modal-close-btn"
+                type="button"
+                onClick={() => setShowTodoModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <h4 style={{ 
+                fontSize: '0.95rem', 
+                color: 'var(--color-primary)', 
+                marginBottom: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <CalendarIcon size={16} />
+                오늘의 할 일 ({dailyTodos.length})
+              </h4>
+              
+              {dailyTodos.length === 0 ? (
+                <p style={{ 
+                  fontSize: '0.85rem', 
+                  color: 'var(--color-text-disabled)',
+                  textAlign: 'center',
+                  padding: '16px'
+                }}>
+                  오늘의 TODO가 없습니다
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {dailyTodos.map((todo) => (
+                    <div
+                      key={todo.id}
+                      onClick={() => addTodoToSchedule(todo)}
+                      style={{
+                        padding: '12px 16px',
+                        background: 'var(--color-surface-hover)',
+                        border: '1.5px solid var(--color-border)',
+                        borderRadius: 'var(--radius-md)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        fontSize: '0.9rem'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'var(--color-primary-lighter)';
+                        e.currentTarget.style.borderColor = 'var(--color-primary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'var(--color-surface-hover)';
+                        e.currentTarget.style.borderColor = 'var(--color-border)';
+                      }}
+                    >
+                      {todo.title}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <h4 style={{ 
+                fontSize: '0.95rem', 
+                color: 'var(--color-secondary)', 
+                marginBottom: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <ListTodo size={16} />
+                언제든 할 일 ({generalTodos.length})
+              </h4>
+              
+              {generalTodos.length === 0 ? (
+                <p style={{ 
+                  fontSize: '0.85rem', 
+                  color: 'var(--color-text-disabled)',
+                  textAlign: 'center',
+                  padding: '16px'
+                }}>
+                  일반 TODO가 없습니다
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {generalTodos.map((todo) => (
+                    <div
+                      key={todo.id}
+                      onClick={() => addTodoToSchedule(todo)}
+                      style={{
+                        padding: '12px 16px',
+                        background: 'var(--color-surface-hover)',
+                        border: '1.5px solid var(--color-secondary-light)',
+                        borderRadius: 'var(--radius-md)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        fontSize: '0.9rem'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(247, 173, 192, 0.2)';
+                        e.currentTarget.style.borderColor = 'var(--color-secondary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'var(--color-surface-hover)';
+                        e.currentTarget.style.borderColor = 'var(--color-secondary-light)';
+                      }}
+                    >
+                      {todo.title}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 일정 추가/수정 모달 */}
       {showTaskModal && (
         <div
           className="withai-task-modal"
@@ -743,6 +906,16 @@ export default function Withai() {
                   setIsEditing(false);
                   setEditId(null);
                 }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  fontSize: '1.2rem',
+                  cursor: 'pointer',
+                  color: 'var(--color-text-tertiary)',
+                  transition: 'color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
+                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-tertiary)'}
               >
                 ✕
               </button>
@@ -785,7 +958,6 @@ export default function Withai() {
                 </div>
               </div>
 
-              {/* 카테고리 */}
               <div className="withai-task-group">
                 <label className="withai-task-label">카테고리</label>
 
@@ -853,7 +1025,7 @@ export default function Withai() {
         </div>
       )}
 
-      {/* =============== AI 설정 모달 =============== */}
+      {/* AI 설정 모달 */}
       {showSettingsModal && (
         <div
           className="withai-settings-modal"
@@ -897,8 +1069,13 @@ export default function Withai() {
                 <h4>사용할 데이터 요약</h4>
 
                 <div className="withai-data-item">
-                  <span className="withai-data-label">Todo</span>
-                  <span className="withai-data-value">{todos.length}개</span>
+                  <span className="withai-data-label">오늘의 TODO</span>
+                  <span className="withai-data-value">{dailyTodos.length}개</span>
+                </div>
+
+                <div className="withai-data-item">
+                  <span className="withai-data-label">일반 TODO</span>
+                  <span className="withai-data-value">{generalTodos.length}개</span>
                 </div>
 
                 <div className="withai-data-item">

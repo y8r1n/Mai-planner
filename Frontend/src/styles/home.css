@@ -1,5 +1,5 @@
 /* ===========================
-   📍 HOME TAB - Refactored
+   🏠 HOME TAB - Refactored
 =========================== */
 
 #home-container {
@@ -33,84 +33,182 @@
   margin-bottom: var(--space-lg);
 }
 
-/* Divider */
-.divider {
-  border: none;
-  height: 2px;
-  background: linear-gradient(to right, 
-    transparent 0%, 
-    var(--color-border) 50%, 
-    transparent 100%
-  );
-  margin: var(--space-lg) 0;
-  opacity: 0.6;
+/* ========================================
+   🎯 UNIFIED TODO SECTION (통합 TODO)
+======================================== */
+#unified-todo-section {
+  width: 92%;
+  max-width: var(--container-max-width);
+  margin: 0 auto var(--space-2xl);
 }
 
-/* ========================================
-   HOME CARD BASE
-======================================== */
-.home-card {
+/* 통합 TODO 카드 */
+.unified-todo-card {
   background: var(--color-surface);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
   box-shadow: var(--shadow-md);
   transition: all var(--transition-base);
   cursor: pointer;
 }
 
-.home-card:hover {
+.unified-todo-card:hover {
   background: var(--color-surface-hover);
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
 
-.home-card p,
-.home-card span {
-  color: var(--color-text-primary);
-  font-size: var(--font-size-base);
-  line-height: 1.6;
+/* TODO 서브섹션 (Daily / AnyTime) */
+.todo-subsection {
+  margin-bottom: var(--space-lg);
 }
 
-/* ========================================
-   🩷 TODO SECTION
-======================================== */
-#todo-section .todo-empty {
-  text-align: center;
-  color: var(--color-text-disabled);
-  font-size: var(--font-size-base);
-  padding: var(--space-xl);
+.todo-subsection:last-child {
+  margin-bottom: 0;
 }
 
+/* 서브섹션 제목 */
+.subsection-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.subsection-title::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  background: var(--color-primary);
+  border-radius: 2px;
+}
+
+.todo-subsection:last-child .subsection-title::before {
+  background: var(--color-secondary);
+}
+
+/* TODO 아이템 그룹 */
+.todo-items-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* TODO 아이템 */
 .todo-item {
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  padding: var(--space-md) 0;
-  border-bottom: 1px solid var(--color-border-lighter);
+  padding: var(--space-sm) 0;
   transition: all var(--transition-fast);
-}
-
-.todo-item:last-child {
-  border-bottom: none;
 }
 
 .todo-item:hover {
   padding-left: var(--space-sm);
 }
 
+/* TODO Dot */
 .todo-dot {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  border: 2.5px solid var(--color-primary);
   flex-shrink: 0;
   transition: all var(--transition-fast);
 }
 
+.todo-dot.daily {
+  border: 2.5px solid var(--color-primary);
+  background: transparent;
+}
+
+.todo-dot.anytime {
+  border: 2.5px solid var(--color-secondary);
+  background: transparent;
+}
+
 .todo-item:hover .todo-dot {
-  transform: scale(1.15);
+  transform: scale(1.2);
+}
+
+.todo-item:hover .todo-dot.daily {
+  background: var(--color-primary);
   border-color: var(--color-primary-dark);
+}
+
+.todo-item:hover .todo-dot.anytime {
+  background: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+
+/* TODO More */
+.todo-more {
+  margin-top: var(--space-sm);
+  padding: var(--space-xs) var(--space-md);
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-weight-medium);
+  background: var(--color-background);
+  border-radius: var(--radius-md);
+}
+
+/* 서브섹션 빈 상태 */
+.subsection-empty {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-disabled);
+  text-align: center;
+  padding: var(--space-md) 0;
+  font-style: italic;
+}
+
+/* TODO 구분선 */
+.todo-divider {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--color-border-lighter) 20%,
+    var(--color-border-lighter) 80%,
+    transparent 100%
+  );
+  margin: var(--space-xl) 0;
+  position: relative;
+}
+
+.todo-divider::after {
+  content: '•';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-surface);
+  padding: 0 var(--space-sm);
+  color: var(--color-border);
+  font-size: 8px;
+}
+
+.unified-todo-card:hover .todo-divider::after {
+  background: var(--color-surface-hover);
+}
+
+/* 통합 TODO 빈 상태 */
+.unified-todo-empty {
+  text-align: center;
+  background: var(--color-background);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3xl) var(--space-xl);
+  color: var(--color-text-disabled);
+}
+
+.unified-todo-empty p {
+  margin-bottom: var(--space-lg);
 }
 
 .todo-btn {
@@ -123,8 +221,8 @@
   font-size: var(--font-size-base);
   cursor: pointer;
   transition: all var(--transition-base);
-  margin-top: var(--space-lg);
   width: 100%;
+  max-width: 280px;
 }
 
 .todo-btn:hover {
@@ -383,6 +481,14 @@
   #home-container {
     padding: calc(var(--navbar-height) + var(--space-lg)) var(--space-md) var(--space-2xl);
   }
+
+  .unified-todo-card {
+    padding: var(--space-lg);
+  }
+
+  .todo-divider {
+    margin: var(--space-lg) 0;
+  }
   
   .timetable-grid {
     gap: var(--space-sm);
@@ -402,6 +508,23 @@
 @media (max-width: 480px) {
   #home-container h2 {
     font-size: var(--font-size-md);
+  }
+
+  .unified-todo-card {
+    padding: var(--space-md);
+  }
+
+  .subsection-title {
+    font-size: var(--font-size-xs);
+  }
+
+  .todo-item {
+    font-size: var(--font-size-sm);
+  }
+
+  .todo-dot {
+    width: 10px;
+    height: 10px;
   }
   
   .timetable-box,
@@ -441,9 +564,270 @@
 /* ========================================
    ♿ ACCESSIBILITY
 ======================================== */
-.home-card:focus-visible,
+.unified-todo-card:focus-visible,
 .timetable-box:focus-visible,
 .calendar-box:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
+}
+/* ========================================
+   🌙 DARK MODE
+======================================== */
+[data-theme="dark"] .home-page {
+  background: #121212;
+}
+
+[data-theme="dark"] .home-header {
+  background: #1e1e1e;
+  border-bottom-color: #333;
+}
+
+[data-theme="dark"] .header-greeting h2 {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .header-greeting p {
+  color: #808080;
+}
+
+[data-theme="dark"] .hamburger-button {
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .hamburger-button:hover {
+  background: #252525;
+  color: #888;
+}
+
+[data-theme="dark"] .home-container {
+  background: #1a1a1a;
+}
+
+[data-theme="dark"] .home-section-title {
+  color: #808080;
+}
+
+[data-theme="dark"] .quick-actions {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+[data-theme="dark"] .quick-action-item {
+  background: #252525;
+  border-color: #333;
+}
+
+[data-theme="dark"] .quick-action-item:hover {
+  background: #2a2a2a;
+  border-color: #555;
+}
+
+[data-theme="dark"] .quick-action-item:active {
+  background: #333;
+}
+
+[data-theme="dark"] .quick-action-label {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .todo-summary {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+[data-theme="dark"] .todo-stats {
+  color: #808080;
+}
+
+[data-theme="dark"] .stat-number {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .calendar-preview {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+[data-theme="dark"] .calendar-header h4 {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .calendar-month {
+  color: #808080;
+}
+
+[data-theme="dark"] .calendar-grid {
+  border-color: #333;
+}
+
+[data-theme="dark"] .calendar-day {
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .calendar-day:hover {
+  background: #252525;
+}
+
+[data-theme="dark"] .calendar-day.today {
+  background: #2a2a2a;
+  color: #888;
+  border-color: #666;
+}
+
+[data-theme="dark"] .calendar-day.has-event::after {
+  background: #666;
+}
+
+[data-theme="dark"] .upcoming-card {
+  background: #1e1e1e;
+  border-left-color: #666;
+}
+
+[data-theme="dark"] .upcoming-time {
+  color: #808080;
+}
+
+[data-theme="dark"] .upcoming-title {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .upcoming-subject {
+  color: #808080;
+}
+
+[data-theme="dark"] .empty-state {
+  color: #505050;
+}
+
+[data-theme="dark"] .ai-suggestion {
+  background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+  border-color: #444;
+}
+
+[data-theme="dark"] .ai-suggestion-header h4 {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .ai-suggestion-content {
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .ai-action-btn {
+  background: #2a2a2a;
+  color: #888;
+}
+
+[data-theme="dark"] .ai-action-btn:hover {
+  background: #333;
+  color: #999;
+}
+/* ========================================
+   🌙 HOME - School 미리보기 과목 무채색
+======================================== */
+
+/* Home 화면의 School 미리보기 과목 블록들 */
+[data-theme="dark"] .home-page .school-subject,
+[data-theme="dark"] .timetable-preview .school-subject,
+[data-theme="dark"] .schedule-preview .school-subject {
+  background: linear-gradient(135deg, #4a4a4a 0%, #555 100%) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* 여러 색상으로 구분 */
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+1),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+1) {
+  background: linear-gradient(135deg, #4a4a4a 0%, #555 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+2),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+2) {
+  background: linear-gradient(135deg, #5a5a5a 0%, #666 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+3),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+3) {
+  background: linear-gradient(135deg, #505050 0%, #5d5d5d 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+4),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+4) {
+  background: linear-gradient(135deg, #454545 0%, #525252 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+5),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+5) {
+  background: linear-gradient(135deg, #555555 0%, #626262 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+6),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+6) {
+  background: linear-gradient(135deg, #4d4d4d 0%, #595959 100%) !important;
+}
+
+/* 과목 텍스트 밝게 */
+[data-theme="dark"] .home-page .school-subject-title,
+[data-theme="dark"] .timetable-preview .school-subject-title {
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .home-page .school-subject-room,
+[data-theme="dark"] .timetable-preview .school-subject-room {
+  color: #d0d0d0;
+}
+EOF
+cat /mnt/user-data/outputs/home-school-preview-fix.css
+출력
+
+/* ========================================
+   🌙 HOME - School 미리보기 과목 무채색
+======================================== */
+
+/* Home 화면의 School 미리보기 과목 블록들 */
+[data-theme="dark"] .home-page .school-subject,
+[data-theme="dark"] .timetable-preview .school-subject,
+[data-theme="dark"] .schedule-preview .school-subject {
+  background: linear-gradient(135deg, #4a4a4a 0%, #555 100%) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* 여러 색상으로 구분 */
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+1),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+1) {
+  background: linear-gradient(135deg, #4a4a4a 0%, #555 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+2),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+2) {
+  background: linear-gradient(135deg, #5a5a5a 0%, #666 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+3),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+3) {
+  background: linear-gradient(135deg, #505050 0%, #5d5d5d 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+4),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+4) {
+  background: linear-gradient(135deg, #454545 0%, #525252 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+5),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+5) {
+  background: linear-gradient(135deg, #555555 0%, #626262 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+6),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+6) {
+  background: linear-gradient(135deg, #4d4d4d 0%, #595959 100%) !important;
+}
+
+/* 과목 텍스트 밝게 */
+[data-theme="dark"] .home-page .school-subject-title,
+[data-theme="dark"] .timetable-preview .school-subject-title {
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .home-page .school-subject-room,
+[data-theme="dark"] .timetable-preview .school-subject-room {
+  color: #d0d0d0;
 }

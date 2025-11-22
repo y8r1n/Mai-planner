@@ -602,3 +602,321 @@ textarea.input {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary-light);
 }
+/* ========================================
+   🌙 GLOBAL DARK MODE - 텍스트 밝게 수정
+======================================== */
+/* ========================================
+   ✨ 최종 밝기 수정 - 모든 페이지
+======================================== */
+
+/* 전역 텍스트 색상 - 매우 밝게 */
+[data-theme="dark"] {
+  --color-text-primary: #f5f5f5 !important;    /* 거의 흰색 */
+  --color-text-secondary: #e0e0e0 !important;  /* 밝은 회색 */
+  --color-text-tertiary: #c0c0c0 !important;   /* 중간 밝은 회색 */
+  --color-text-disabled: #808080 !important;   /* 비활성 */
+}
+
+/* ========================================
+   HOME 페이지
+======================================== */
+[data-theme="dark"] .header-greeting h2 {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .header-greeting p {
+  color: #d0d0d0 !important;
+}
+
+[data-theme="dark"] .quick-action-label {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .home-section-title {
+  color: #d0d0d0 !important;
+}
+
+/* ========================================
+   WITHAI 페이지
+======================================== */
+[data-theme="dark"] .withai-title {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .timeline-title {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .timeline-time {
+  color: #c0c0c0 !important;
+}
+
+[data-theme="dark"] .timeline-desc {
+  color: #e0e0e0 !important;
+}
+
+/* ========================================
+   SUBJECT 페이지
+======================================== */
+[data-theme="dark"] .subject-title {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .week-number {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .content-title {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .tab-item {
+  color: #c0c0c0 !important;
+}
+
+[data-theme="dark"] .tab-item.active {
+  color: #f5f5f5 !important;
+}
+
+/* ========================================
+   SCHOOL 페이지
+======================================== */
+[data-theme="dark"] .school-title {
+  color: #e0e0e0 !important;
+}
+
+[data-theme="dark"] .school-modal-title {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .school-subject-title {
+  color: #ffffff !important; /* 완전 흰색 */
+}
+
+[data-theme="dark"] .school-subject-room {
+  color: #e0e0e0 !important;
+}
+
+/* ========================================
+   ALARM 페이지
+======================================== */
+[data-theme="dark"] .alarm-title {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .alarm-message {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .alarm-time {
+  color: #b0b0b0 !important;
+}
+
+/* ========================================
+   TODO 페이지
+======================================== */
+[data-theme="dark"] .todotab-title {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .todo-text {
+  color: #f5f5f5 !important;
+}
+
+/* ========================================
+   SETTINGS 페이지
+======================================== */
+[data-theme="dark"] .settings-title {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .settings-item-info h4 {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .radio-title {
+  color: #f5f5f5 !important;
+}
+
+/* ========================================
+   NAVBAR
+======================================== */
+[data-theme="dark"] #global-nav {
+  background: #1e1e1e;
+  border-bottom: 1px solid #333;
+}
+
+[data-theme="dark"] .nav-btn {
+  color: #e0e0e0 !important;
+}
+
+[data-theme="dark"] .nav-btn.active {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .icon-btn {
+  color: #e0e0e0 !important;
+}
+/* ========================================
+   🔥 궁극의 수정 - 핑크 완전 제거! 레전드 수정 안되면 ....ㅎㅎ
+======================================== */
+
+/* ========================================
+   1. WithAI - AI 추천 카드 (핑크 배경 제거)
+======================================== */
+
+/* 모든 AI 추천 관련 요소 강제 회색 */
+[data-theme="dark"] .ai-suggestion,
+[data-theme="dark"] .today-suggestion,
+[data-theme="dark"] .suggestion-card,
+[data-theme="dark"] .ai-recommendation {
+  background: linear-gradient(135deg, #252525 0%, #2a2a2a 100%) !important;
+  border-color: #444 !important;
+}
+
+/* AI 추천 헤더 */
+[data-theme="dark"] .ai-suggestion-header,
+[data-theme="dark"] .today-suggestion-header {
+  color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .ai-suggestion-header h4,
+[data-theme="dark"] .today-suggestion h4 {
+  color: #f5f5f5 !important;
+}
+
+/* AI 추천 내용 */
+[data-theme="dark"] .ai-suggestion-content,
+[data-theme="dark"] .today-suggestion p {
+  color: #e0e0e0 !important;
+}
+
+/* ========================================
+   2. Home - School 미리보기 (과목 블록 회색)
+======================================== */
+
+/* Home 화면의 모든 School 관련 과목 블록 */
+[data-theme="dark"] .home-page .school-subject,
+[data-theme="dark"] .timetable-preview .school-subject,
+[data-theme="dark"] .schedule-preview .school-subject,
+[data-theme="dark"] .school-preview .school-subject,
+[data-theme="dark"] div[class*="school"] .school-subject,
+[data-theme="dark"] div[class*="timetable"] .school-subject {
+  background: linear-gradient(135deg, #4a4a4a 0%, #555 100%) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 다양한 회색 톤 */
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+1),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+1),
+[data-theme="dark"] .school-preview .school-subject:nth-child(6n+1) {
+  background: linear-gradient(135deg, #4a4a4a 0%, #555 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+2),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+2),
+[data-theme="dark"] .school-preview .school-subject:nth-child(6n+2) {
+  background: linear-gradient(135deg, #5a5a5a 0%, #666 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+3),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+3),
+[data-theme="dark"] .school-preview .school-subject:nth-child(6n+3) {
+  background: linear-gradient(135deg, #505050 0%, #5d5d5d 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+4),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+4),
+[data-theme="dark"] .school-preview .school-subject:nth-child(6n+4) {
+  background: linear-gradient(135deg, #454545 0%, #525252 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+5),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+5),
+[data-theme="dark"] .school-preview .school-subject:nth-child(6n+5) {
+  background: linear-gradient(135deg, #555555 0%, #626262 100%) !important;
+}
+
+[data-theme="dark"] .home-page .school-subject:nth-child(6n+6),
+[data-theme="dark"] .timetable-preview .school-subject:nth-child(6n+6),
+[data-theme="dark"] .school-preview .school-subject:nth-child(6n+6) {
+  background: linear-gradient(135deg, #4d4d4d 0%, #595959 100%) !important;
+}
+
+/* ========================================
+   3. School 페이지 - 과목 블록 (회색 강제)
+======================================== */
+
+/* School 페이지의 모든 과목 블록 */
+[data-theme="dark"] #school-page .school-subject,
+[data-theme="dark"] .school-table .school-subject,
+[data-theme="dark"] .school-grid .school-subject,
+[data-theme="dark"] .school-subject-container .school-subject {
+  background: linear-gradient(135deg, #4a4a4a 0%, #555 100%) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 다양한 회색 톤 */
+[data-theme="dark"] #school-page .school-subject:nth-child(6n+1),
+[data-theme="dark"] .school-subject-container .school-subject:nth-child(6n+1) {
+  background: linear-gradient(135deg, #4a4a4a 0%, #555 100%) !important;
+}
+
+[data-theme="dark"] #school-page .school-subject:nth-child(6n+2),
+[data-theme="dark"] .school-subject-container .school-subject:nth-child(6n+2) {
+  background: linear-gradient(135deg, #5a5a5a 0%, #666 100%) !important;
+}
+
+[data-theme="dark"] #school-page .school-subject:nth-child(6n+3),
+[data-theme="dark"] .school-subject-container .school-subject:nth-child(6n+3) {
+  background: linear-gradient(135deg, #505050 0%, #5d5d5d 100%) !important;
+}
+
+[data-theme="dark"] #school-page .school-subject:nth-child(6n+4),
+[data-theme="dark"] .school-subject-container .school-subject:nth-child(6n+4) {
+  background: linear-gradient(135deg, #454545 0%, #525252 100%) !important;
+}
+
+[data-theme="dark"] #school-page .school-subject:nth-child(6n+5),
+[data-theme="dark"] .school-subject-container .school-subject:nth-child(6n+5) {
+  background: linear-gradient(135deg, #555555 0%, #626262 100%) !important;
+}
+
+[data-theme="dark"] #school-page .school-subject:nth-child(6n+6),
+[data-theme="dark"] .school-subject-container .school-subject:nth-child(6n+6) {
+  background: linear-gradient(135deg, #4d4d4d 0%, #595959 100%) !important;
+}
+
+/* ========================================
+   4. 과목 텍스트 (흰색으로)
+======================================== */
+
+[data-theme="dark"] .school-subject-title {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="dark"] .school-subject-room {
+  color: #e0e0e0 !important;
+  opacity: 0.9 !important;
+}
+
+/* ========================================
+   5. 호버 효과
+======================================== */
+
+[data-theme="dark"] .school-subject:hover {
+  filter: brightness(1.2) !important;
+  transform: scale(1.03) !important;
+}
+
+/* ========================================
+   6. 모든 핑크색 강제 제거 (비상용)
+======================================== */
+
+/* 혹시 모를 핑크색 완전 제거 */
+[data-theme="dark"] *[style*="background"][style*="pink"],
+[data-theme="dark"] *[style*="background"][style*="#f"],
+[data-theme="dark"] *[style*="background"][style*="rgb(2"] {
+  background: #555 !important;
+}

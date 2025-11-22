@@ -1,57 +1,30 @@
 /* ===========================
-   🔐 LOGIN PAGE
+   🌸 LOGIN PAGE
 =========================== */
 
 .login-page {
   min-height: 100vh;
+  background: linear-gradient(135deg, var(--color-background) 0%, #fff5f8 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--color-background) 0%, var(--color-primary-lighter) 100%);
-  padding: var(--space-xl);
-  position: relative;
-  overflow: hidden;
-}
-
-/* 배경 장식 */
-.login-page::before {
-  content: '';
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--color-primary-lighter) 0%, transparent 70%);
-  top: -250px;
-  right: -250px;
-  opacity: 0.3;
-}
-
-.login-page::after {
-  content: '';
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--color-secondary-light) 0%, transparent 70%);
-  bottom: -200px;
-  left: -200px;
-  opacity: 0.2;
+  padding: var(--space-2xl) var(--space-lg);
+  font-family: var(--font-family);
 }
 
 .login-container {
   width: 100%;
   max-width: 440px;
-  position: relative;
-  z-index: 1;
   animation: fadeSlideUp 0.6s ease;
 }
 
-/* ========================================
-   HEADER
-======================================== */
+/* ===========================
+   HEADER & LOGO
+=========================== */
+
 .login-header {
   text-align: center;
-  margin-bottom: var(--space-3xl);
+  margin-bottom: var(--space-2xl);
 }
 
 .logo {
@@ -64,7 +37,7 @@
 
 .logo-icon {
   font-size: 3rem;
-  animation: bounce 2s infinite;
+  animation: bounce 1s ease infinite;
 }
 
 @keyframes bounce {
@@ -72,41 +45,40 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
 }
 
 .logo h1 {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-primary);
+  margin: 0;
 }
 
 .login-subtitle {
   font-size: var(--font-size-base);
   color: var(--color-text-tertiary);
-  font-weight: var(--font-weight-medium);
+  margin: 0;
 }
 
-/* ========================================
+/* ===========================
    LOGIN CARD
-======================================== */
+=========================== */
+
 .login-card {
   background: var(--color-surface);
-  border: 2px solid var(--color-border-lighter);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-2xl);
-  padding: var(--space-3xl);
+  padding: var(--space-2xl);
   box-shadow: var(--shadow-xl);
-  backdrop-filter: blur(10px);
+  margin-bottom: var(--space-2xl);
 }
 
 .login-card h2 {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
   margin-bottom: var(--space-sm);
   text-align: center;
 }
@@ -118,43 +90,31 @@
   margin-bottom: var(--space-2xl);
 }
 
-/* ========================================
+/* ===========================
    ERROR MESSAGE
-======================================== */
+=========================== */
+
 .error-message {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  background: rgba(240, 92, 130, 0.1);
+  background: #fff1f4;
   border: 1.5px solid var(--color-error);
   border-radius: var(--radius-md);
-  padding: var(--space-md) var(--space-lg);
-  margin-bottom: var(--space-xl);
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
   color: var(--color-error);
   font-size: var(--font-size-sm);
-  animation: shake 0.3s ease;
-}
-
-@keyframes shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-5px);
-  }
-  75% {
-    transform: translateX(5px);
-  }
 }
 
 .error-icon {
   font-size: 1.2rem;
-  flex-shrink: 0;
 }
 
-/* ========================================
+/* ===========================
    GOOGLE LOGIN BUTTON
-======================================== */
+=========================== */
+
 .google-login-btn {
   width: 100%;
   display: flex;
@@ -163,69 +123,40 @@
   gap: var(--space-md);
   background: white;
   border: 2px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg) var(--space-xl);
+  border-radius: var(--radius-full);
+  padding: var(--space-lg);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   cursor: pointer;
   transition: all var(--transition-base);
-  box-shadow: var(--shadow-md);
-  position: relative;
-  overflow: hidden;
+  margin-bottom: var(--space-lg);
 }
 
-.google-login-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-  transition: left 0.5s;
-}
-
-.google-login-btn:hover {
-  background: var(--color-background);
+.google-login-btn:hover:not(:disabled) {
+  background: var(--color-surface-hover);
   border-color: var(--color-primary);
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
 
-.google-login-btn:hover::before {
-  left: 100%;
-}
-
-.google-login-btn:active {
-  transform: translateY(0);
-}
-
 .google-login-btn:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-.google-login-btn:disabled:hover {
-  transform: none;
-}
-
 .google-icon {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
-/* ========================================
-   SPINNER
-======================================== */
-.spinner {
   width: 20px;
   height: 20px;
-  border: 3px solid var(--color-border-lighter);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-border);
   border-top-color: var(--color-primary);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.6s linear infinite;
 }
 
 @keyframes spin {
@@ -234,39 +165,86 @@
   }
 }
 
-/* ========================================
+/* ===========================
+   BUTTON GROUP (버튼 2개 나란히)
+=========================== */
+
+.login-button-group {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.skip-login-btn {
+  flex: 2;
+  background: var(--color-background);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.skip-login-btn:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+/* 튜토리얼 테스트 버튼 */
+.tutorial-test-btn {
+  flex: 1;
+  background: var(--color-secondary-light);
+  border: 1.5px solid var(--color-secondary);
+  border-radius: var(--radius-full);
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: white;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.tutorial-test-btn:hover {
+  background: var(--color-secondary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ===========================
    FOOTER
-======================================== */
+=========================== */
+
 .login-footer {
-  margin-top: var(--space-xl);
-  padding-top: var(--space-xl);
-  border-top: 1px solid var(--color-border-lighter);
+  text-align: center;
 }
 
 .terms-text {
   font-size: var(--font-size-xs);
   color: var(--color-text-disabled);
-  text-align: center;
+  margin: 0;
   line-height: 1.6;
 }
 
-.terms-link {
+.terms-text a {
   color: var(--color-primary);
   text-decoration: none;
   font-weight: var(--font-weight-medium);
-  transition: color var(--transition-fast);
 }
 
-.terms-link:hover {
-  color: var(--color-primary-dark);
+.terms-text a:hover {
   text-decoration: underline;
 }
 
-/* ========================================
+/* ===========================
    FEATURES SECTION
-======================================== */
+=========================== */
+
 .features-section {
-  margin-top: var(--space-3xl);
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
@@ -276,100 +254,109 @@
   display: flex;
   align-items: center;
   gap: var(--space-lg);
-  background: rgba(255, 255, 255, 0.8);
-  border: 1.5px solid var(--color-border-lighter);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
-  backdrop-filter: blur(10px);
   transition: all var(--transition-base);
 }
 
 .feature-item:hover {
-  background: white;
-  border-color: var(--color-border);
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
   transform: translateX(4px);
   box-shadow: var(--shadow-md);
 }
 
 .feature-icon {
-  font-size: 2rem;
+  font-size: 2.5rem;
   flex-shrink: 0;
 }
 
-.feature-text h3 {
+.feature-item h3 {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin-bottom: var(--space-xs);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-xs) 0;
 }
 
-.feature-text p {
+.feature-item p {
   font-size: var(--font-size-sm);
   color: var(--color-text-tertiary);
+  margin: 0;
 }
 
-/* ========================================
+/* ===========================
+   ANIMATIONS
+=========================== */
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===========================
    RESPONSIVE DESIGN
-======================================== */
+=========================== */
+
 @media (max-width: 480px) {
   .login-page {
-    padding: var(--space-lg);
+    padding: var(--space-xl) var(--space-md);
   }
-  
-  .login-card {
-    padding: var(--space-2xl);
-  }
-  
-  .logo h1 {
-    font-size: var(--font-size-xl);
-  }
-  
+
   .logo-icon {
     font-size: 2.5rem;
   }
-  
+
+  .logo h1 {
+    font-size: var(--font-size-xl);
+  }
+
+  .login-card {
+    padding: var(--space-xl) var(--space-lg);
+  }
+
   .login-card h2 {
     font-size: var(--font-size-lg);
   }
-  
+
   .google-login-btn {
-    padding: var(--space-md) var(--space-lg);
     font-size: var(--font-size-sm);
+    padding: var(--space-md);
   }
-  
-  .features-section {
-    margin-top: var(--space-2xl);
-    gap: var(--space-md);
+
+  .login-button-group {
+    flex-direction: column;
+    gap: var(--space-sm);
   }
-  
+
+  .skip-login-btn,
+  .tutorial-test-btn {
+    flex: 1;
+  }
+
+  .feature-icon {
+    font-size: 2rem;
+  }
+
   .feature-item {
     padding: var(--space-md);
-    gap: var(--space-md);
-  }
-  
-  .feature-icon {
-    font-size: 1.5rem;
-  }
-  
-  .feature-text h3 {
-    font-size: var(--font-size-sm);
-  }
-  
-  .feature-text p {
-    font-size: var(--font-size-xs);
   }
 }
 
-/* ========================================
+/* ===========================
    ACCESSIBILITY
-======================================== */
-.google-login-btn:focus-visible {
+=========================== */
+
+.google-login-btn:focus-visible,
+.skip-login-btn:focus-visible,
+.tutorial-test-btn:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
-}
-
-.terms-link:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 1px;
-  border-radius: 2px;
 }

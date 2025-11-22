@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Check,
   X,
+  List,
 } from "lucide-react";
 import "../styles/todotab.css";
 
@@ -32,14 +33,13 @@ export default function TodoTab() {
   const [newTodo, setNewTodo] = useState("");
   const [adding, setAdding] = useState(false);
   const [filter, setFilter] = useState("all");
-  const [viewMode, setViewMode] = useState("date");
+  const [viewMode, setViewMode] = useState("date"); // 'date' or 'general'
 
-  // 로그인된 유저 ID
   const userId = auth.currentUser?.uid;
 
   if (!userId) {
     return (
-      <div style={{ padding: "80px 20px" }}>
+      <div style={{ padding: "80px 20px", textAlign: "center" }}>
         <h3>로그인이 필요합니다.</h3>
       </div>
     );
@@ -122,6 +122,8 @@ export default function TodoTab() {
 
   /* 🗑 삭제 */
   const deleteTodo = async (todo) => {
+    if (!confirm(`"${todo.title}"을(를) 삭제하시겠습니까?`)) return;
+
     const base =
       viewMode === "date"
         ? `users/${userId}/todos/${selectedDate.format("YYYY-MM-DD")}/tasks`
@@ -148,7 +150,7 @@ export default function TodoTab() {
         </button>
       </div>
 
-      {/* 날짜/일반 모드 */}
+      {/* 날짜/일반 모드 전환 */}
       <div className="view-mode-switch">
         <button
           className={`mode-btn ${viewMode === "date" ? "active" : ""}`}
@@ -160,25 +162,38 @@ export default function TodoTab() {
           className={`mode-btn ${viewMode === "general" ? "active" : ""}`}
           onClick={() => setViewMode("general")}
         >
-          일반 목록
+          <List size={16} /> 일반 목록
         </button>
       </div>
 
-      {/* 날짜 선택 */}
+      {/* 날짜 선택 (Daily TODO 모드에만 표시) */}
       {viewMode === "date" && (
         <div className="date-selector">
-          <button onClick={() => setSelectedDate((p) => p.subtract(1, "day"))}>
+          <button 
+            className="date-nav-btn"
+            onClick={() => setSelectedDate((p) => p.subtract(1, "day"))}
+          >
             <ChevronLeft size={20} />
           </button>
 
-          <div>
+          <div className="date-display">
             <div className="date-main">{selectedDate.format("M월 D일")}</div>
             <div className="date-sub">{selectedDate.format("dddd")}</div>
           </div>
 
-          <button onClick={() => setSelectedDate((p) => p.add(1, "day"))}>
+          <button 
+            className="date-nav-btn"
+            onClick={() => setSelectedDate((p) => p.add(1, "day"))}
+          >
             <ChevronRight size={20} />
           </button>
+        </div>
+      )}
+
+      {/* General TODO 안내 문구 */}
+      {viewMode === "general" && (
+        <div className="general-info">
+          <p>날짜 상관없이 언제든 할 수 있는 일들을 관리하세요.</p>
         </div>
       )}
 
@@ -203,15 +218,23 @@ export default function TodoTab() {
             autoFocus
             value={newTodo}
             onChange={(e) => setNewTodo(e.target.value)}
-            placeholder="할 일 입력..."
+            placeholder={
+              viewMode === "date" 
+                ? "오늘 할 일 입력..." 
+                : "일반 할 일 입력..."
+            }
           />
-          <button type="submit" className="submit-btn">
+          <button type="submit" className="submit-btn" title="추가">
             <Check size={18} />
           </button>
           <button
             type="button"
-            onClick={() => setAdding(false)}
+            onClick={() => {
+              setAdding(false);
+              setNewTodo("");
+            }}
             className="cancel-btn"
+            title="취소"
           >
             <X size={18} />
           </button>
@@ -220,21 +243,33 @@ export default function TodoTab() {
 
       {/* 리스트 */}
       <div className="todo-list">
-        {filteredTodos.length === 0 && <p className="todo-empty">등록된 할 일이 없습니다.</p>}
+        {filteredTodos.length === 0 && (
+          <p className="todo-empty">
+            {viewMode === "date" 
+              ? "오늘 등록된 할 일이 없습니다." 
+              : "등록된 일반 할 일이 없습니다."}
+          </p>
+        )}
 
         {filteredTodos.map((todo) => (
           <div key={todo.id} className="todo-item-wrapper">
-            <button className="delete-btn" onClick={() => deleteTodo(todo)}>
-              삭제
-            </button>
-
             <div
               className={`todo-item ${todo.completed ? "done" : ""}`}
               onClick={() => toggleTodo(todo)}
             >
-              <span className="check-circle" />
+              <span className={`check-circle ${todo.completed ? "checked" : ""}`} />
               <span className="todo-title">{todo.title}</span>
             </div>
+            
+            <button 
+              className="delete-btn" 
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteTodo(todo);
+              }}
+            >
+              삭제
+            </button>
           </div>
         ))}
       </div>

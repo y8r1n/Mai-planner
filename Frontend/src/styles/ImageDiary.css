@@ -17,24 +17,26 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-lg);
 }
 
 .diary-title {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
+  padding-left: 10px;
 }
 
 .filter-toggle-btn {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-md) var(--space-lg);
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
   background: var(--color-surface);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-full);
   color: var(--color-primary);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--transition-base);
@@ -51,10 +53,10 @@
 .diary-filters {
   background: var(--color-surface);
   border: 2px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  padding: var(--space-xl);
-  margin-bottom: var(--space-2xl);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  box-shadow: var(--shadow-sm);
   animation: slideDown 0.3s ease;
 }
 
@@ -71,18 +73,18 @@
 
 .filter-row {
   display: flex;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   flex-wrap: wrap;
 }
 
 /* 검색 박스 */
 .search-box {
   flex: 1;
-  min-width: 220px;
+  min-width: 200px;
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-md) var(--space-lg);
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
   background: var(--color-background);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-full);
@@ -96,6 +98,8 @@
 
 .search-box svg {
   color: var(--color-text-disabled);
+  width: 16px;
+  height: 16px;
 }
 
 .search-box input {
@@ -103,7 +107,7 @@
   border: none;
   background: transparent;
   outline: none;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   color: var(--color-text-primary);
 }
 
@@ -127,11 +131,11 @@
 
 /* 필터 셀렉트 */
 .filter-select {
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   background: var(--color-surface);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-full);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   color: var(--color-text-primary);
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -149,11 +153,12 @@
 
 /* 초기화 버튼 */
 .reset-filters-btn {
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   background: var(--color-border-lighter);
   border: none;
   border-radius: var(--radius-full);
   color: var(--color-primary);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--transition-base);
@@ -165,11 +170,11 @@
 
 /* 필터 정보 */
 .filter-info {
-  margin-top: var(--space-lg);
-  padding-top: var(--space-lg);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
   border-top: 1px solid var(--color-border-lighter);
   color: var(--color-text-tertiary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   text-align: center;
 }
 
@@ -179,26 +184,26 @@
 .diary-input-section {
   background: var(--color-surface);
   border: 2px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  padding: var(--space-xl);
-  margin-bottom: var(--space-2xl);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  box-shadow: var(--shadow-sm);
 }
 
 .diary-input-section textarea {
   width: 100%;
-  min-height: 120px;
-  padding: var(--space-lg);
+  min-height: 80px;
+  padding: var(--space-md) var(--space-lg);
   border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: var(--color-background);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   color: var(--color-text-primary);
   resize: vertical;
   outline: none;
   transition: all var(--transition-fast);
   font-family: inherit;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .diary-input-section textarea:focus {
@@ -208,16 +213,16 @@
 
 .diary-controls {
   display: flex;
-  gap: var(--space-md);
-  margin-top: var(--space-lg);
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
 }
 
 .diary-controls select {
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   color: var(--color-text-primary);
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -229,11 +234,12 @@
 
 .diary-controls button {
   flex: 1;
-  padding: var(--space-md) var(--space-xl);
+  padding: var(--space-sm) var(--space-lg);
   background: var(--color-primary);
   color: white;
   border: none;
   border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--transition-base);
@@ -254,7 +260,7 @@
 ======================================== */
 .diary-gallery {
   column-count: 3;
-  column-gap: var(--space-lg);
+  column-gap: var(--space-md);
 }
 
 @media (max-width: 1024px) {
@@ -275,27 +281,27 @@
 .diary-card {
   position: relative;
   break-inside: avoid;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
   background: var(--color-surface);
   border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
 }
 
 .diary-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* 삭제 버튼 */
 .diary-delete-btn {
   position: absolute;
-  top: var(--space-md);
-  right: var(--space-md);
-  width: 36px;
-  height: 36px;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -333,37 +339,37 @@
 
 /* 정보 */
 .diary-info {
-  padding: var(--space-lg);
+  padding: var(--space-md);
 }
 
 .emotion-tag {
   display: inline-block;
-  padding: var(--space-xs) var(--space-md);
+  padding: var(--space-xs) var(--space-sm);
   background: var(--color-border-lighter);
   color: var(--color-primary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   border-radius: var(--radius-full);
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-xs);
 }
 
 .diary-text {
   color: var(--color-text-primary);
-  font-size: var(--font-size-base);
-  line-height: 1.6;
-  margin: var(--space-md) 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  margin: var(--space-sm) 0;
 }
 
 .diary-tags {
   color: var(--color-text-disabled);
-  font-size: var(--font-size-sm);
-  margin: var(--space-sm) 0;
+  font-size: var(--font-size-xs);
+  margin: var(--space-xs) 0;
 }
 
 .diary-date {
   color: var(--color-text-tertiary);
   font-size: var(--font-size-xs);
-  margin-top: var(--space-sm);
+  margin-top: var(--space-xs);
 }
 
 /* ========================================
@@ -514,14 +520,14 @@
   }
   
   .diary-input-section textarea {
-    min-height: 100px;
+    min-height: 70px;
   }
 }
 
 @media (max-width: 480px) {
   .diary-header {
     flex-direction: column;
-    gap: var(--space-md);
+    gap: var(--space-sm);
     align-items: stretch;
   }
   
@@ -531,11 +537,11 @@
   }
   
   .diary-filters {
-    padding: var(--space-lg);
+    padding: var(--space-md);
   }
   
   .diary-input-section {
-    padding: var(--space-lg);
+    padding: var(--space-md);
   }
   
   .diary-controls {

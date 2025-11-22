@@ -103,7 +103,7 @@ export default function Study() {
         
         {/* 상단 헤더 */}
         <div className="study-header-row">
-          <h2 className="study-page-title">나의 과목</h2>
+          <h2 className="study-page-title">My Subject</h2>
           <button className="study-add-btn" onClick={() => setShowModal(true)}>
             ＋
           </button>

@@ -89,82 +89,73 @@ export default function QuizAI() {
     }
   };
 
-  /* ------------------ 문제 생성 ------------------ */
-  const startQuiz = async () => {
-    setLoading(true);
 
-    try {
-      const res = await quizAI.post("/generate-quiz", {
-        subjectName,
-        subjectId,
-        weekId,
-        count: 5,
-      });
+/* ------------------ 문제 생성 ------------------ */
+console.log("📡 FULL 요청 URL:", `${quizAI.defaults.baseURL}/api/quiz/generate`);
 
-      const raw = res.data?.questions;
+const startQuiz = async () => {
+  setLoading(true);
 
-      const qList =
-        (Array.isArray(raw) && raw) ||
-        (Array.isArray(raw?.questions) && raw.questions) ||
-        (Array.isArray(raw?.data) && raw.data) ||
-        (Array.isArray(res.data) && res.data) ||
-        [];
+  try {
+    const weekRef = doc(db, "users", userId, "subjects", subjectId, "weeks", weekId);
+    const wkSnap = await getDoc(weekRef);
+    const wk = wkSnap.data();
 
-      if (!res.data?.success || qList.length === 0) {
-        alert("문제 생성에 실패했습니다. 😢");
-        return;
-      }
+    const filesRef = collection(db, "users", userId, "subjects", subjectId, "weeks", weekId, "files");
+    const fileSnap = await getDocs(filesRef);
+    const files = fileSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      // ---- 문제 포맷 통일 ----
-      const formatted = qList.map((q, idx) => {
-        const options =
-          q.options ||
-          q.choices ||
-          q.보기 ||
-          q.선택지 ||
-          [];
+   const pdfUrls = files.map(f => f.url);   // 모든 파일 URL 배열
+console.log("📂 선택된 PDF들:", pdfUrls);
 
-        const rawAnswer =
-          q.answer ??
-          q.correct ??
-          q.correctAnswer ??
-          q.정답 ??
-          null;
+const res = await quizAI.post("/api/quiz/generate", {
+  pdfUrls,                     
+  summary: wk.summary || "",
+  notes: wk.memo || "",
+  count: 5,
+});
 
-        let correctIndex = null;
 
-        if (typeof rawAnswer === "number") {
-          correctIndex = rawAnswer;
-        } else if (typeof rawAnswer === "string") {
-          correctIndex = options.indexOf(rawAnswer);
-        }
+    console.log("🔥 서버 응답:", res.data);
 
-        if (correctIndex === -1 || correctIndex === null) correctIndex = 0;
+    const qList = res.data?.quiz?.questions  || [];
 
-        return {
-          id: q.id || idx,
-          question: q.question || "",
-          options,
-          answer: correctIndex,
-        };
-      });
-
-      setQuestions(formatted);
-      setAnswers(Array(formatted.length).fill(null));
-      setIdx(0);
-      setPhase("quiz");
-    } catch (e) {
-      alert("문제 생성 중 오류 발생!");
-    } finally {
-      setLoading(false);
+    if (!res.data?.success || qList.length === 0) {
+      alert("문제 생성 실패 😢");
+      return;
     }
-  };
 
-  /* ------------------ 선택 ------------------ */
-  const choose = (optIdx) => {
-    const next = [...answers];
-    next[idx] = optIdx;
-    setAnswers(next);
+    const formatted = qList.map((q, idx) => {
+    const options = Array.isArray(q.options) ? q.options : ["보기1", "보기2", "보기3", "보기4"];
+  const answerIndex = options.findIndex(o => o === q.answer);
+
+  return {
+    id: idx,
+    question: q.question || "질문이 없습니다.",
+    options,
+    answer: answerIndex >= 0 ? answerIndex : 0,
+    explanation: q.explanation || "해설이 없습니다.",
+  };
+});
+    setQuestions(formatted);
+    setAnswers(Array(formatted.length).fill(null));
+    setIdx(0);
+    setPhase("quiz");
+
+  } catch (e) {
+    console.error("🔥 Quiz 생성 오류:", e);
+    alert("문제 생성 중 오류 발생!");
+  } finally {
+    setLoading(false);
+  }
+};
+  /* ------------------ 선택 처리 ------------------ */
+  const choose = (optIndex) => {
+    setAnswers((prev) => {
+      const next = [...prev];
+      next[idx] = optIndex; // 현재 문제의 선택지 저장
+      return next;
+    });
   };
 
   /* ------------------ 페이지 이동 ------------------ */
@@ -172,47 +163,51 @@ export default function QuizAI() {
   const prev = () => setIdx((p) => Math.max(p - 1, 0));
 
   /* ------------------ 퀴즈 종료 + 저장 ------------------ */
-  const finish = async () => {
-    const wrongList = questions
-      .map((q, i) => ({
-        question: q.question,
-        myAnswer: answers[i],
-        correctAnswer: q.answer,
-      }))
-      .filter((w) => w.myAnswer !== w.correctAnswer);
+const finish = async () => {
+  const wrongList = questions
+    .map((q, i) => ({
+      question: q.question,
+      myAnswer: answers[i],
+      correctAnswer: q.answer,
+      explanation: q.explanation,   // explanation 함께 저장
+    }))
+    .filter((w) => w.myAnswer !== w.correctAnswer);
 
-    try {
-      // 퀴즈 저장
-      await addDoc(
-        collection(
-          db,
-          "users",
-          userId,
-          "subjects",
-          subjectId,
-          "weeks",
-          weekId,
-          "quizzes"
-        ),
-        {
-          subjectName,
-          score,
-          total: questions.length,
-          wrongList,
-          createdAt: serverTimestamp(),
-        }
-      );
-
-      if (wrongList.length > 0) {
-        const noteRefId = await createWrongNote(wrongList);
-        setNoteId(noteRefId);
+  try {
+    // 퀴즈 전체 결과 저장
+    const quizRef = await addDoc(
+      collection(
+        db,
+        "users",
+        userId,
+        "subjects",
+        subjectId,
+        "weeks",
+        weekId,
+        "quizzes"
+      ),
+      {
+        subjectName,
+        score,
+        total: questions.length,
+        wrongList,
+        createdAt: serverTimestamp(),
       }
-    } catch (e) {
-      console.error("🔥 저장 실패:", e);
+    );
+
+    // 오답 노트 생성 (wrongList 있는 경우)
+    if (wrongList.length > 0) {
+      const noteRefId = await createWrongNote(wrongList);
+      setNoteId(noteRefId);
     }
 
-    setPhase("result");
-  };
+  } catch (e) {
+    console.error("🔥 저장 실패:", e);
+  }
+
+  setPhase("result");
+};
+
 
   /* ------------------ 화면 렌더링 ------------------ */
   if (phase === "intro") {
@@ -273,21 +268,21 @@ export default function QuizAI() {
           <p className="question-number">문제 {idx + 1}</p>
           <p className="question-text">{q.question}</p>
           
-          <div className="options-list">
-            {q.options.map((opt, i) => {
-              const isSel = answers[idx] === i;
-              return (
-                <button
-                  key={i}
-                  className={`option-btn ${isSel ? "selected" : ""}`}
-                  onClick={() => choose(i)}
-                >
-                  <span className="option-label">{String.fromCharCode(65 + i)}</span>
-                  <span className="option-text">{opt}</span>
-                </button>
-              );
-            })}
-          </div>
+         <div className="options-list">
+  {(q.options && Array.isArray(q.options) ? q.options : ["보기1", "보기2", "보기3", "보기4"]).map((opt, i) => {
+    const isSel = answers[idx] === i;
+    return (
+      <button
+        key={i}
+        className={`option-btn ${isSel ? "selected" : ""}`}
+        onClick={() => choose(i)}
+      >
+        <span className="option-label">{String.fromCharCode(65 + i)}</span>
+        <span className="option-text">{opt}</span>
+      </button>
+    );
+  })}
+</div>
         </div>
       </div>
     );
@@ -346,23 +341,14 @@ export default function QuizAI() {
         </div>
 
         <div className="result-actions">
-          <button
-            className="result-btn primary"
-            disabled={loading || !noteId}
-            onClick={async () => {
-              await quizAI.post("/generate-explanations", {
-                subjectName,
-                subjectId,
-                weekId,
-                questions,
-                userAnswers: answers,
-              });
+         <button
+  className="result-btn primary"
+  disabled={!noteId}
+  onClick={() => navigate(`/ReviewDetail/${subjectId}/${weekId}/${noteId}`)}
+>
+  📖 오답 풀이 해설 보기
+</button>
 
-              navigate(`/ReviewDetail/${subjectId}/${weekId}/${noteId}`);
-            }}
-          >
-            {loading ? "해설 생성 중..." : "📖 오답 풀이 해설 보기"}
-          </button>
         </div>
       </div>
     );

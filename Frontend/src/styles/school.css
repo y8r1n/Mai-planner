@@ -83,6 +83,8 @@
 /* 과목들 */
 .school-subject-container {
   position: relative;
+
+  
 }
 
 .school-subject {
@@ -112,6 +114,7 @@
   color: #fff;
   opacity: 0.9;
 }
+
 
 /* ===========================
    🎀 Buttons
@@ -303,4 +306,222 @@
 .school-btn-close {
   background: transparent;
   color: #9d7b78;
+}
+/* ========================================
+   🌙 SCHOOL - DARK MODE
+======================================== */
+
+[data-theme="dark"] #school-page {
+  background: #121212;
+}
+
+[data-theme="dark"] .school-title {
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .school-table {
+  background: #1e1e1e;
+  border-color: #333;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .school-header {
+  color: #808080;
+}
+
+[data-theme="dark"] .school-grid {
+  border-top-color: #333;
+}
+
+[data-theme="dark"] .school-time-column {
+  color: #666;
+}
+
+[data-theme="dark"] .school-subject {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .school-add-btn {
+  background: #2a2a2a;
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .school-add-btn:hover {
+  background: #333;
+}
+
+[data-theme="dark"] .school-modal-bg {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="dark"] .school-modal {
+  background: #1e1e1e;
+  border-color: #333;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .school-modal-title {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .school-day-btn {
+  border-color: #333;
+  color: #808080;
+  background: #252525;
+}
+
+[data-theme="dark"] .school-day-btn.active {
+  background: #666;
+  color: #fff;
+}
+
+[data-theme="dark"] .school-time-inputs input {
+  background: #252525;
+  border-color: #333;
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .school-input {
+  background: #252525;
+  border-color: #333;
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .school-input:focus {
+  border-color: #666;
+}
+
+[data-theme="dark"] .school-btn-confirm {
+  background: #2a2a2a;
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .school-btn-confirm:hover {
+  background: #333;
+}
+
+[data-theme="dark"] .school-btn-cancel {
+  color: #808080;
+}
+
+[data-theme="dark"] .school-info {
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .school-btn-edit {
+  background: #2a2a2a;
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .school-btn-edit:hover {
+  background: #333;
+}
+
+[data-theme="dark"] .school-btn-delete {
+  background: #3a2a2a;
+  color: #d88888;
+}
+
+[data-theme="dark"] .school-btn-delete:hover {
+  background: #442a2a;
+}
+
+[data-theme="dark"] .school-btn-close {
+  color: #808080;
+}
+/* ========================================
+   🌙 SCHOOL - 다크모드 과목별 무채색 (여러 색상)
+======================================== */
+
+/* 기본 과목 블록들을 다양한 회색 톤으로 */
+[data-theme="dark"] .school-subject:nth-child(6n+1) {
+  background: linear-gradient(135deg, #4a4a4a 0%, #555 100%) !important; /* 다크 그레이 */
+}
+
+[data-theme="dark"] .school-subject:nth-child(6n+2) {
+  background: linear-gradient(135deg, #5a5a5a 0%, #666 100%) !important; /* 미디엄 그레이 */
+}
+
+[data-theme="dark"] .school-subject:nth-child(6n+3) {
+  background: linear-gradient(135deg, #505050 0%, #5d5d5d 100%) !important; /* 쿨 그레이 */
+}
+
+[data-theme="dark"] .school-subject:nth-child(6n+4) {
+  background: linear-gradient(135deg, #454545 0%, #525252 100%) !important; /* 딥 그레이 */
+}
+
+[data-theme="dark"] .school-subject:nth-child(6n+5) {
+  background: linear-gradient(135deg, #555555 0%, #626262 100%) !important; /* 라이트 그레이 */
+}
+
+[data-theme="dark"] .school-subject:nth-child(6n+6) {
+  background: linear-gradient(135deg, #4d4d4d 0%, #595959 100%) !important; /* 웜 그레이 */
+}
+
+/* 호버 시 모두 약간 밝게 */
+[data-theme="dark"] .school-subject:hover {
+  filter: brightness(1.15);
+  transform: scale(1.03);
+}
+
+/* 과목명 텍스트 밝게 */
+[data-theme="dark"] .school-subject-title {
+  color: #f0f0f0;
+  font-weight: 600;
+}
+
+/* 강의실 텍스트 밝게 */
+[data-theme="dark"] .school-subject-room {
+  color: #d0d0d0;
+  opacity: 0.9;
+}
+EOF
+cat /mnt/user-data/outputs/school-subjects-colors.css
+출력
+
+/* ========================================
+   🌙 SCHOOL - 다크모드 과목별 무채색 (여러 색상)
+======================================== */
+
+/* 기본 과목 블록들을 다양한 회색 톤으로 */
+[data-theme="dark"] .school-subject:nth-child(6n+1) {
+  background: linear-gradient(135deg, #4a4a4a 0%, #555 100%) !important; /* 다크 그레이 */
+}
+
+[data-theme="dark"] .school-subject:nth-child(6n+2) {
+  background: linear-gradient(135deg, #5a5a5a 0%, #666 100%) !important; /* 미디엄 그레이 */
+}
+
+[data-theme="dark"] .school-subject:nth-child(6n+3) {
+  background: linear-gradient(135deg, #505050 0%, #5d5d5d 100%) !important; /* 쿨 그레이 */
+}
+
+[data-theme="dark"] .school-subject:nth-child(6n+4) {
+  background: linear-gradient(135deg, #454545 0%, #525252 100%) !important; /* 딥 그레이 */
+}
+
+[data-theme="dark"] .school-subject:nth-child(6n+5) {
+  background: linear-gradient(135deg, #555555 0%, #626262 100%) !important; /* 라이트 그레이 */
+}
+
+[data-theme="dark"] .school-subject:nth-child(6n+6) {
+  background: linear-gradient(135deg, #4d4d4d 0%, #595959 100%) !important; /* 웜 그레이 */
+}
+
+/* 호버 시 모두 약간 밝게 */
+[data-theme="dark"] .school-subject:hover {
+  filter: brightness(1.15);
+  transform: scale(1.03);
+}
+
+/* 과목명 텍스트 밝게 */
+[data-theme="dark"] .school-subject-title {
+  color: #f0f0f0;
+  font-weight: 600;
+}
+
+/* 강의실 텍스트 밝게 */
+[data-theme="dark"] .school-subject-room {
+  color: #d0d0d0;
+  opacity: 0.9;
 }

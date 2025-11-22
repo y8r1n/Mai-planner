@@ -6,8 +6,57 @@ import { Trash2, Calendar, Filter, Search, X } from "lucide-react";
 import "../styles/ImageDiary.css";
 
 export default function ImageDiary() {
-  const user = auth.currentUser;
-  const userId = user?.uid || "test-user";
+  const [userId, setUserId] = useState(null);
+  
+  // ⭐ userId 제대로 가져오기
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log("✅ 로그인된 사용자:", user.uid);
+        setUserId(user.uid);
+      } else {
+        console.log("❌ 로그인 안 됨");
+        setUserId(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // ⭐ 프록시 URL 생성
+  const getProxyImageUrl = (entry) => {
+    if (!userId) {
+      console.warn("⚠️ userId가 없습니다");
+      return "";
+    }
+
+    // filename이 있으면 사용 (새 방식)
+    if (entry.filename) {
+      const baseUrl = import.meta.env.DEV 
+        ? "http://localhost:4003" 
+        : "https://mai-planner.onrender.com";
+      
+      const proxyUrl = `${baseUrl}/api/image/${userId}/${entry.filename}`;
+      console.log("🔄 프록시 URL (filename):", proxyUrl);
+      return proxyUrl;
+    }
+    
+    // filename이 없으면 imageUrl에서 추출 (기존 방식)
+    if (entry.imageUrl) {
+      const parts = entry.imageUrl.split("/");
+      const filename = parts[parts.length - 1].split("?")[0];
+      
+      const baseUrl = import.meta.env.DEV 
+        ? "http://localhost:4003" 
+        : "https://mai-planner.onrender.com";
+      
+      const proxyUrl = `${baseUrl}/api/image/${userId}/${filename}`;
+      console.log("🔄 프록시 URL (imageUrl):", proxyUrl);
+      return proxyUrl;
+    }
+    
+    return "";
+  };
 
   const [emotion, setEmotion] = useState("평온 🌿");
   const [text, setText] = useState("");
@@ -24,9 +73,13 @@ export default function ImageDiary() {
   const [modalImg, setModalImg] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  /* 🔥 Firestore 실시간 구독: users/{uid}/imageDiary */
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      console.log("⏳ userId 대기 중...");
+      return;
+    }
+
+    console.log("📡 Firestore 구독 시작:", userId);
 
     const q = collection(db, "users", userId, "imageDiary");
 
@@ -35,6 +88,8 @@ export default function ImageDiary() {
         id: doc.id,
         ...doc.data(),
       }));
+
+      console.log("📊 Firestore 데이터:", data.length, "개");
 
       const filtered = data.filter((item) => item.imageUrl);
 
@@ -57,7 +112,6 @@ export default function ImageDiary() {
     return () => unsub();
   }, [userId]);
 
-  /* 🔥 필터링 */
   useEffect(() => {
     let result = [...entries];
 
@@ -87,29 +141,33 @@ export default function ImageDiary() {
     setFilteredEntries(result);
   }, [entries, selectedMonth, selectedEmotion, searchQuery]);
 
-  /* 🔥 AI 이미지 생성 */
   const handleCreate = async () => {
     if (!text.trim()) return alert("일기를 입력하세요!");
+    if (!userId) return alert("로그인이 필요합니다!");
 
     setLoading(true);
     try {
+      console.log("🎨 이미지 생성 요청:", { userId, emotion, diaryText: text.substring(0, 50) });
+      
       await drawAI.post("/generate-image-diary", {
         emotion,
         diaryText: text,
-        userId, // ⭐ 진짜 사용자 ID 전달
+        userId,
       });
 
       setText("");
+      console.log("✅ 이미지 생성 요청 성공");
     } catch (e) {
-      console.error("이미지 생성 실패:", e);
+      console.error("❌ 이미지 생성 실패:", e);
       alert("AI 이미지 생성 실패!");
     } finally {
       setLoading(false);
     }
   };
 
-  /* 🔥 개별 삭제 */
   const handleDelete = async (entryId) => {
+    if (!userId) return;
+    
     try {
       await deleteDoc(doc(db, "users", userId, "imageDiary", entryId));
       setDeleteConfirm(null);
@@ -119,7 +177,6 @@ export default function ImageDiary() {
     }
   };
 
-  /* 🔥 월 목록 생성 */
   const getAvailableMonths = () => {
     const months = new Set();
     entries.forEach((entry) => {
@@ -137,11 +194,22 @@ export default function ImageDiary() {
     setSearchQuery("");
   };
 
+  // 로그인 대기 중
+  if (userId === null) {
+    return (
+      <div className="diary-page">
+        <div className="diary-empty">
+          <Calendar size={48} />
+          <p>로그인 확인 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="diary-page">
-      {/* 헤더 */}
       <div className="diary-header">
-        <h2 className="diary-title">🌤 AI 이미지 다이어리</h2>
+        <h2 className="diary-title">  AI 이미지 다이어리</h2>
         <button
           className="filter-toggle-btn"
           onClick={() => setShowFilters(!showFilters)}
@@ -151,11 +219,9 @@ export default function ImageDiary() {
         </button>
       </div>
 
-      {/* 필터 영역 */}
       {showFilters && (
         <div className="diary-filters">
           <div className="filter-row">
-            {/* 검색 */}
             <div className="search-box">
               <Search size={18} />
               <input
@@ -171,7 +237,6 @@ export default function ImageDiary() {
               )}
             </div>
 
-            {/* 월 */}
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
@@ -185,7 +250,6 @@ export default function ImageDiary() {
               ))}
             </select>
 
-            {/* 감정 */}
             <select
               value={selectedEmotion}
               onChange={(e) => setSelectedEmotion(e.target.value)}
@@ -210,7 +274,6 @@ export default function ImageDiary() {
         </div>
       )}
 
-      {/* 입력 영역 */}
       <div className="diary-input-section">
         <textarea
           value={text}
@@ -236,7 +299,6 @@ export default function ImageDiary() {
         </div>
       </div>
 
-      {/* 갤러리 */}
       {filteredEntries.length === 0 ? (
         <div className="diary-empty">
           <Calendar size={48} />
@@ -249,6 +311,8 @@ export default function ImageDiary() {
               ? entry.createdAt.seconds * 1000
               : entry.createdAt;
 
+            const imageUrl = getProxyImageUrl(entry);
+
             return (
               <div key={entry.id} className="diary-card fade-in">
                 <button
@@ -259,10 +323,16 @@ export default function ImageDiary() {
                 </button>
 
                 <img
-                  src={entry.imageUrl}
+                  src={imageUrl}
                   alt="AI diary"
                   className="diary-img"
-                  onClick={() => setModalImg(entry.imageUrl)}
+                  onClick={() => setModalImg(imageUrl)}
+                  onError={(e) => {
+                    console.error("❌ 이미지 로드 실패:", imageUrl);
+                    e.target.style.backgroundColor = "#f0f0f0";
+                    e.target.style.minHeight = "200px";
+                    e.target.alt = "이미지 로드 실패";
+                  }}
                 />
 
                 <div className="diary-info">
@@ -288,14 +358,12 @@ export default function ImageDiary() {
         </div>
       )}
 
-      {/* 이미지 확대 */}
       {modalImg && (
         <div className="modal" onClick={() => setModalImg(null)}>
           <img src={modalImg} className="modal-img" alt="" />
         </div>
       )}
 
-      {/* 삭제 모달 */}
       {deleteConfirm && (
         <div className="delete-modal-bg" onClick={() => setDeleteConfirm(null)}>
           <div className="delete-modal" onClick={(e) => e.stopPropagation()}>

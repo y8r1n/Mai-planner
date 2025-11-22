@@ -486,19 +486,46 @@
   border-color: var(--color-secondary);
 }
 
+/* AI Plan Header */
+.aiplan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
 .withai-aiplan-card h3 {
   font-size: var(--font-size-md);
   color: var(--color-secondary);
   font-weight: var(--font-weight-semibold);
-  margin-bottom: var(--space-md);
+  margin: 0;
   display: flex;
   align-items: center;
   gap: var(--space-sm);
 }
 
-.withai-aiplan-card h3::before {
-  content: '🤖';
-  font-size: 1.5rem;
+/* 삭제 버튼 - 원본 디자인과 조화 */
+.aiplan-delete-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1.5px solid var(--color-border-lighter);
+  border-radius: 50%;
+  color: var(--color-text-disabled);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  z-index: 2;
+}
+
+.aiplan-delete-btn:hover {
+  background: var(--color-error);
+  color: white;
+  border-color: var(--color-error);
+  transform: scale(1.1);
 }
 
 .withai-aiplan-card p {
@@ -1247,4 +1274,315 @@
 
 .category-pill .emoji {
   font-size: 15px;
+}
+/* ========================================
+   🌙 다크모드
+======================================== */
+[data-theme="dark"] .withai-page {
+  background: #121212;
+}
+
+[data-theme="dark"] .title-ai {
+  color: #888;
+}
+
+[data-theme="dark"] .title-timeline {
+  color: #f5f5f5;
+}
+
+[data-theme="dark"] .withai-topbar {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+[data-theme="dark"] .withai-playbtn {
+  color: #888;
+}
+
+[data-theme="dark"] .withai-date {
+  color: #d0d0d0;
+}
+
+[data-theme="dark"] .withai-date:hover {
+  background: #252525;
+  color: #888;
+}
+
+[data-theme="dark"] .withai-addbtn {
+  background: #888;
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .withai-addbtn:hover {
+  background: #999;
+}
+
+[data-theme="dark"] .withai-dropdown {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+[data-theme="dark"] .date-item {
+  color: #d0d0d0;
+}
+
+[data-theme="dark"] .date-item:hover {
+  background: #252525;
+}
+
+[data-theme="dark"] .date-item.selected {
+  background: #2a2a2a;
+  color: #888;
+}
+
+[data-theme="dark"] .withai-error-message {
+  background: #2a1a1a;
+  border-color: #8a4a4a;
+  color: #d88888;
+}
+
+/* AI 플랜 카드 - 핑크 제거 */
+[data-theme="dark"] .withai-aiplan-card {
+  background: linear-gradient(135deg, #252525 0%, #2a2a2a 100%) !important;
+  border-color: #444;
+}
+
+[data-theme="dark"] .aiplan-header h3 {
+  color: #f5f5f5;
+}
+
+[data-theme="dark"] .aiplan-header {
+  border-bottom-color: #333;
+}
+
+[data-theme="dark"] .aiplan-content {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .withai-timeline {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+[data-theme="dark"] .withai-timeline::before {
+  background: #333;
+}
+
+[data-theme="dark"] .withai-item button {
+  border-color: #1e1e1e;
+}
+
+[data-theme="dark"] .withai-item button {
+  background: #888;
+}
+
+[data-theme="dark"] .withai-item button.start {
+  background: #5a8a5a;
+}
+
+[data-theme="dark"] .withai-item button.end {
+  background: #aa7744;
+}
+
+[data-theme="dark"] .withai-item button.timetable {
+  background: #667eea;
+}
+
+[data-theme="dark"] .withai-content {
+  background: #252525;
+  border-color: #333;
+}
+
+[data-theme="dark"] .withai-content:hover {
+  border-color: #555;
+}
+
+[data-theme="dark"] .withai-time {
+  color: #c0c0c0;
+}
+
+[data-theme="dark"] .withai-task-title {
+  color: #f5f5f5;
+}
+
+[data-theme="dark"] .tag.timetable {
+  background: #2a3a4a;
+  color: #8ab4f8;
+}
+
+[data-theme="dark"] .tag.todo {
+  background: #3a2a1a;
+  color: #d8a870;
+}
+
+[data-theme="dark"] .category-pill {
+  background: #2a2a2a;
+  border-color: #b0b0b0;
+  color: white;
+}
+[data-theme="dark"] .btn-edit {
+  background: #2a2a2a;
+  color: #c0c0c0;
+}
+
+[data-theme="dark"] .btn-edit:hover {
+  background: #333;
+  color: #888;
+}
+
+[data-theme="dark"] .btn-delete {
+  background: #3a2a2a;
+  color: #d88888;
+}
+
+[data-theme="dark"] .btn-delete:hover {
+  background: #442a2a;
+}
+
+/* 간격 추천 다크모드 */
+[data-theme="dark"] .gap-suggestion {
+  background: linear-gradient(135deg, #555 0%, #555 100%);
+  border-color: #555;
+  
+}
+
+[data-theme="dark"] .gap-suggestion h4 {
+  color: #8ab4f8;
+}
+
+[data-theme="dark"] .gap-suggestion p {
+  color: #c0c0d0;
+}
+
+[data-theme="dark"] .gap-suggestion button {
+  background: #555;
+  color: #c0c0d0;
+}
+
+[data-theme="dark"] .gap-suggestion button:hover {
+  background: #555;
+}
+
+/* 모달 다크모드 */
+[data-theme="dark"] .withai-task-modal {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .withai-task-content {
+  background: #1e1e1e;
+}
+
+[data-theme="dark"] .withai-task-header h3 {
+  color: #f5f5f5;
+}
+
+[data-theme="dark"] .modal-close-btn {
+  color: #c0c0c0;
+}
+
+[data-theme="dark"] .modal-close-btn:hover {
+  background: #252525;
+  color: #888;
+}
+
+[data-theme="dark"] .withai-task-label {
+  color: #d0d0d0;
+}
+
+[data-theme="dark"] .withai-task-input,
+[data-theme="dark"] .withai-task-textarea,
+[data-theme="dark"] .withai-custom-category {
+  background: #252525;
+  border-color: #333;
+  color: #f5f5f5;
+}
+
+[data-theme="dark"] .withai-task-input:focus,
+[data-theme="dark"] .withai-task-textarea:focus {
+  border-color: #666;
+  background: #2a2a2a;
+}
+[data-theme="dark"] .withai-data-summary {    
+  background: #252525;
+  border-color: #666;
+  color: #f5f5f5;
+}
+[data-theme="dark"] .withai-data-item {    
+  border-color: #666;
+  color: #f5f5f5;
+}
+[data-theme="dark"] .withai-data-label {    
+  
+  color: #f5f5f5;
+}
+[data-theme="dark"] .withai-category-btn {
+  background: #252525;
+  border-color: #333;
+}
+
+
+[data-theme="dark"] .withai-category-btn:hover {
+  background: #2a2a2a;
+  border-color: #555;
+}
+
+[data-theme="dark"] .withai-category-btn.active {
+  background: #2a2a2a;
+  border-color: #888;
+}
+
+[data-theme="dark"] .withai-category-btn span:last-child {
+  color: #c0c0c0;
+}
+
+[data-theme="dark"] .btn-cancel {
+  background: #2a2a2a;
+  color: #c0c0c0;
+}
+
+[data-theme="dark"] .btn-cancel:hover {
+  background: #333;
+}
+
+[data-theme="dark"] .btn-submit {
+  background: #888;
+}
+
+[data-theme="dark"] .btn-submit:hover {
+  background: #999;
+}
+
+/* ========================================
+   반응형
+======================================== */
+@media (max-width: 768px) {
+  .withai-topbar {
+    flex-wrap: wrap;
+  }
+  
+  .withai-addbtn span {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .withai-timeline {
+    padding: 20px 16px;
+  }
+  
+  .withai-timeline::before {
+    left: 28px;
+  }
+  
+  .withai-task-content {
+    padding: 20px;
+  }
+  
+  .withai-category-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .withai-time-group {
+    grid-template-columns: 1fr;
+  }
 }
