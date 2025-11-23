@@ -121,33 +121,28 @@ const res = await quizAI.post("/api/quiz/generate", {
      // ==============================
     // ⭐ 단일 문제 / 배열 문제 대응
     // ==============================
-    let rawQuiz = res.data?.quiz;
-    let qList = [];
+   let rawQuiz = res.data?.quiz;
+let qList = Array.isArray(rawQuiz) ? rawQuiz : [];
 
-    if (Array.isArray(rawQuiz)) {
-      qList = rawQuiz; // 다수 문제
-    } else if (rawQuiz && typeof rawQuiz === "object") {
-      qList = [rawQuiz]; // 단일 문제 → 배열로 감싸기
-    }
+if (!res.data?.success || !qList.length) {
+  alert("문제 생성 실패 😢");
+  return;
+}
 
-    if (!res.data?.success || !qList.length) {
-      alert("문제 생성 실패 😢");
-      return;
-    }
+const formatted = qList.map((q, idx) => {
+  const options = Array.isArray(q.options)
+    ? q.options
+    : ["보기1", "보기2", "보기3", "보기4"];
+  const answerIndex = options.indexOf(q.answer);
 
-    const formatted = qList.map((q, idx) => {
-      const options = Array.isArray(q.options) ? q.options : ["보기1", "보기2", "보기3", "보기4"];
-      const answerIndex = options.indexOf(q.answer);
-
-      return {
-        id: idx,
-        question: q.question || "질문이 없습니다.",
-        options,
-        answer: answerIndex >= 0 ? answerIndex : 0,
-        explanation: q.explanation || "해설이 없습니다.",
-      };
-    });
-
+  return {
+    id: idx,
+    question: q.question || "질문이 없습니다.",
+    options,
+    answer: answerIndex >= 0 ? answerIndex : 0,
+    explanation: q.explanation || "해설이 없습니다.",
+  };
+});
     setQuestions(formatted);
     setAnswers(Array(formatted.length).fill(null));
     setIdx(0);

@@ -10,15 +10,22 @@ import fs from "fs";
 import FormData from "form-data";
 import admin from "firebase-admin";
 import { extraPdfText } from "./extrapdfText.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 /* ========================================================================== */
 /* 🔐 Load Firebase Admin Secret */
 /* ========================================================================== */
-const isRender = process.env.RENDER === "true";
+const isRender = process.env.RENDER?.trim() === "true";
+console.log("🌍 실행 환경:", isRender ? "RENDER (배포)" : "LOCAL (로컬)");
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const serviceAccountPath = isRender
   ? "/etc/secrets/serviceAccountKey.json"
-  : "./serviceAccountKey.json";
+  : path.join(__dirname, "serviceAccountKey.json");
 
 if (!fs.existsSync(serviceAccountPath)) {
   console.error("❌ serviceAccountKey.json 파일 없음:", serviceAccountPath);
@@ -469,36 +476,33 @@ app.post("/api/mentor-ai/generate-summary", async (req, res) => {
 /* ========================================================================== */
 /* 🧠 Quiz 생성 + 해설 포함 (file + summary + notes 기반) */
 /* ========================================================================== */
-
 app.post("/api/quiz/generate", async (req, res) => {
   const { pdfUrls = [], summary = "", notes = "", count = 5 } = req.body;
 
   console.log("📡 QUIZ REQUEST:", { pdfUrls });
 
   let fileText = "";
+
   for (const url of pdfUrls) {
-    fileText += "\n\n" + (await extraPdfText(url));
+    const text = await extraPdfText(url);
+    fileText += `\n\n${text}`;
   }
 
   console.log("📄 총 텍스트 길이:", fileText.length);
 
-  // 🔥 최소 데이터 검증
   if (!fileText.trim() && !summary.trim() && !notes.trim()) {
     return res.status(400).json({
       success: false,
-      error: "학습 데이터가 없습니다.",
+      error: "교안 정보가 부족합니다.",
     });
   }
 
-  // ==========================
-  // 🎯 문제 생성 프롬프트 구성
-  // ==========================
   const prompt = `
 다음 내용을 기반으로 ${count}개의 객관식 문제와 정답, 해설을 생성해줘.
 
-반드시 JSON 배열형태로 다음 구조로만 출력:
+반드시 JSON 배열만 출력:
 [
- { "question": "...", "options": ["보기1","보기2","보기3","보기4"], "answer": "보기1", "explanation": "왜 이 답인지 상세히" }
+ { "question": "...", "options": ["A","B","C","D"], "answer": "A", "explanation": "왜냐하면..." }
 ]
 
 📌 교안 내용:
@@ -512,14 +516,30 @@ ${notes}
 `;
 
   try {
-    const raw = await callOpenAI(prompt, "gpt-4o", true);
-    const quiz = safeJsonParse(raw);
+    const raw = await callOpenAI(prompt, "gpt-4o-mini", true);
 
-    console.log("🎉 생성된 quiz:", quiz);
+    let quiz = safeJsonParse(raw);
+
+    // 🚩 단일 객체일 수도 있으니, 항상 배열 형태 보장
+    let normalized = [];
+    if (Array.isArray(quiz)) {
+      normalized = quiz;
+    } else if (quiz && typeof quiz === "object") {
+      normalized = [quiz];
+    }
+
+    if (!normalized.length) {
+      return res.status(500).json({
+        success: false,
+        error: "퀴즈를 생성하지 못했습니다.",
+      });
+    }
+
+    console.log("🎉 생성된 quiz:", normalized);
 
     return res.json({
       success: true,
-      quiz
+      quiz: normalized,
     });
 
   } catch (e) {
