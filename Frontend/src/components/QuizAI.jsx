@@ -118,16 +118,25 @@ const res = await quizAI.post("/api/quiz/generate", {
 
 
 
-     // ==============================
-    // ⭐ 단일 문제 / 배열 문제 대응
-    // ==============================
- let rawQuiz = res.data?.quiz;
+  
+ // ==============================
+// ⭐ 단일 문제 / 배열 문제 대응 + 내부 questions 처리
+// ==============================
+let rawQuiz = res.data?.quiz;
 let qList = [];
 
 if (Array.isArray(rawQuiz)) {
-  qList = rawQuiz; // 여러 문제
+  if (Array.isArray(rawQuiz[0]?.questions)) {
+    qList = rawQuiz[0].questions;  // 핵심!!!
+  } else {
+    qList = rawQuiz;
+  }
 } else if (rawQuiz && typeof rawQuiz === "object") {
-  qList = [rawQuiz]; // 단일 문제
+  if (Array.isArray(rawQuiz.questions)) {
+    qList = rawQuiz.questions;
+  } else {
+    qList = [rawQuiz];
+  }
 }
 
 if (!res.data?.success || !qList.length) {

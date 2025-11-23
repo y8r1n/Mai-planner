@@ -212,7 +212,8 @@ export default function WeekDetail() {
 
       const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
       const key = `${uuidv4()}_${file.name}`;
-      const path = `users/${userId}/subjects/${id}/weeks/${selectedWeek.id}/files/${key}`;
+      const path = `users/${userId}/subjects/${subjectId}/weeks/${selectedWeek.id}/files/${key}`;
+
       const fileRef = ref(storage, path);
 
       for (let i = 0; i < totalChunks; i++) {
