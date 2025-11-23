@@ -476,80 +476,149 @@ app.post("/api/mentor-ai/generate-summary", async (req, res) => {
 /* ========================================================================== */
 /* 🧠 Quiz 생성 + 해설 포함 (file + summary + notes 기반) */
 /* ========================================================================== */
+
+import { extraPdfText } from "./extrapdfText.js"; // 파일 상단 import 있는지 확인!
+
 app.post("/api/quiz/generate", async (req, res) => {
   const { pdfUrls = [], summary = "", notes = "", count = 5 } = req.body;
 
-  console.log("📡 QUIZ REQUEST:", { pdfUrls });
+  console.log("📡 QUIZ REQUEST:", {
+    pdfUrls,
+    summaryLen: summary.length,
+    notesLen: notes.length,
+    count,
+  });
 
   let fileText = "";
 
-  for (const url of pdfUrls) {
-    const text = await extraPdfText(url);
-    fileText += `\n\n${text}`;
+  // 1) PDF 텍스트 추출 (Vision 기반) 시도
+  try {
+    for (const url of pdfUrls) {
+      if (!url) continue;
+      const one = await extraPdfText(url);
+      if (one && one.trim().length > 0) {
+        fileText += "\n\n" + one;
+      }
+    }
+  } catch (e) {
+    console.error("⚠ PDF 텍스트 추출 오류:", e.message || e.toString());
   }
 
-  console.log("📄 총 텍스트 길이:", fileText.length);
+  console.log("📄 PDF 기반 텍스트 길이:", fileText.length);
 
-  if (!fileText.trim() && !summary.trim() && !notes.trim()) {
+  // 2) 요약 + 메모 fallback 포함
+  const fallbackText = `${summary}\n\n${notes}`.trim();
+  const combinedText = (fileText || "").trim() || fallbackText;
+
+  if (!combinedText) {
     return res.status(400).json({
       success: false,
-      error: "교안 정보가 부족합니다.",
+      error: "교안(PDF) / 요약 / 메모 중 하나는 반드시 있어야 합니다.",
     });
   }
 
-  const prompt = `
-다음 내용을 기반으로 ${count}개의 객관식 문제와 정답, 해설을 생성해줘.
+  // 길이 제한 (토큰 방어)
+  const safeText = combinedText.slice(0, 7000);
 
-반드시 JSON 배열만 출력:
+  // 3) 프롬프트 구성 (JSON 배열 ONLY, 문제 개수 count 맞추기 지시)
+  const prompt = `
+다음 학습 자료를 바탕으로 난이도 중간 수준의 객관식 문제를 정확히 ${count}개 만들어줘.
+
+반드시 아래 JSON 형식의 "배열"만 출력해야 해. 추가 설명, 한국어 문장, 마크다운, 코드블럭 금지.
+
 [
- { "question": "...", "options": ["A","B","C","D"], "answer": "A", "explanation": "왜냐하면..." }
+  {
+    "question": "질문 내용",
+    "options": ["보기1", "보기2", "보기3", "보기4"],
+    "answer": "보기1",
+    "explanation": "왜 이 답이 맞는지 자세한 해설"
+  }
 ]
 
-📌 교안 내용:
-${fileText.substring(0, 7000)}
+규칙:
+- 최상위는 반드시 JSON 배열이어야 한다.
+- 각 요소는 question, options, answer, explanation 필드를 가진다.
+- options는 항상 4개의 보기로 구성한다.
+- answer는 options 배열 안에 있는 보기 문자열 중 하나여야 한다.
+- explanation은 정답이 맞는 이유를 한국어로 자세히 설명한다.
 
-📌 요약:
-${summary}
+아래 학습 자료를 참고해 문제를 만들어라.
 
-📌 메모:
-${notes}
+--- 학습 자료 시작 ---
+${safeText}
+--- 학습 자료 끝 ---
+JSON 배열만 출력해. (예: [ { ... }, { ... } ])
 `;
 
   try {
-    const raw = await callOpenAI(prompt, "gpt-4o-mini", true);
+    const raw = await callOpenAI(prompt, "gpt-4o-mini", true); // jsonMode=true
+    console.log("🧾 OpenAI raw (앞 200자):", raw?.slice?.(0, 200));
 
-    let quiz = safeJsonParse(raw);
-
-    // 🚩 단일 객체일 수도 있으니, 항상 배열 형태 보장
-    let normalized = [];
-    if (Array.isArray(quiz)) {
-      normalized = quiz;
-    } else if (quiz && typeof quiz === "object") {
-      normalized = [quiz];
+    let parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      parsed = safeJsonParse(raw); // 기존 util
     }
 
-    if (!normalized.length) {
+    // 4) 항상 배열 형태로 정규화
+    let quizArray = [];
+
+    if (Array.isArray(parsed)) {
+      quizArray = parsed;
+    } else if (parsed && Array.isArray(parsed.questions)) {
+      quizArray = parsed.questions;
+    } else if (parsed && parsed.quiz && Array.isArray(parsed.quiz)) {
+      quizArray = parsed.quiz;
+    } else if (parsed && typeof parsed === "object") {
+      quizArray = [parsed]; // 단일 객체
+    }
+
+    console.log("✅ 파싱된 문제 개수:", quizArray.length);
+
+    if (!quizArray.length) {
       return res.status(500).json({
         success: false,
         error: "퀴즈를 생성하지 못했습니다.",
       });
     }
 
-    console.log("🎉 생성된 quiz:", normalized);
+    // 5) 최소 정규화 (options / answer / explanation 보정)
+    const normalized = quizArray.map((q, idx) => {
+      const opt =
+        Array.isArray(q.options) && q.options.length >= 2
+          ? q.options
+          : ["보기1", "보기2", "보기3", "보기4"];
+
+      const answerStr =
+        typeof q.answer === "string" && opt.includes(q.answer)
+          ? q.answer
+          : opt[0];
+
+      return {
+        question: q.question || `문제 ${idx + 1}`,
+        options: opt,
+        answer: answerStr,
+        explanation: q.explanation || "",
+      };
+    });
+
+    // 배열 길이 보정 (count보다 많이 오면 자르기)
+    const trimmed = normalized.slice(0, count);
 
     return res.json({
       success: true,
-      quiz: normalized,
+      quiz: trimmed,
     });
-
   } catch (e) {
-    console.error("❌ quiz 생성 오류:", e);
+    console.error("❌ quiz 생성 오류:", e.response?.data || e.message);
     return res.status(500).json({
       success: false,
-      error: e.message,
+      error: "퀴즈 생성 중 서버 오류가 발생했습니다.",
     });
   }
 });
+
 
 
 /* ========================================================================== */
