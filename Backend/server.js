@@ -477,7 +477,7 @@ app.post("/api/mentor-ai/generate-summary", async (req, res) => {
 /* 🧠 Quiz 생성 + 해설 포함 (file + summary + notes 기반) */
 /* ========================================================================== */
 
-import { extraPdfText } from "./extrapdfText.js"; // 파일 상단 import 있는지 확인!
+import { extraPdfText } from "./extrapdfText.js";
 
 app.post("/api/quiz/generate", async (req, res) => {
   const { pdfUrls = [], summary = "", notes = "", count = 5 } = req.body;
@@ -491,11 +491,17 @@ app.post("/api/quiz/generate", async (req, res) => {
 
   let fileText = "";
 
-  // 1) PDF 텍스트 추출 (Vision 기반) 시도
+  // 1) PDF 텍스트 추출
   try {
     for (const url of pdfUrls) {
       if (!url) continue;
-      const one = await extraPdfText(url);
+
+      // 🔽🔽 여기: 멀티 페이지 + 길이 제한 옵션 넣어서 호출
+      const one = await extraPdfText(url, {
+        maxPages: 8,   // 앞 8페이지까지만
+        maxChars: 8000 // 각 PDF당 최대 8000자
+      });
+
       if (one && one.trim().length > 0) {
         fileText += "\n\n" + one;
       }
@@ -506,7 +512,7 @@ app.post("/api/quiz/generate", async (req, res) => {
 
   console.log("📄 PDF 기반 텍스트 길이:", fileText.length);
 
-  // 2) 요약 + 메모 fallback 포함
+  // 2) 요약 + 메모 fallback (기존 로직 그대로)
   const fallbackText = `${summary}\n\n${notes}`.trim();
   const combinedText = (fileText || "").trim() || fallbackText;
 
@@ -517,7 +523,7 @@ app.post("/api/quiz/generate", async (req, res) => {
     });
   }
 
-  // 길이 제한 (토큰 방어)
+  // 길이 제한 (토큰 방어) – extraPdfText에서 한 번 자르지만 여기서도 한 번 더 방어
   const safeText = combinedText.slice(0, 7000);
 
   // 3) 프롬프트 구성 (JSON 배열 ONLY, 문제 개수 count 맞추기 지시)
@@ -551,7 +557,7 @@ JSON 배열만 출력해. (예: [ { ... }, { ... } ])
 `;
 
   try {
-    const raw = await callOpenAI(prompt, "gpt-4o-mini", true); // jsonMode=true
+    const raw = await callOpenAI(prompt, "gpt-4o", true); // jsonMode=true
     console.log("🧾 OpenAI raw (앞 200자):", raw?.slice?.(0, 200));
 
     let parsed;
