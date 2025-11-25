@@ -472,12 +472,9 @@ app.post("/api/mentor-ai/generate-summary", async (req, res) => {
   }
 });
 
-
 /* ========================================================================== */
 /* 🧠 Quiz 생성 + 해설 포함 (file + summary + notes 기반) */
 /* ========================================================================== */
-
-import { extraPdfText } from "./extrapdfText.js";
 
 app.post("/api/quiz/generate", async (req, res) => {
   const { pdfUrls = [], summary = "", notes = "", count = 5 } = req.body;
