@@ -24,15 +24,16 @@
 
 .login-header {
   text-align: center;
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-xl);
 }
 
 .logo {
   display: flex;
   align-items: center;
+  width: 65%;
+  margin-left: 18%;
   justify-content: center;
   gap: var(--space-md);
-  margin-bottom: var(--space-lg);
 }
 
 .logo-icon {
@@ -59,7 +60,8 @@
 .login-subtitle {
   font-size: var(--font-size-base);
   color: var(--color-text-tertiary);
-  margin: 0;
+  margin-bottom: 50px;
+  margin-top: -40px;
 }
 
 /* ===========================
@@ -284,7 +286,85 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-tertiary);
   margin: 0;
+  
 }
+
+.features-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.features-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.features-section {
+  display: flex;
+  flex-direction: row;
+  gap: 20px; /* 카드 사이 간격 */
+  width: max-content;
+  padding: 8px 0;
+}
+
+/* 기존 카드 크기 그대로 — 하지만 가로 슬라이드 되게 한 화면 1장 차지 */
+.feature-item {
+  flex: 0 0 60%;  /* 한 화면 = 카드 1개 */
+  scroll-snap-align: center;
+}
+
+
+.feature-slider::-webkit-scrollbar {
+  display: none;
+}
+
+/* 슬라이더 박스 */
+.feature-slider {
+  width: 100%;
+  max-width: 480px;
+  border: 1.7px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  padding: 28px 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  display: flex;
+  scrollbar-width: none;
+  margin: 0 auto;
+  height: 135px; /* 🔥 고정 높이 — 내용이 변해도 흔들리지 않음 */
+}
+
+/* 개별 슬라이드 */
+.feature-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* 🔥 중앙정렬 */
+  gap: 6px;
+  text-align: center;
+}
+
+/* 아이콘 크기 살짝 축소 */
+.feature-icon {
+  font-size: 26px;
+  margin-bottom: 2px;
+}
+
+/* 텍스트 라인 간격 컴팩트하게 */
+.feature-slide h3 {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.feature-slide p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.35;
+}
+
+
 
 /* ===========================
    ANIMATIONS
@@ -349,6 +429,50 @@
     padding: var(--space-md);
   }
 }
+/* 외부 컨테이너 (여백 조절) */
+.maintenance-box {
+  width: 100%;
+  max-width: 480px;
+  margin: 14px auto 0;
+}
+
+/* 박스 자체 스타일 */
+.maintenance-note {
+  background: #fff7f6; 
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 텍스트 */
+.maintenance-note p {
+  font-size: 13px;
+  color: #b25b58; 
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+  margin: 0;
+}
+
+/* 푸터 전체 영역 */
+.login-footer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 32px; /* 로그인 박스와 간격 */
+  margin-bottom: 20px;
+}
+
+/* 텍스트 박스 */
+.footer-note {
+  font-size: 12px;
+  color: #b9b4b4;
+  text-align: center;
+  user-select: none;
+}
+
 
 /* ===========================
    ACCESSIBILITY

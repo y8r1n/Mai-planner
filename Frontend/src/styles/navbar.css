@@ -26,18 +26,6 @@
 }
 
 /* ========================================
-   LOGO
-======================================== */
-.logo img {
-  margin-top: 20px;
-  height: 70px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;   
-  position: relative;
-}
-/* ========================================
    NAV CONTAINER
 ======================================== */
 .nav-container {

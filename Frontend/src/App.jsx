@@ -15,7 +15,7 @@ import ImageDiary from "./components/ImageDiary.jsx";
 import Study from "./components/Study.jsx";
 import Withai from "./components/Withai.jsx";
 import Subject from "./components/Subject.jsx";
-import WeekDetail from "./components/WeekDetail.jsx"; // 🔥 NEW: 주차 상세 페이지
+import WeekDetail from "./components/WeekDetail.jsx"; 
 import MentorChat from "./components/MentorChat.jsx";
 import QuizAI from "./components/QuizAI.jsx";
 import ReviewDetail from "./components/Reviewdetail.jsx";

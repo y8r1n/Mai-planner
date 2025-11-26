@@ -55,8 +55,7 @@ export default function Login() {
         {/* 로고 */}
         <div className="login-header">
           <div className="logo">
-            <span className="logo-icon">🌸</span>
-            <h1>MAi Planner</h1>
+             <img src="/Logo.svg" alt="logo" />
           </div>
           <p className="login-subtitle">AI와 함께하는 스마트 학습 관리</p>
         </div>
@@ -134,6 +133,7 @@ export default function Login() {
         </div>
 
         {/* 소개 박스 3개 */}
+        <div className="features-wrapper">
         <div className="features-section">
           <div className="feature-item">
             <span className="feature-icon">📚</span>
@@ -157,6 +157,19 @@ export default function Login() {
             </div>
           </div>
         </div>
+      </div>
+             {/*점검시간*/}
+      <div className="maintenance-box">
+      <div className="maintenance-note">
+        <p>⚠️ 매일 오전 0시 ~ 오후 24시: 서비스 점검 시간입니다.</p>
+      </div>
+      </div>
+
+      {/* 푸터 */}
+      <div className="login-footer">
+        <div className="footer-note">ⓒ 2025. 22Z. All rights reserved.</div>
+        </div>
+
       </div>
 
       {/* 튜토리얼 모달 */}

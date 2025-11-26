@@ -35,10 +35,6 @@ export default function NavBar() {
     <>
       <nav id="global-nav">
         <div className="nav-container">
-
-          <div className="logo">
-            <img src="/Logo.png" alt="logo" />
-          </div>
           
           {/* 탭 링크 */}
           <div className="nav-links">
