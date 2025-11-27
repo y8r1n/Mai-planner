@@ -2,7 +2,7 @@ import NavBar from "./NavBar";
 import { Outlet } from "react-router-dom";
 import NotificationManager from './NotificationManager';
 import Footer from "../common/Footer.jsx";
-import "../styles/Layout.css";
+import "../styles/layout.css";
 
 export default function Layout() {
   return (
